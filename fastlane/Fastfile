@@ -182,6 +182,8 @@ platform :ios do
       force: true,
       skip_screenshots: true,
       skip_metadata: ENV['SKIP_METADATA'] == 'true',
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
       submit_for_review: options[:submit_for_review] || false,
       automatic_release: options[:automatic_release] || false
     )
