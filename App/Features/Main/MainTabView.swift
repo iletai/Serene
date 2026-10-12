@@ -79,7 +79,7 @@ public struct MainTabView: View {
         .frame(maxWidth: 520)
         .background(Color.vnSurfaceElevated.opacity(0.85), in: Capsule())
         .background(.ultraThinMaterial, in: Capsule())
-        .overlay(Capsule().stroke(Color.vnBorderSubtle.opacity(0.4), lineWidth: VNBorderWidth.regular))
+        .overlay(Capsule().stroke(Color.vnBorderSubtle.opacity(0.4), lineWidth: VNBorderWidth.hairline))
         .shadow(color: VNShadow.floating.color, radius: VNShadow.floating.radius,
                 x: VNShadow.floating.x, y: VNShadow.floating.y)
         .padding(.horizontal, VNSpacing.lg)

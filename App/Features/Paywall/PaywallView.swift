@@ -181,7 +181,7 @@ public struct PaywallView: View {
     }
 
     private var restoreButton: some View {
-        Button("paywall.restore") {
+        Button("Khôi phục gói mua") {
             Task {
                 do {
                     try await subscriptionManager.restorePurchases()
@@ -203,13 +203,13 @@ public struct PaywallView: View {
     // Required by App Review Guideline 3.1.2
     private var legalLinks: some View {
         HStack(spacing: VNSpacing.lg) {
-            legalLink(title: "paywall.terms", url: Self.termsOfUseURL)
-            legalLink(title: "paywall.privacy", url: Self.privacyPolicyURL)
+            legalLink(title: "Điều khoản sử dụng", url: Self.termsOfUseURL)
+            legalLink(title: "Chính sách bảo mật", url: Self.privacyPolicyURL)
         }
         .padding(.bottom, VNSpacing.xxl)
     }
 
-    private func legalLink(title: LocalizedStringKey, url: URL?) -> some View {
+    private func legalLink(title: String, url: URL?) -> some View {
         Button(title) {
             guard let url else { return }
             openURL(url)

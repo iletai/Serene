@@ -1,8 +1,8 @@
 import OSLog
 import SwiftUI
-import VNCalendarData
 import VNCalendarDomain
 import VNCalendarDesignSystem
+import VNCalendarKit
 
 private let settingsLogger = Logger(subsystem: "com.iletai.annien", category: "SettingsView")
 
@@ -11,11 +11,8 @@ public struct SettingsView: View {
     @State private var subscriptionManager = SubscriptionManager.shared
     @State private var container = AppContainer.shared
     @State private var isShowingPaywall = false
-    @State private var exportText: String = ""
-    @State private var isShowingExportSheet = false
-    @State private var backupStatusMessage: String?
-    @State private var isSyncingContent = false
     @AppStorage("appThemeAppearance") private var appThemeAppearance: Int = 0 // 0: Auto, 1: Rice Paper Light, 2: Lacquer Charcoal Dark
+    @AppStorage("appLanguage") private var appLanguage: String = "system"
 
     public init() {}
 
@@ -23,12 +20,8 @@ public struct SettingsView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: VNSpacing.xl) {
-                    membershipSection
-                    appearanceSection
-                    dataSection
-                    timezoneSection
-                    privacySection
-                    aboutSection
+                    membershipCard
+                    navigationMenuList
                 }
                 .padding(.horizontal, VNSpacing.xl)
                 .padding(.top, VNSpacing.xl)
@@ -40,12 +33,12 @@ public struct SettingsView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Cài Đặt")
+                    Text(String(localized: "tab.settings"))
                         .font(.vnTitleCeremonial)
                         .foregroundColor(.vnAccentDeepPrimary)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Xong") { dismiss() }
+                    Button(String(localized: "settings.action.done")) { dismiss() }
                         .frame(minHeight: 44)
                         .contentShape(Rectangle())
                 }
@@ -53,33 +46,30 @@ public struct SettingsView: View {
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView()
             }
-            .sheet(isPresented: $isShowingExportSheet) {
-                ShareSheet(activityItems: [exportText])
-            }
         }
     }
 
-    // MARK: - Sections
-    private var membershipSection: some View {
+    // MARK: - Membership Banner Card
+    private var membershipCard: some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader("Gói Thành Viên")
+            sectionHeader(String(localized: "settings.membership.header"))
             settingsCard {
                 HStack {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                        let proTitle = "An Niên Gia Tộc Pro"
-                        let freeTitle = "Bản Tiêu Chuẩn (Miễn Phí)"
+                        let proTitle = String(localized: "settings.membership.pro_title")
+                        let freeTitle = String(localized: "settings.membership.free_title")
                         Text(subscriptionManager.entitlement.isPro ? proTitle : freeTitle)
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.vnTextPrimary)
-                        let proSubtitle = "Không giới hạn ngày nhớ & Đồng bộ iCloud"
-                        let freeSubtitle = "Tối đa 5 ngày nhớ gia đình"
+                        let proSubtitle = String(localized: "settings.membership.pro_subtitle")
+                        let freeSubtitle = String(localized: "settings.membership.free_subtitle")
                         Text(subscriptionManager.entitlement.isPro ? proSubtitle : freeSubtitle)
                             .font(.system(size: 12))
                             .foregroundColor(.vnTextSecondary)
                     }
                     Spacer()
                     if !subscriptionManager.entitlement.isPro {
-                        Button("Nâng Cấp") {
+                        Button(String(localized: "settings.action.upgrade")) {
                             isShowingPaywall = true
                         }
                         .font(.vnCaption1)
@@ -102,170 +92,96 @@ public struct SettingsView: View {
         }
     }
 
-    private var appearanceSection: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader("Giao Diện & Bản Sắc")
-            settingsCard {
-                HStack {
-                    Text("Chế độ hiển thị")
-                        .font(.system(size: 16))
-                        .foregroundColor(.vnTextPrimary)
-                    Spacer()
-                    Picker("Chế độ hiển thị", selection: $appThemeAppearance) {
-                        Text("Tự động theo hệ thống").tag(0)
-                        Text("Giấy Dó (Sáng)").tag(1)
-                        Text("Than Mài (Tối)").tag(2)
+    // MARK: - Navigation Menu List
+    private var navigationMenuList: some View {
+        VStack(alignment: .leading, spacing: VNSpacing.xl) {
+            // 1. Calendar & Astronomy Sub-menu
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                sectionHeader(String(localized: "settings.timezone.header"))
+                settingsCard {
+                    NavigationLink(destination: CalendarSettingsView()) {
+                        menuRow(icon: "calendar.badge.clock", title: String(localized: "settings.calendar.title"), subtitle: String(localized: "settings.calendar.subtitle_desc"), tint: .vnAccentHeritageRed)
                     }
-                    .labelsHidden()
-                    .tint(.vnAccentHeritageRed)
+                    .buttonStyle(.plain)
                 }
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
             }
-        }
-    }
 
-    private var dataSection: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader("Dữ Liệu & Đồng Bộ")
-            settingsCard {
-                Button(action: handleRefreshContent) {
-                    HStack {
-                        Label("Làm mới Phong tục & Ngày lễ", systemImage: "arrow.triangle.2.circlepath")
-                            .font(.system(size: 16))
-                            .foregroundColor(.vnTextPrimary)
-                        Spacer()
-                        if isSyncingContent {
-                            ProgressView()
-                                .scaleEffect(0.8)
-                        }
+            // 2. Appearance & Language Sub-menu
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                sectionHeader(String(localized: "settings.appearance.header"))
+                settingsCard {
+                    NavigationLink(destination: AppearanceLanguageSettingsView()) {
+                        menuRow(icon: "paintpalette.fill", title: String(localized: "settings.appearance.mode"), subtitle: appThemeAppearance == 1 ? String(localized: "settings.appearance.light") : (appThemeAppearance == 2 ? String(localized: "settings.appearance.dark") : String(localized: "settings.appearance.auto")), tint: .vnAccentImperialGold)
                     }
+                    .buttonStyle(.plain)
                 }
-                .frame(minHeight: 44)
-                .contentShape(Rectangle())
-                .disabled(isSyncingContent)
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
-                rowDivider
-                Button(action: handleExportJSON) {
-                    HStack {
-                        Label("Xuất Bản Sao Lưu (JSON)", systemImage: "square.and.arrow.up")
-                            .font(.system(size: 16))
-                            .foregroundColor(.vnTextPrimary)
-                        Spacer()
+            }
+
+            // 3. Data & Sync Sub-menu
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                sectionHeader(String(localized: "settings.data.header"))
+                settingsCard {
+                    NavigationLink(destination: DataBackupSettingsView()) {
+                        menuRow(icon: "arrow.triangle.2.circlepath.cloud.fill", title: String(localized: "settings.data.header"), subtitle: String(localized: "settings.data.refresh"), tint: .vnStatusSuccess)
                     }
+                    .buttonStyle(.plain)
                 }
-                .frame(minHeight: 44)
-                .contentShape(Rectangle())
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
-                rowDivider
-                Button(action: handleExportICS) {
-                    HStack {
-                        Label("Đồng Bộ Apple Calendar (ICS)", systemImage: "calendar.badge.plus")
-                            .font(.system(size: 16))
-                            .foregroundColor(.vnTextPrimary)
-                        Spacer()
+            }
+
+            // 4. Privacy Sub-menu
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                sectionHeader(String(localized: "settings.privacy.header"))
+                settingsCard {
+                    NavigationLink(destination: PrivacySecuritySettingsView()) {
+                        menuRow(icon: "lock.shield.fill", title: String(localized: "settings.privacy.zero_knowledge_title"), subtitle: "Zero-Knowledge Privacy", tint: .vnAccentDeepPrimary)
                     }
+                    .buttonStyle(.plain)
                 }
-                .frame(minHeight: 44)
-                .contentShape(Rectangle())
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
-                if let msg = backupStatusMessage {
-                    rowDivider
-                    Text(msg)
-                        .font(.system(size: 12))
-                        .foregroundColor(.vnStatusSuccess)
-                        .padding(.horizontal, VNSpacing.lg)
-                        .padding(.vertical, VNSpacing.sm)
+            }
+
+            // 5. About Sub-menu
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                sectionHeader(String(localized: "settings.about.header"))
+                settingsCard {
+                    NavigationLink(destination: AboutSettingsView()) {
+                        menuRow(icon: "info.circle.fill", title: String(localized: "settings.about.version"), subtitle: "1.0.0 (Build 1)", tint: .vnAccentImperialGold)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
     }
 
-    private var timezoneSection: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader("Cài Đặt Lịch & Múi Giờ")
-            settingsCard {
-                HStack {
-                    Text("Múi Giờ Tính Lịch Âm")
-                        .font(.system(size: 16))
-                        .foregroundColor(.vnTextPrimary)
-                    Spacer()
-                    Text("GMT+7 (Hà Nội)")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.vnAccentHeritageRed)
-                }
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
-                rowDivider
-                HStack {
-                    Text("Ngày Bắt Đầu Tuần")
-                        .font(.system(size: 16))
-                        .foregroundColor(.vnTextPrimary)
-                    Spacer()
-                    Text("Thứ Hai")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.vnAccentHeritageRed)
-                }
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
+    private func menuRow(icon: String, title: String, subtitle: String, tint: Color) -> some View {
+        HStack(spacing: VNSpacing.md) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(tint)
+                .frame(width: 40, height: 40)
+                .background(tint.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.vnTextPrimary)
+                Text(subtitle)
+                    .font(.system(size: 12))
+                    .foregroundColor(.vnTextSecondary)
+                    .lineLimit(1)
             }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(.vnTextSecondary.opacity(0.6))
         }
+        .padding(.horizontal, VNSpacing.lg)
+        .padding(.vertical, VNSpacing.md)
+        .contentShape(Rectangle())
     }
 
-    private var privacySection: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader("Quyền Riêng Tư & An Toàn Dữ Liệu")
-            settingsCard {
-                VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    Text("Cam kết Zero-Knowledge Privacy")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.vnTextPrimary)
-                    Text("Tất cả ngày giỗ, tên người thân và thông tin gia tộc chỉ lưu trữ trên thiết bị của bạn " +
-                         "và tài khoản iCloud cá nhân. Ứng dụng không sử dụng máy chủ trung gian.")
-                        .font(.system(size: 12))
-                        .foregroundColor(.vnTextSecondary)
-                }
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
-            }
-        }
-    }
-
-    private var aboutSection: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader("Thông Tin Ứng Dụng")
-            settingsCard {
-                HStack {
-                    Text("Phiên Bản")
-                        .font(.system(size: 16))
-                        .foregroundColor(.vnTextPrimary)
-                    Spacer()
-                    Text("1.0.0 (Build 1)")
-                        .font(.system(size: 12))
-                        .foregroundColor(.vnTextSecondary)
-                }
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
-                rowDivider
-                HStack {
-                    Text("Bản Quyền")
-                        .font(.system(size: 16))
-                        .foregroundColor(.vnTextPrimary)
-                    Spacer()
-                    Text("An Niên • iletai")
-                        .font(.system(size: 12))
-                        .foregroundColor(.vnTextSecondary)
-                }
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
-            }
-        }
-    }
-
-    // MARK: - Canonical helpers (presentation only)
     private func sectionHeader(_ title: String) -> some View {
         Text(title.uppercased())
             .font(.system(size: 11, weight: .medium))
@@ -287,11 +203,143 @@ public struct SettingsView: View {
                 .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
         )
     }
+}
 
-    private var rowDivider: some View {
-        Divider()
-            .background(Color.vnBorderSubtle)
-            .padding(.leading, VNSpacing.lg)
+// MARK: - Sub-screens for Navigation Menu
+
+public struct AppearanceLanguageSettingsView: View {
+    @AppStorage("appThemeAppearance") private var appThemeAppearance: Int = 0
+    @AppStorage("appLanguage") private var appLanguage: String = "system"
+
+    public var body: some View {
+        ScrollView {
+            VStack(spacing: VNSpacing.xl) {
+                // Theme Card
+                VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                    Text(String(localized: "settings.appearance.header").uppercased())
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.vnOnGoldContainer)
+                        .padding(.horizontal, 4)
+
+                    VStack(spacing: 0) {
+                        Picker(String(localized: "settings.appearance.mode"), selection: $appThemeAppearance) {
+                            Text(String(localized: "settings.appearance.auto")).tag(0)
+                            Text(String(localized: "settings.appearance.light")).tag(1)
+                            Text(String(localized: "settings.appearance.dark")).tag(2)
+                        }
+                        .pickerStyle(.inline)
+                        .padding(VNSpacing.lg)
+                    }
+                    .background(Color.vnBackgroundSecondary)
+                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+                }
+
+                // Language Card
+                VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                    Text("NGÔN NGỮ ỨNG DỤNG / APP LANGUAGE".uppercased())
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.vnOnGoldContainer)
+                        .padding(.horizontal, 4)
+
+                    VStack(spacing: 0) {
+                        Picker("Ngôn ngữ", selection: $appLanguage) {
+                            Text("Hệ thống (System)").tag("system")
+                            Text("Tiếng Việt").tag("vi")
+                            Text("English").tag("en")
+                        }
+                        .pickerStyle(.inline)
+                        .padding(VNSpacing.lg)
+                    }
+                    .background(Color.vnBackgroundSecondary)
+                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+                }
+            }
+            .padding(.horizontal, VNSpacing.xl)
+            .padding(.top, VNSpacing.xl)
+        }
+        .background(Color.vnBackgroundPrimary.ignoresSafeArea())
+        .navigationTitle(String(localized: "settings.appearance.header"))
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+public struct DataBackupSettingsView: View {
+    @State private var container = AppContainer.shared
+    @State private var exportText: String = ""
+    @State private var isShowingExportSheet = false
+    @State private var backupStatusMessage: String?
+    @State private var isSyncingContent = false
+
+    public var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: VNSpacing.xl) {
+                VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                    Text(String(localized: "settings.data.header").uppercased())
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.vnOnGoldContainer)
+                        .padding(.horizontal, 4)
+
+                    VStack(spacing: 0) {
+                        Button(action: handleRefreshContent) {
+                            HStack {
+                                Label(String(localized: "settings.data.refresh"), systemImage: "arrow.triangle.2.circlepath")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.vnTextPrimary)
+                                Spacer()
+                                if isSyncingContent { ProgressView().scaleEffect(0.8) }
+                            }
+                            .padding(.horizontal, VNSpacing.lg)
+                            .padding(.vertical, VNSpacing.md)
+                        }
+
+                        Divider().background(Color.vnBorderSubtle).padding(.leading, VNSpacing.lg)
+
+                        Button(action: handleExportJSON) {
+                            HStack {
+                                Label(String(localized: "settings.data.export_json"), systemImage: "square.and.arrow.up")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.vnTextPrimary)
+                                Spacer()
+                            }
+                            .padding(.horizontal, VNSpacing.lg)
+                            .padding(.vertical, VNSpacing.md)
+                        }
+
+                        Divider().background(Color.vnBorderSubtle).padding(.leading, VNSpacing.lg)
+
+                        Button(action: handleExportICS) {
+                            HStack {
+                                Label(String(localized: "settings.data.export_ics"), systemImage: "calendar.badge.plus")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.vnTextPrimary)
+                                Spacer()
+                            }
+                            .padding(.horizontal, VNSpacing.lg)
+                            .padding(.vertical, VNSpacing.md)
+                        }
+
+                        if let msg = backupStatusMessage {
+                            Divider().background(Color.vnBorderSubtle)
+                            Text(msg)
+                                .font(.system(size: 12))
+                                .foregroundColor(.vnStatusSuccess)
+                                .padding(.horizontal, VNSpacing.lg)
+                                .padding(.vertical, VNSpacing.sm)
+                        }
+                    }
+                    .background(Color.vnBackgroundSecondary)
+                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+                }
+            }
+            .padding(.horizontal, VNSpacing.xl)
+            .padding(.top, VNSpacing.xl)
+        }
+        .background(Color.vnBackgroundPrimary.ignoresSafeArea())
+        .navigationTitle(String(localized: "settings.data.header"))
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isShowingExportSheet) {
+            ShareSheet(activityItems: [exportText])
+        }
     }
 
     private func handleRefreshContent() {
@@ -299,11 +347,9 @@ public struct SettingsView: View {
         Task {
             do {
                 try await container.holidayRepository.synchronizeRemoteContent()
-                backupStatusMessage = "Đã cập nhật dữ liệu phong tục & ngày lễ mới nhất."
-            } catch MicroCMSError.configurationMissing {
-                settingsLogger.info("MicroCMS key missing, skip remote sync.")
+                backupStatusMessage = String(localized: "settings.data.sync_success")
             } catch {
-                backupStatusMessage = "Đã sử dụng dữ liệu bản địa ngoại tuyến."
+                backupStatusMessage = String(localized: "settings.data.sync_offline")
             }
             isSyncingContent = false
         }
@@ -317,10 +363,10 @@ public struct SettingsView: View {
                 if let str = String(data: data, encoding: .utf8) {
                     exportText = str
                     isShowingExportSheet = true
-                    backupStatusMessage = "Đã xuất \(reminders.count) sự kiện."
+                    backupStatusMessage = String(format: String(localized: "settings.data.export_done"), reminders.count)
                 }
             } catch {
-                backupStatusMessage = "Lỗi xuất sao lưu: \(error.localizedDescription)"
+                backupStatusMessage = String(format: String(localized: "settings.data.export_error"), error.localizedDescription)
             }
         }
     }
@@ -331,8 +377,92 @@ public struct SettingsView: View {
             let ics = await DataBackupEngine.generateICS(reminders: reminders)
             exportText = ics
             isShowingExportSheet = true
-            backupStatusMessage = "Đã tạo file iCalendar (ICS)."
+            backupStatusMessage = String(localized: "settings.data.ics_done")
         }
+    }
+}
+
+public struct PrivacySecuritySettingsView: View {
+    public var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: VNSpacing.xl) {
+                VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                    Text(String(localized: "settings.privacy.header").uppercased())
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.vnOnGoldContainer)
+                        .padding(.horizontal, 4)
+
+                    VStack(alignment: .leading, spacing: VNSpacing.md) {
+                        Text(String(localized: "settings.privacy.zero_knowledge_title"))
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(.vnTextPrimary)
+
+                        Text(String(localized: "settings.privacy.zero_knowledge_body"))
+                            .font(.system(size: 14))
+                            .foregroundColor(.vnTextSecondary)
+                            .lineSpacing(4)
+                    }
+                    .padding(VNSpacing.lg)
+                    .background(Color.vnBackgroundSecondary)
+                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+                }
+            }
+            .padding(.horizontal, VNSpacing.xl)
+            .padding(.top, VNSpacing.xl)
+        }
+        .background(Color.vnBackgroundPrimary.ignoresSafeArea())
+        .navigationTitle(String(localized: "settings.privacy.header"))
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+public struct AboutSettingsView: View {
+    public var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: VNSpacing.xl) {
+                VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                    Text(String(localized: "settings.about.header").uppercased())
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.vnOnGoldContainer)
+                        .padding(.horizontal, 4)
+
+                    VStack(spacing: 0) {
+                        HStack {
+                            Text(String(localized: "settings.about.version"))
+                                .font(.system(size: 16))
+                                .foregroundColor(.vnTextPrimary)
+                            Spacer()
+                            Text("1.0.0 (Build 1)")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.vnTextSecondary)
+                        }
+                        .padding(.horizontal, VNSpacing.lg)
+                        .padding(.vertical, VNSpacing.md)
+
+                        Divider().background(Color.vnBorderSubtle).padding(.leading, VNSpacing.lg)
+
+                        HStack {
+                            Text(String(localized: "settings.about.copyright"))
+                                .font(.system(size: 16))
+                                .foregroundColor(.vnTextPrimary)
+                            Spacer()
+                            Text("An Niên • iletai")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.vnTextSecondary)
+                        }
+                        .padding(.horizontal, VNSpacing.lg)
+                        .padding(.vertical, VNSpacing.md)
+                    }
+                    .background(Color.vnBackgroundSecondary)
+                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+                }
+            }
+            .padding(.horizontal, VNSpacing.xl)
+            .padding(.top, VNSpacing.xl)
+        }
+        .background(Color.vnBackgroundPrimary.ignoresSafeArea())
+        .navigationTitle(String(localized: "settings.about.header"))
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -345,3 +475,4 @@ public struct ShareSheet: UIViewControllerRepresentable {
 
     public func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
+

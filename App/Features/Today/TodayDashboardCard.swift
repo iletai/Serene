@@ -371,31 +371,34 @@ private struct TodayCardActions: View {
             Button(action: onAddReminder) {
                 Label("Thêm Ngày Nhớ", systemImage: "plus")
                     .font(.system(size: 13, weight: .semibold))
+                    .padding(.vertical, 13)
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 44)
                     .background(Color.vnAccentHeritageRed)
                     .foregroundColor(.white)
-                    .clipShape(Capsule())
+                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
                     .shadow(color: Color.vnAccentHeritageRed.opacity(0.2), radius: 4, x: 0, y: 2)
             }
 
             Button(action: onQuickSearch) {
                 Label("Tra Cứu", systemImage: "magnifyingglass")
                     .font(.system(size: 13, weight: .semibold))
+                    .padding(.vertical, 13)
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 44)
                     .background(Color.vnBackgroundSecondary)
                     .foregroundColor(.vnTextPrimary)
-                    .clipShape(Capsule())
+                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
                     .overlay(
-                        Capsule().stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
+                        RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                            .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                     )
             }
         }
     }
 }
 
-// Four L-shaped corner strokes framing the hero almanac card.
+// Four L-shaped corner strokes framing top-left and bottom-right corners of the hero almanac card (DESIGN §4: dual corner framing marks).
 private struct HeroCornerMarks: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -407,12 +410,10 @@ private struct HeroCornerMarks: Shape {
         let right = rect.maxX - inset
         let top = rect.minY + inset
         let bottom = rect.maxY - inset
+        // Top-Left corner mark
         path.addRect(CGRect(x: left, y: top, width: arm, height: width))
         path.addRect(CGRect(x: left, y: top, width: width, height: arm))
-        path.addRect(CGRect(x: right - arm, y: top, width: arm, height: width))
-        path.addRect(CGRect(x: right - width, y: top, width: width, height: arm))
-        path.addRect(CGRect(x: left, y: bottom - width, width: arm, height: width))
-        path.addRect(CGRect(x: left, y: bottom - arm, width: width, height: arm))
+        // Bottom-Right corner mark
         path.addRect(CGRect(x: right - arm, y: bottom - width, width: arm, height: width))
         path.addRect(CGRect(x: right - width, y: bottom - arm, width: width, height: arm))
         return path

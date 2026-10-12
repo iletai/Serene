@@ -144,9 +144,9 @@ public struct CalendarMainView: View {
                 .foregroundColor(.vnAccentDeepPrimary)
                 .frame(width: 36, height: 36)
                 .background(Color.vnBackgroundSecondary)
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
+                .clipShape(Circle())
                 .overlay(
-                    RoundedRectangle(cornerRadius: VNCornerRadius.small)
+                    Circle()
                         .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                 )
                 .frame(minWidth: 44, minHeight: 44)

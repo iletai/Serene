@@ -58,7 +58,7 @@ public struct CalendarSettingsView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Cài Đặt Lịch")
+                Text(String(localized: "settings.calendar.title"))
                     .font(.vnTitleCeremonial)
                     .foregroundColor(.vnAccentDeepPrimary)
             }
@@ -70,18 +70,18 @@ public struct CalendarSettingsView: View {
     private var headerSummaryBanner: some View {
         VStack(spacing: VNSpacing.sm) {
             VNSealBadge(
-                text: "LỊCH PHÁP",
+                text: String(localized: "settings.calendar.seal"),
                 shape: .square,
                 color: .cinnabarWhite,
                 size: .medium
             )
             .padding(.top, VNSpacing.xs)
 
-            Text("Thiết Lập Lịch & Micro CMS")
+            Text(String(localized: "settings.calendar.subtitle"))
                 .font(.vnTitleCeremonial)
                 .foregroundColor(.vnTextPrimary)
 
-            Text("Tuỳ biến hiển thị lịch số, điều hướng các chế độ xem và đồng bộ dữ liệu văn hóa trực tuyến")
+            Text(String(localized: "settings.calendar.subtitle_desc"))
                 .font(.vnCaption1)
                 .foregroundColor(.vnTextSecondary)
                 .multilineTextAlignment(.center)
@@ -95,17 +95,17 @@ public struct CalendarSettingsView: View {
     @ViewBuilder
     private var calendarModesGroup: some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader(title: "CHẾ ĐỘ LỊCH & ĐIỀU HƯỚNG")
+            sectionHeader(title: String(localized: "settings.calendar.modes_header"))
 
             groupedCard {
                 VStack(alignment: .leading, spacing: VNSpacing.sm) {
-                    rowLabel(icon: "square.grid.2x2.fill", tint: .vnAccentHeritageRed, title: "Chế độ xem mặc định")
+                    rowLabel(icon: "square.grid.2x2.fill", tint: .vnAccentHeritageRed, title: String(localized: "settings.calendar.display_mode"))
 
-                    Picker("Chế độ xem mặc định", selection: $defaultDisplayModeRaw) {
-                        Text("Nhật Lịch").tag("block")
-                        Text("Lịch Tháng").tag("month")
-                        Text("Lịch Tuần").tag("week")
-                        Text("Lịch Năm").tag("year")
+                    Picker(String(localized: "settings.calendar.display_mode"), selection: $defaultDisplayModeRaw) {
+                        Text(String(localized: "settings.calendar.mode_block")).tag("block")
+                        Text(String(localized: "settings.calendar.mode_month")).tag("month")
+                        Text(String(localized: "settings.calendar.mode_week")).tag("week")
+                        Text(String(localized: "settings.calendar.mode_year")).tag("year")
                     }
                     .pickerStyle(.segmented)
                     .tint(.vnAccentHeritageRed)
@@ -116,11 +116,11 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 HStack {
-                    rowLabel(icon: "calendar", tint: .vnAccentImperialGold, title: "Ngày bắt đầu tuần")
+                    rowLabel(icon: "calendar", tint: .vnAccentImperialGold, title: String(localized: "settings.calendar.week_start"))
                     Spacer()
-                    Picker("Bắt đầu tuần", selection: $startOfWeek) {
-                        Text("Thứ Hai (Việt Nam)").tag(2)
-                        Text("Chủ Nhật").tag(1)
+                    Picker(String(localized: "settings.calendar.week_start"), selection: $startOfWeek) {
+                        Text(String(localized: "settings.calendar.week_start_monday")).tag(2)
+                        Text(String(localized: "settings.calendar.week_start_sunday")).tag(1)
                     }
                     .labelsHidden()
                     .tint(.vnAccentHeritageRed)
@@ -131,7 +131,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $highlightFullAndNewMoon) {
-                    rowLabel(icon: "moon.stars.fill", tint: .vnAccentImperialGold, title: "Làm nổi bật Rằm (15) & Mùng 1")
+                    rowLabel(icon: "moon.stars.fill", tint: .vnAccentImperialGold, title: String(localized: "settings.calendar.highlight_full_new_moon"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -140,7 +140,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $showAuspiciousHours) {
-                    rowLabel(icon: "clock.badge.checkmark.fill", tint: .vnAccentImperialGold, title: "Hiển thị Giờ Hoàng Đạo")
+                    rowLabel(icon: "clock.badge.checkmark.fill", tint: .vnAccentImperialGold, title: String(localized: "settings.calendar.show_auspicious_hours"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -149,7 +149,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $showSolarTermsAndTruc) {
-                    rowLabel(icon: "sun.haze.fill", tint: .vnAccentImperialGold, title: "Hiển thị Tiết Khí & Thập Nhị Trực")
+                    rowLabel(icon: "sun.haze.fill", tint: .vnAccentImperialGold, title: String(localized: "settings.calendar.show_solar_terms"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -162,7 +162,7 @@ public struct CalendarSettingsView: View {
     @ViewBuilder
     private var microCMSSyncGroup: some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader(title: "NỘI DUNG VĂN HÓA & MICRO CMS")
+            sectionHeader(title: String(localized: "settings.microcms.header"))
 
             groupedCard {
                 microCMSStatusHeader
@@ -170,7 +170,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $autoSyncMicroCMS) {
-                    rowLabel(icon: "arrow.triangle.2.circlepath.circle.fill", tint: .vnAccentHeritageRed, title: "Tự động đồng bộ nội dung")
+                    rowLabel(icon: "arrow.triangle.2.circlepath.circle.fill", tint: .vnAccentHeritageRed, title: String(localized: "settings.microcms.auto_sync"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -179,7 +179,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $microCMSWifiOnly) {
-                    rowLabel(icon: "wifi", tint: .vnAccentImperialGold, title: "Chỉ tải khi kết nối Wi-Fi")
+                    rowLabel(icon: "wifi", tint: .vnAccentImperialGold, title: String(localized: "settings.microcms.wifi_only"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -188,7 +188,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $cachePrayersOffline) {
-                    rowLabel(icon: "arrow.down.circle.fill", tint: .vnAccentHeritageRed, title: "Lưu trữ ngoại tuyến (Offline)")
+                    rowLabel(icon: "arrow.down.circle.fill", tint: .vnAccentHeritageRed, title: String(localized: "settings.microcms.offline_cache"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -224,7 +224,7 @@ public struct CalendarSettingsView: View {
                     .frame(width: 8, height: 8)
                     .accessibilityHidden(true)
 
-                Text("MicroCMS Đám Mây: Đã Kết Nối")
+                Text(String(localized: "settings.microcms.connected"))
                     .font(.vnFootnote)
                     .foregroundColor(.vnTextPrimary)
 
@@ -240,12 +240,12 @@ public struct CalendarSettingsView: View {
             }
 
             HStack(spacing: VNSpacing.sm) {
-                cmsStatPill(icon: "book.fill", text: "48 Văn Khấn")
-                cmsStatPill(icon: "sparkles", text: "12 Lễ Tiết")
-                cmsStatPill(icon: "quote.opening", text: "365 Lời Chúc")
+                cmsStatPill(icon: "book.fill", text: String(format: String(localized: "settings.microcms.stat_prayers"), 48))
+                cmsStatPill(icon: "sparkles", text: String(format: String(localized: "settings.microcms.stat_holidays"), 12))
+                cmsStatPill(icon: "quote.opening", text: String(format: String(localized: "settings.microcms.stat_quotes"), 365))
             }
 
-            Text("Đồng bộ gần nhất: \(lastSyncTimestamp)")
+            Text(String(format: String(localized: "settings.microcms.last_sync"), lastSyncTimestamp))
                 .font(.system(size: 11))
                 .foregroundColor(.vnTextSecondary)
         }
@@ -262,12 +262,12 @@ public struct CalendarSettingsView: View {
                     ProgressView()
                         .tint(.white)
                         .scaleEffect(0.9)
-                    Text("Đang đồng bộ từ MicroCMS...")
+                    Text(String(localized: "settings.microcms.syncing"))
                         .font(.vnFootnote)
                 } else {
                     Image(systemName: "arrow.triangle.2.circlepath")
                         .font(.system(size: 13, weight: .bold))
-                    Text("Đồng Bộ Nội Dung Ngay")
+                    Text(String(localized: "settings.microcms.sync_now"))
                         .font(.vnFootnote)
                 }
                 Spacer()
@@ -284,13 +284,13 @@ public struct CalendarSettingsView: View {
     @ViewBuilder
     private var dailyCustomizationGroup: some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader(title: "TÙY BIẾN TRẢI NGHIỆM LỊCH NGÀY")
+            sectionHeader(title: String(localized: "settings.daily.header"))
 
             groupedCard {
                 Toggle(isOn: $showDailyQuote) {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                        rowLabel(icon: "quote.opening", tint: .vnAccentImperialGold, title: "Lời chúc & Danh ngôn ngày mới")
-                        Text("Hiển thị ca dao, tục ngữ và lời khuyên an lành trên tờ Nhật Lịch")
+                        rowLabel(icon: "quote.opening", tint: .vnAccentImperialGold, title: String(localized: "settings.daily.quote"))
+                        Text(String(localized: "settings.daily.quote_desc"))
                             .font(.system(size: 12))
                             .foregroundColor(.vnTextSecondary)
                             .padding(.leading, Self.settingsSubtitleLeadingInset)
@@ -303,7 +303,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $isHapticEnabled) {
-                    rowLabel(icon: "hand.tap.fill", tint: .vnAccentHeritageRed, title: "Rung phản hồi khi đổi ngày")
+                    rowLabel(icon: "hand.tap.fill", tint: .vnAccentHeritageRed, title: String(localized: "settings.daily.haptic"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -316,21 +316,19 @@ public struct CalendarSettingsView: View {
     @ViewBuilder
     private var astronomicalTimezoneGroup: some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader(title: "MÚI GIỜ & ĐỘC LẬP THIÊN VĂN")
+            sectionHeader(title: String(localized: "settings.timezone.astronomy_header"))
 
             groupedCard {
                 VStack(alignment: .leading, spacing: VNSpacing.sm) {
                     HStack {
-                        rowLabel(icon: "globe.asia.australia.fill", tint: .vnAccentHeritageRed, title: "Múi giờ tính Lịch Âm")
+                        rowLabel(icon: "globe.asia.australia.fill", tint: .vnAccentHeritageRed, title: String(localized: "settings.timezone.lunar"))
                         Spacer()
                         Text("GMT+7")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundColor(.vnAccentImperialGold)
                     }
 
-                    Text("Hệ thống thiên văn An Niên tự động tính toán thời điểm Sóc Vọng và 24 Tiết Khí dựa trên " +
-                         "Kinh tuyến 105° Đông (Hà Nội, Đông Dương), đảm bảo lịch ngày và ngày giỗ hoàn toàn " +
-                         "chính xác theo phong tục Việt Nam dù bạn đang ở bất kỳ nơi nào trên thế giới.")
+                    Text(String(localized: "settings.timezone.astronomy_desc"))
                         .font(.system(size: 12))
                         .foregroundColor(.vnTextSecondary)
                         .lineSpacing(3)

@@ -1,4 +1,5 @@
-git_url(ENV["MATCH_GIT_URL"])
+is_ci = ENV["CI"] == "true"
+git_url(ENV["MATCH_GIT_URL"] || "git@github.com:iletai/ios-certificates.git")
 storage_mode("git")
 type("appstore")
 app_identifier([
@@ -7,8 +8,8 @@ app_identifier([
   "com.iletai.annien.dev",
   "com.iletai.annien.dev.widget"
 ])
-username(ENV["APPLE_ID"])
-team_id(ENV["APPLE_TEAM_ID"])
+username(ENV["APPLE_ID"]) if ENV["APPLE_ID"]
+team_id(ENV["APPLE_TEAM_ID"] || "AP58YLHQ2S")
 git_branch("master")
 shallow_clone(true)
 readonly(is_ci)

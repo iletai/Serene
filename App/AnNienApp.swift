@@ -11,6 +11,7 @@ struct AnNienApp: App {
     @State private var container = AppContainer.shared
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("appThemeAppearance") private var appThemeAppearance: Int = 0
+    @AppStorage("appLanguage") private var appLanguage: String = "system"
     @State private var scheduleTask: Task<Void, Never>?
     @State private var updateAction: AppUpdateAction = .none
 
@@ -29,10 +30,19 @@ struct AnNienApp: App {
         }
     }
 
+    private var selectedLocale: Locale {
+        switch appLanguage {
+        case "vi": return Locale(identifier: "vi")
+        case "en": return Locale(identifier: "en")
+        default: return .autoupdatingCurrent
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             MainTabView()
                 .preferredColorScheme(preferredScheme)
+                .environment(\.locale, selectedLocale)
                 .task {
                     // Initial permissions & background synchronization
                     _ = try? await container.notificationEngine.requestAuthorization()
