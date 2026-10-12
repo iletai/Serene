@@ -11,7 +11,7 @@
 [![CI](https://github.com/iletai/Serene/actions/workflows/ci.yml/badge.svg)](https://github.com/iletai/Serene/actions)
 [![Swift 6](https://img.shields.io/badge/Swift-6.0-orange.svg?style=flat&logo=swift)](https://swift.org)
 [![iOS 17.0+](https://img.shields.io/badge/iOS-17.0%2B-blue.svg?style=flat&logo=apple)](https://developer.apple.com/ios/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 An Niên is a native iOS application built with SwiftUI, SwiftData, and WidgetKit, combining accurate Vietnamese Lunar-Solar astronomical calculations with a smart memorial and ritual tracking system. Designed with Neo-Minimalist aesthetics, Apple New York typography, and strict Swift 6 concurrency.
 
@@ -96,4 +96,4 @@ Config/                       # Build configurations (.xcconfig) & Entitlements
 
 ## 📄 License
 
-Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
+Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more information.

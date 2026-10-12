@@ -11,7 +11,7 @@
 [![CI](https://github.com/iletai/Serene/actions/workflows/ci.yml/badge.svg)](https://github.com/iletai/Serene/actions)
 [![Swift 6](https://img.shields.io/badge/Swift-6.0-orange.svg?style=flat&logo=swift)](https://swift.org)
 [![iOS 17.0+](https://img.shields.io/badge/iOS-17.0%2B-blue.svg?style=flat&logo=apple)](https://developer.apple.com/ios/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 An Niên（Serene）は、SwiftUI、SwiftData、WidgetKit を用いて構築された iOS ネイティブアプリです。高精度なベトナム陰陽暦（旧暦）天文学計算と、命日（Giỗ）や伝統祭礼のリマインダー機能を融合しています。ネオミニマリズムデザイン、Apple New York タイポグラフィ、Swift 6 の厳格な並行処理（Strict Concurrency）を採用しています。
 
@@ -96,4 +96,4 @@ Config/                       # ビルド設定 (.xcconfig) & Entitlements
 
 ## 📄 ライセンス
 
-MIT ライセンスの下で配布されています。詳細は [LICENSE](LICENSE) をご覧ください。
+Apache 2.0 ライセンスの下で配布されています。詳細は [LICENSE](LICENSE) をご覧ください。

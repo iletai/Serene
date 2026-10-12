@@ -11,7 +11,7 @@
 [![CI](https://github.com/iletai/Serene/actions/workflows/ci.yml/badge.svg)](https://github.com/iletai/Serene/actions)
 [![Swift 6](https://img.shields.io/badge/Swift-6.0-orange.svg?style=flat&logo=swift)](https://swift.org)
 [![iOS 17.0+](https://img.shields.io/badge/iOS-17.0%2B-blue.svg?style=flat&logo=apple)](https://developer.apple.com/ios/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 An Niên là ứng dụng iOS thuần túy (native) được xây dựng bằng SwiftUI, SwiftData và WidgetKit, kết hợp thuật toán tính toán thiên văn Âm Dương Lịch Việt Nam chính xác với hệ thống quản lý ngày giỗ, ngày nhớ và nghi lễ thông minh. Thiết kế theo phong cách Neo-Minimalism, typography Apple New York và kiểm tra đồng thời nghiêm ngặt Swift 6 (Strict Concurrency).
 
@@ -96,4 +96,4 @@ Config/                       # Cấu hình build (.xcconfig) & Entitlements
 
 ## 📄 License
 
-Phân phối dưới giấy phép MIT. Xem [LICENSE](LICENSE) để biết thêm chi tiết.
+Phân phối dưới giấy phép Apache 2.0. Xem [LICENSE](LICENSE) để biết thêm chi tiết.
