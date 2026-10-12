@@ -1,0 +1,63 @@
+name: CI - PR & Build Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Select latest stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Setup Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Install Tooling
+        run: |
+          which xcodegen || brew install xcodegen
+          which swiftlint || brew install swiftlint
+
+      - name: SwiftLint Verification
+        run: swiftlint --strict --quiet
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: SPM Dependency Cache
+        uses: actions/cache@v4
+        with:
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved', 'project.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Run Unit & Integration Tests
+        run: bundle exec fastlane test
+        env:
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: fastlane/test_output

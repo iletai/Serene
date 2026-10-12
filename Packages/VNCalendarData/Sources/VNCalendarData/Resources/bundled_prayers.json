@@ -1,0 +1,82 @@
+[
+  {
+    "id": "prayer_mung_mot",
+    "title": "Văn Khấn Mùng Một Hàng Tháng",
+    "category": "Mùng 1 & Rằm",
+    "occasion": "Mùng 1 Âm lịch hàng tháng",
+    "offerings": ["Hương, hoa tươi, quả ngọt", "Trầu cau, nước sạch", "Đèn hoặc nến thắp sáng", "Mâm cỗ mặn hoặc chay tùy tâm"],
+    "prayerText": "Nam mô A Di Đà Phật! (3 lần, 3 lạy)\n\nCon kính lạy chín phương Trời, mười phương Chư Phật, Chư Phật mười phương.\nCon kính lạy Hoàng thiên Hậu Thổ chư vị Tôn thần.\nCon kính lạy ngài Bản cảnh Thành hoàng, ngài Bản xứ Thổ địa, ngài Bản gia Táo quân cùng chư vị Tôn thần cai quản trong xứ này.\n\nCon kính lạy Cao Tằng Tổ Khảo, Cao Tằng Tổ Tỷ, Thúc Bá Đệ Huynh, Cô Di Tỷ Muội, chư vị Hương linh dòng họ nội ngoại.\n\nTín chủ con là: [Tên tín chủ]\nNgụ tại: [Địa chỉ gia đình]\n\nHôm nay là ngày Mùng 1 tháng [Tháng] năm [Năm], tiết [Tiết khí].\nTín chủ con thành tâm sửa biện hương hoa, lễ vật, kim ngân, trà quả, dâng lên trước án, lòng thành kính cẩn tâu trình:\n\nCúi xin chư vị Tôn thần cùng liệt vị Tiên linh thương xót tín chủ, giáng lâm trước án, chứng giám lòng thành, thụ hưởng lễ vật.\n\nNguyện xin chư vị phù hộ độ trì cho toàn gia chúng con luôn được an khang thịnh vượng, gia đạo thuận hòa, tâm thân an lạc, vạn sự hanh thông, tai qua nạn khỏi.\n\nChúng con lễ bạc tâm thành, trước án kính lễ, cúi xin được phù hộ độ trì.\n\nNam mô A Di Đà Phật! (3 lần, 3 lạy)",
+    "notes": "Nên thắp hương vào buổi sáng sớm hoặc giờ Hoàng đạo của ngày Mùng 1.",
+    "tags": ["mung1", "socvong", "hangthang", "giatien", "thanlinh"]
+  },
+  {
+    "id": "prayer_ngay_ram",
+    "title": "Văn Khấn Ngày Rằm (Tiết Vọng) Hàng Tháng",
+    "category": "Mùng 1 & Rằm",
+    "occasion": "Ngày Rằm (15 Âm lịch) hàng tháng",
+    "offerings": ["Hương, hoa thơm, quả chín", "Trầu cau, chén nước trong", "Đèn dầu hoặc nến", "Lễ chay hoặc mâm cơm thanh tịnh"],
+    "prayerText": "Nam mô A Di Đà Phật! (3 lần, 3 lạy)\n\nCon kính lạy chín phương Trời, mười phương Chư Phật, Chư Phật mười phương.\nCon kính lạy Bản cảnh Thành hoàng chư vị Đại Vương, ngài Định Phúc Táo Quân, ngài Long Mạch Thổ Địa Chư vị Tôn Thần.\n\nCon kính lạy Tổ Tiên nội ngoại, chư vị Chân linh gia tộc.\n\nTín chủ con là: [Tên tín chủ]\nCùng toàn thể gia đình cư ngụ tại: [Địa chỉ]\n\nHôm nay là ngày Rằm tháng [Tháng] năm [Năm] ([Can Chi]).\nNhân ngày sóc vọng nguyệt tròn, tín chủ con lòng thành sắm sửa hương hoa trà quả, kim ngân lễ vật, kính dâng trước hương án.\n\nCúi xin chư vị Thần linh bản xứ, Tiên tổ tiền nhân soi xét tấc dạ thành kính, giáng lâm án tọa, thụ hưởng lễ vật.\n\nCầu xin gia hộ cho gia quyến bốn mùa bình an, tám tiết tươi vui, sở cầu tất ứng, sở nguyện tòng tâm, lộc tài vượng tiến, gia đình hòa thuận.\n\nChúng con lễ bạc tâm thành, trước án kính lễ, cúi xin lượng cả chở che.\n\nNam mô A Di Đà Phật! (3 lần, 3 lạy)",
+    "notes": "Có thể thắp hương vào chiều ngày 14 hoặc sáng trưa ngày 15 ÂL.",
+    "tags": ["ram", "vong", "nguyettron", "15am", "giatien"]
+  },
+  {
+    "id": "prayer_gio_gia_tien",
+    "title": "Văn Khấn Cúng Giỗ Tiền Nhân Gia Tiên",
+    "category": "Giỗ Gia Tiên",
+    "occasion": "Ngày Kỵ Nhật / Giỗ Tổ Tiên",
+    "offerings": ["Mâm cỗ mặn hoặc chay truyền thống", "Hương, đăng, hoa, quả tươi", "Trầu cau, rượu trắng, chén nước trong", "Vàng mã, sớ cúng kỵ nhật"],
+    "prayerText": "Nam mô A Di Đà Phật! (3 lần, 3 lạy)\n\nCon kính lạy chín phương Trời, mười phương Chư Phật, Chư Phật mười phương.\nCon kính lạy Hoàng Thiên Hậu Thổ chư vị Tôn thần cai quản bản xứ.\nCon kính lạy ngài Đông Trù Tư Mệnh Táo Phủ Thần Quân, Thổ Địa Long Mạch Tôn Thần.\n\nCon kính lạy Hương linh: [Tên tiền nhân / Chức vị / Thân vị]\nHôm nay là ngày [Ngày] tháng [Tháng] năm [Năm] ([Can Chi]).\nChính ngày Kỵ Nhật của [Vai vế tiền nhân].\n\nTín chủ con là: [Tên con cháu trưởng / đại diện gia đình]\nCùng các con cháu nội ngoại quy tụ tề tựu tại: [Địa chỉ từ đường / gia đình]\n\nNhớ thuở tiền nhân sinh thành dưỡng dục, công đức cù lao biển trời khôn xiết. Nay đến ngày giỗ phụng thờ, con cháu sắm sửa mâm cơm thanh khiết, kính dâng lễ vật hương đăng kim ngân, cúi đầu tạ tội trước linh sàng.\n\nCúi xin Hương linh giáng lâm linh tọa, chứng giám tấc dạ thảo hiếu, thụ hưởng lễ vật, phù hộ độ trì cho con cháu cháu chắt sức khỏe dồi dào, tâm trí sáng suốt, hiếu kính thuận hòa, gia tộc hưng thịnh vạn đời.\n\nChúng con kính cẩn cúi lạy, tâm thành kính dâng.\n\nNam mô A Di Đà Phật! (3 lần, 3 lạy)",
+    "notes": "Trước khi cúng giỗ chính ngày, có thể làm lễ Tiên Thường (cúng chiều hôm trước).",
+    "tags": ["gio", "kynhat", "giatien", "tochu", "hieudao"]
+  },
+  {
+    "id": "prayer_tao_quan",
+    "title": "Văn Khấn Cúng Ông Công Ông Táo (Táo Quân)",
+    "category": "Lễ Tiết & Tết",
+    "occasion": "Ngày 23 tháng Chạp hàng năm",
+    "offerings": ["3 con cá chép sống thả chậu nước", "Bộ mũ áo hia ông Táo (2 mũ ông, 1 mũ bà)", "Mâm cỗ mặn hoặc chay, xôi gà, giò chả", "Hương hoa, trầu cau, nếp nến"],
+    "prayerText": "Nam mô A Di Đà Phật! (3 lần, 3 lạy)\n\nCon kính lạy chín phương Trời, mười phương Chư Phật.\nCon kính lạy ngài Đông Trù Tư Mệnh Táo Phủ Thần Quân.\n\nTín chủ con là: [Tên tín chủ]\nNgụ tại: [Địa chỉ]\n\nHôm nay là ngày 23 tháng Chạp năm [Năm], tiết cuối đông sắp đón tân xuân.\nTín chủ con thành tâm sửa soạn hương hoa, áo mão, cá chép cùng mâm lễ vật kính cẩn dâng lên bàn thờ Tôn Thần.\n\nKính cẩn tâu trình: Ngài là chủ một nhà, trông coi việc bếp núc, ghi chép mọi việc lành dữ trong gia quyến. Nay đến kỳ thượng thiên chầu trời, bẩm báo Ngọc Hoàng Thượng Đế việc nhân gian.\n\nCúi xin Thần quân tấu bày điều lành, che chở điều dở, xin ban phúc lành cho toàn gia chúng con sang năm mới vạn sự an khang, gia đạo thái hòa, lộc tài sung túc.\n\nChúng con kính tiễn Thần quân cưỡi chép bay về chầu Thiên đình.\n\nNam mô A Di Đà Phật! (3 lần, 3 lạy)",
+    "notes": "Nên tiến hành lễ cúng trước 12h trưa ngày 23 tháng Chạp để kịp giờ Táo Quân lên trời.",
+    "tags": ["23chap", "ongtao", "tet", "cuoinam", "thanchau"]
+  },
+  {
+    "id": "prayer_giao_thua",
+    "title": "Văn Khấn Đêm Giao Thừa (Trừ Tịch Ngoài Trời)",
+    "category": "Lễ Tiết & Tết",
+    "occasion": "Đêm 30 Tết sang Mùng 1 Tết",
+    "offerings": ["Gà trống hoa luộc ngậm hoa hồng hoặc thủ lợn", "Mâm ngũ quả, trầu cau tươi, trà rượu", "Hương hoa, đèn nến, vàng mã giao thừa"],
+    "prayerText": "Nam mô A Di Đà Phật! (3 lần, 3 lạy)\n\nCon kính lạy chín phương Trời, mười phương Chư Phật.\nCon kính lạy Quan Đương Niên Hành Khiển, Quan Đương Cảnh Thành Hoàng chư vị Đại Vương.\nCon kính lạy ngài Cựu Niên Hành Khiển và Tân Niên Hành Khiển Tôn Thần.\n\nTín chủ con là: [Tên gia chủ]\nNgụ tại: [Địa chỉ]\n\nPhút thiêng liêng Giao Thừa năm cũ [Năm Cũ] chuyển sang năm mới [Năm Mới] ([Can Chi]), trời đất giao hòa, vạn vật bừng sắc xuân.\n\nTín chủ con kính cẩn sửa soạn hương đăng trà quả kính dâng trước hương án ngoài trời, kính cẩn tạ ơn Quan Hành Khiển năm cũ đã bảo bọc chở che, và kính nghênh đón Quan Tân Niên hành khiển giáng lâm nghênh tiếp vận hội mới.\n\nCúi xin các ngài giáng lâm thụ hưởng, phù trì cho đất nước thái bình, toàn gia chúng con bước sang năm mới hanh thông cát tường, phúc thọ tăng long, gia hòa vạn sự hưng.\n\nNam mô A Di Đà Phật! (3 lần, 3 lạy)",
+    "notes": "Lễ Giao thừa ngoài trời cúng đúng thời khắc 0h00 đêm Giao Thừa.",
+    "tags": ["giaothua", "trutich", "tet", "nammoi", "hanhkhein"]
+  },
+  {
+    "id": "prayer_dong_tho",
+    "title": "Văn Khấn Lễ Động Thổ & Khởi Công Làm Nhà",
+    "category": "Nghi Lễ Gia Sự",
+    "occasion": "Ngày làm móng, khởi công xây dựng",
+    "offerings": ["Bộ tam sên (thịt luộc, tôm/cua, trứng luộc)", "Xôi gà, rượu trắng, nước sạch", "Hương hoa tươi, mâm ngũ quả, vàng mã động thổ"],
+    "prayerText": "Nam mô A Di Đà Phật! (3 lần, 3 lạy)\n\nCon kính lạy chín phương Trời, mười phương Chư Phật.\nCon kính lạy Hoàng Thiên Hậu Thổ chư vị Tôn Thần.\nCon kính lạy Quan Đương Niên, ngài Bản Cảnh Thành Hoàng, ngài Thần Linh Thổ Địa cai quản khu vực.\n\nTín chủ con là: [Tên gia chủ]\nĐịa chỉ công trình xây dựng: [Địa chỉ]\n\nHôm nay là ngày lành tháng tốt, ngày [Ngày] tháng [Tháng] năm [Năm] ([Can Chi]).\nTín chủ con thành tâm sắm sửa lễ vật, kính cẩn tâu trình trước chư vị Tôn Thần xin phép được Động Thổ khởi công tạo tác ngôi nhà/công trình.\n\nCúi xin chư vị Tôn Thần, Thần Linh bản thổ giáng lâm chứng giám, thụ hưởng lễ vật, cho phép việc thi công đào móng xây dựng được hanh thông trơn tru, thợ thuyền bình an, công trình vững chãi, gia chủ đời đời cát bảo.\n\nChúng con lễ bạc tâm thành cúi xin gia ân bảo bọc.\n\nNam mô A Di Đà Phật! (3 lần, 3 lạy)",
+    "notes": "Chọn giờ Hoàng Đạo và người động thổ hợp tuổi với gia chủ.",
+    "tags": ["dongtho", "khoicong", "lamnha", "xaydung", "giasu"]
+  },
+  {
+    "id": "prayer_nhap_trach",
+    "title": "Văn Khấn Lễ Nhập Trạch (Về Nhà Mới)",
+    "category": "Nghi Lễ Gia Sự",
+    "occasion": "Ngày dọn vào nhà mới",
+    "offerings": ["Bếp lửa/ấm nước đun sôi đầu tiên", "Mâm ngũ quả, hương hoa tươi, trầu cau", "Mâm cơm cúng tạ ơn Thần Linh và Gia Tiên"],
+    "prayerText": "Nam mô A Di Đà Phật! (3 lần, 3 lạy)\n\nCon kính lạy chín phương Trời, mười phương Chư Phật.\nCon kính lạy Quan Đương Niên, ngài Bản cảnh Thành hoàng, ngài Định Phúc Táo Quân, Thần Linh Thổ Địa ngự tại địa chỉ này.\n\nCon kính lạy Tổ Tiên nội ngoại dòng họ.\n\nTín chủ con là: [Tên gia chủ]\nCùng toàn thể thành viên gia đình chuyển về cư ngụ tại: [Địa chỉ nhà mới]\n\nHôm nay ngày lành tháng tốt, ngày [Ngày] tháng [Tháng] năm [Năm], tín chủ con kính cẩn sắm sửa hương hoa trà quả, kim ngân lễ vật, kính thỉnh chư vị Thần linh và Tiên tổ định cư linh vị tại ngôi nhà mới.\n\nCúi xin Thần linh Thổ công gia hộ trấn giữ bình yên, xua đuổi tà khí, rước nạp vượng khí, cho gia đạo an cư lạc nghiệp, lộc tài vượng tiến.\n\nNam mô A Di Đà Phật! (3 lần, 3 lạy)",
+    "notes": "Người chủ gia đình nên tự tay mang bát hương và bếp ấm vào nhà đầu tiên.",
+    "tags": ["nhaptrach", "venhamoi", "nhamoi", "ancu", "giasu"]
+  },
+  {
+    "id": "prayer_khai_truong",
+    "title": "Văn Khấn Khai Trương Cửa Hàng & Công Ty",
+    "category": "Nghi Lễ Gia Sự",
+    "occasion": "Ngày mở hàng đầu năm hoặc khai trương kinh doanh",
+    "offerings": ["Gà luộc hoặc heo quay, xôi gấc đỏ", "Mâm ngũ quả sung túc, hoa tươi rực rỡ", "Trầu cau, trà rượu, nến vàng kim, vàng mã"],
+    "prayerText": "Nam mô A Di Đà Phật! (3 lần, 3 lạy)\n\nCon kính lạy chín phương Trời, mười phương Chư Phật.\nCon kính lạy Quan Đương Niên Hành Khiển Tôn Thần.\nCon kính lạy ngài Bản Cảnh Thành Hoàng, ngài Thần Linh Thổ Địa, ngài Thần Tài - Thổ Địa bản sở.\n\nTín chủ con là: [Tên chủ doanh nghiệp / cửa hàng]\nCơ sở kinh doanh tại: [Địa chỉ cửa hàng / văn phòng]\n\nHôm nay là ngày [Ngày] tháng [Tháng] năm [Năm] ([Can Chi]), giờ cát lành.\nTín chủ con thành tâm sắm sửa hương hoa phẩm vật, dâng lên trước án kính cáo chư vị Thần Linh xin phép Khai Trương mở cửa hoạt động kinh doanh.\n\nCúi xin chư vị Tôn Thần thương xót phù hộ cho cửa hàng buôn may bán đắt, khách quý tìm đến, tài lộc dồi dào, kinh doanh thuận buồm xuôi gió, công việc hanh thông.\n\nChúng con tâm thành kính lễ, cúi xin chứng giám.\n\nNam mô A Di Đà Phật! (3 lần, 3 lạy)",
+    "notes": "Chọn giờ Hoàng đạo và hướng xuất hành đắc lộc khi mở cửa.",
+    "tags": ["khaitruong", "thantai", "kinhdoanh", "tailoc", "giasu"]
+  }
+]

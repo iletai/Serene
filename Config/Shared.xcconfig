@@ -1,0 +1,22 @@
+// Shared build settings across all configurations
+#include? "Secrets.xcconfig"
+
+DEVELOPMENT_TEAM = AP58YLHQ2S
+CODE_SIGN_STYLE = Automatic
+SWIFT_VERSION = 6.0
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
+TARGETED_DEVICE_FAMILY = 1
+MARKETING_VERSION = 1.0.0
+CURRENT_PROJECT_VERSION = 1
+SWIFT_STRICT_CONCURRENCY = complete
+ENABLE_USER_SCRIPT_SANDBOXING = YES
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
+ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_KEY_CFBundleDisplayName = $(APP_DISPLAY_NAME)
+INFOPLIST_KEY_UILaunchScreen_Generation = YES
+INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+// Inject microCMS read-only key into generated Info.plist (read by AppConfiguration).
+// Define MICROCMS_API_KEY in Config/Secrets.xcconfig (gitignored); see Secrets.xcconfig.example.
+INFOPLIST_KEY_MICROCMS_API_KEY = $(MICROCMS_API_KEY)

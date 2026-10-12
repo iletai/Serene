@@ -1,0 +1,189 @@
+require "base64"
+
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+    ensure_bundle_exec
+  end
+
+  private_lane :setup_ci_keychain do
+    if is_ci
+      create_keychain(
+        name: "ci_keychain",
+        password: ENV["FASTLANE_KEYCHAIN_PASSWORD"] || "ci_keychain_password",
+        default_keychain: true,
+        unlock: true,
+        timeout: 3600,
+        lock_when_sleeps: false
+      )
+    end
+  end
+
+  private_lane :app_store_connect_auth do
+    app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"] || (ENV["ASC_KEY_CONTENT_BASE64"] ? Base64.decode64(ENV["ASC_KEY_CONTENT_BASE64"]) : nil),
+      is_key_content_base64: false,
+      in_house: false
+    )
+  end
+
+  # Production targets signed for App Store distribution: target name => bundle ID
+  PROD_SIGNING_TARGETS = {
+    "AnNien" => "com.iletai.annien",
+    "AnNienWidget" => "com.iletai.annien.widget"
+  }.freeze
+
+  # Profile name installed by Match (falls back to Match's default naming)
+  def match_profile_name(bundle_id)
+    ENV["sigh_#{bundle_id}_appstore_profile-name"] || "match AppStore #{bundle_id}"
+  end
+
+  def signing_team_id
+    ENV["APPLE_TEAM_ID"] || CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+  end
+
+  # Shared.xcconfig uses Automatic signing; switch each target to Manual with its Match profile
+  private_lane :apply_manual_signing do
+    PROD_SIGNING_TARGETS.each do |target, bundle_id|
+      update_code_signing_settings(
+        path: "AnNien.xcodeproj",
+        use_automatic_signing: false,
+        targets: [target],
+        build_configurations: ["Release-Production"],
+        team_id: signing_team_id,
+        code_sign_identity: "Apple Distribution",
+        profile_name: match_profile_name(bundle_id)
+      )
+    end
+  end
+
+  # Next build number = latest TestFlight build + 1 (applied via xcargs to app + widget)
+  def next_build_number(api_key)
+    latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: PROD_SIGNING_TARGETS["AnNien"],
+      initial_build_number: 0
+    ) + 1
+  end
+
+  def prod_export_options
+    {
+      method: "app-store",
+      signingStyle: "manual",
+      signingCertificate: "Apple Distribution",
+      teamID: signing_team_id,
+      provisioningProfiles: PROD_SIGNING_TARGETS.values.to_h { |id| [id, match_profile_name(id)] }
+    }
+  end
+
+  desc "Run unit and integration tests"
+  lane :test do
+    scan(
+      scheme: "AnNien-Dev",
+      clean: true,
+      code_coverage: true,
+      output_directory: "fastlane/test_output",
+      output_types: "html,junit",
+      fail_build: true
+    )
+  end
+
+  desc "Sync certificates and provisioning profiles via Match"
+  lane :sync_signing do |options|
+    setup_ci_keychain
+    api_key = app_store_connect_auth
+    type = options[:type] || "appstore"
+    readonly = options[:readonly].nil? ? is_ci : options[:readonly]
+
+    match(
+      app_identifier: PROD_SIGNING_TARGETS.values,
+      type: type,
+      readonly: readonly,
+      keychain_name: is_ci ? "ci_keychain" : nil,
+      keychain_password: is_ci ? (ENV["FASTLANE_KEYCHAIN_PASSWORD"] || "ci_keychain_password") : nil,
+      api_key: api_key
+    )
+  end
+
+  desc "Build and upload beta build to TestFlight"
+  lane :beta do |options|
+    setup_ci_keychain
+    api_key = app_store_connect_auth
+
+    # Match code signing for Production App & Extensions
+    match(
+      app_identifier: PROD_SIGNING_TARGETS.values,
+      type: "appstore",
+      readonly: is_ci,
+      keychain_name: is_ci ? "ci_keychain" : nil,
+      keychain_password: is_ci ? (ENV["FASTLANE_KEYCHAIN_PASSWORD"] || "ci_keychain_password") : nil,
+      api_key: api_key
+    )
+    apply_manual_signing
+
+    # Calculate incremented build number
+    next_build = next_build_number(api_key)
+
+    # Archive and export .ipa
+    build_app(
+      scheme: "AnNien-Prod",
+      configuration: "Release-Production",
+      export_method: "app-store",
+      export_options: prod_export_options,
+      clean: true,
+      output_directory: "./build",
+      output_name: "AnNien-Beta.ipa",
+      xcargs: "CURRENT_PROJECT_VERSION=#{next_build}"
+    )
+
+    # Distribute to TestFlight
+    changelog_text = options[:changelog] || prompt(text: "Changelog: ") if !is_ci
+    changelog_text ||= "Automated CI/CD build from commit #{ENV['GITHUB_SHA'] ? ENV['GITHUB_SHA'][0..7] : 'local'}"
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true,
+      changelog: changelog_text,
+      distribute_external: false
+    )
+  end
+
+  desc "Build and submit release to App Store Connect"
+  lane :release do |options|
+    setup_ci_keychain
+    api_key = app_store_connect_auth
+
+    match(
+      app_identifier: PROD_SIGNING_TARGETS.values,
+      type: "appstore",
+      readonly: is_ci,
+      keychain_name: is_ci ? "ci_keychain" : nil,
+      keychain_password: is_ci ? (ENV["FASTLANE_KEYCHAIN_PASSWORD"] || "ci_keychain_password") : nil,
+      api_key: api_key
+    )
+    apply_manual_signing
+
+    build_app(
+      scheme: "AnNien-Prod",
+      configuration: "Release-Production",
+      export_method: "app-store",
+      export_options: prod_export_options,
+      clean: true,
+      output_directory: "./build",
+      output_name: "AnNien-Release.ipa",
+      xcargs: "CURRENT_PROJECT_VERSION=#{next_build_number(api_key)}"
+    )
+
+    upload_to_app_store(
+      api_key: api_key,
+      force: true,
+      skip_screenshots: true,
+      skip_metadata: false,
+      submit_for_review: options[:submit_for_review] || false,
+      automatic_release: options[:automatic_release] || false
+    )
+  end
+end

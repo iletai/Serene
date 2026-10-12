@@ -1,0 +1,78 @@
+{
+  "endpoint": "app-config-develop",
+  "type": "object",
+  "exportedAt": "2026-10-05T00:00:00Z",
+  "note": "LovelyMusic remote config_json (dev). Not An Nien.",
+  "content": {
+    "config_json": {
+      "$schema_version": 1,
+      "toggles": {
+        "download_enabled": false,
+        "youtube_auth_enabled": true,
+        "video_playback_enabled": true,
+        "dev_mode_enabled": true,
+        "appearance_settings_enabled": true,
+        "review_mode_enabled": false,
+        "home_continuation_drain_enabled": false
+      },
+      "monetization": {
+        "free_skip_limit": 12,
+        "free_download_limit": 5,
+        "premium_enabled": true,
+        "lifetime_enabled": true,
+        "ads_enabled": false,
+        "ads_skip_frequency": 4,
+        "ads_section_interval": 3,
+        "ads_song_interval": 10,
+        "terms_of_service_url": "",
+        "privacy_policy_url": ""
+      },
+      "audio": { "bitrate_low": 64000, "bitrate_medium": 128000, "bitrate_high": 256000 },
+      "animations": {
+        "bouncy_response": 0.3, "bouncy_damping": 0.6,
+        "smooth_response": 0.4, "smooth_damping": 0.8,
+        "player_response": 0.5, "player_damping": 0.85,
+        "gentle_duration": 0.25, "crossfade_duration": 0.3
+      },
+      "ui": {
+        "home_mood_carousel_height": 110,
+        "home_mood_item_width": 180,
+        "home_mood_grid_row_height": 48,
+        "scroll_fast_fade_during_fling": true,
+        "scroll_shimmer_timeout_enabled": true
+      },
+      "update": {
+        "min_required_version": "1.0.9",
+        "recommended_version": "1.0.9",
+        "force_update_message": "It's update time. We had release new version.",
+        "app_store_url": "https://apps.apple.com/us/app/lovelys-music/id6761626613",
+        "update_changelog": "Update"
+      },
+      "editorial": {
+        "is_enabled": true,
+        "featured_playlists": [
+          { "id": "editorial_top_vn", "title": "Top 50 Vietnam 🇻🇳", "playlist_id": "PL4fGSI1pDJn5kI81J1fYWK5eZRl1zJ5kM", "badge_text": "TRENDING #1" },
+          { "id": "editorial_top_hits", "title": "Today's Top Hits 🌟", "playlist_id": "PLFgquLnL59alGJcdc0BEZJb2p7IgkL0Wu", "badge_text": "GLOBAL HITS" },
+          { "id": "editorial_lofi_focus", "title": "Deep Focus Lofi ☕️", "playlist_id": "PLDIS8bgpb6FkU5v_bX04V4uM_D262e3d-", "badge_text": "FOCUS" },
+          { "id": "editorial_acoustic_chill", "title": "Acoustic Chill 🍂", "playlist_id": "PLrAl6rVqgUq98N_l3gN0kY-2PZgD0M7zX", "badge_text": "RELAX" }
+        ]
+      },
+      "announcements": [
+        { "id": "dev_notice_01", "is_active": false, "level": "info", "message": "Welcome to LovelyMusic Beta!", "action_title": "Learn More", "action_url": "" }
+      ],
+      "seasonal_theme": {
+        "is_enabled": true,
+        "theme_name": "autumn",
+        "schedules": [
+          { "id": "christmas_recurring", "start_date": "12-20", "end_date": "12-26" },
+          { "id": "tet_2026_event", "start_date": "2026-01-26", "end_date": "2026-02-06" }
+        ]
+      },
+      "paywall_promo": {
+        "is_enabled": false,
+        "headline": "Upgrade to LovelyMusic Pro",
+        "highlighted_product_id": "com.lovelymusic.lifetime"
+      }
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "identifier" : "AnNien_Subscriptions",
+  "nonConsumableProducts" : [
+    {
+      "displayPrice" : "39.99",
+      "familyShareable" : true,
+      "internalID" : "com.iletai.annien.nonconsumable.lifetime",
+      "localizations" : [
+        {
+          "description" : "Truy cập trọn đời tất cả tính năng Pro của An Niên",
+          "displayName" : "An Niên Vĩnh Viễn",
+          "locale" : "vi"
+        }
+      ],
+      "productID" : "com.iletai.annien.nonconsumable.lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "products" : [ ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_storeKitErrors" : [ ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21489012",
+      "localizations" : [
+        {
+          "description" : "Gói thành viên An Niên Pro",
+          "displayName" : "An Niên Pro",
+          "locale" : "vi"
+        }
+      ],
+      "name" : "AnNienProSubscriptions",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [ ],
+          "codeOffers" : [ ],
+          "displayPrice" : "1.99",
+          "familyShareable" : true,
+          "groupNumber" : 2,
+          "internalID" : "com.iletai.annien.sub.monthly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Mở khóa toàn bộ tính năng theo tháng",
+              "displayName" : "Gói Tháng Pro",
+              "locale" : "vi"
+            }
+          ],
+          "productID" : "com.iletai.annien.sub.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [ ],
+          "codeOffers" : [ ],
+          "displayPrice" : "14.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "com.iletai.annien.sub.yearly",
+          "introductoryOffer" : {
+            "internalID" : "intro_7days_free",
+            "paymentMode" : "freeTrial",
+            "subscriptionPeriod" : "P7D"
+          },
+          "localizations" : [
+            {
+              "description" : "Mở khóa toàn bộ tính năng 1 năm (Dùng thử 7 ngày)",
+              "displayName" : "Gói Năm Pro",
+              "locale" : "vi"
+            }
+          ],
+          "productID" : "com.iletai.annien.sub.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

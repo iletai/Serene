@@ -1,0 +1,12 @@
+#include "Shared.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = com.iletai.annien
+WIDGET_BUNDLE_IDENTIFIER = com.iletai.annien.widget
+APP_DISPLAY_NAME = An Niên
+CLOUDKIT_CONTAINER_ID = iCloud.com.iletai.annien
+APP_GROUP_ID = group.com.iletai.annien
+CODE_SIGN_ENTITLEMENTS = Config/Entitlements/AnNien-Prod.entitlements
+WIDGET_CODE_SIGN_ENTITLEMENTS = Config/Entitlements/AnNienWidget-Prod.entitlements
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) PROD
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+OTHER_SWIFT_FLAGS = $(inherited) -D PROD

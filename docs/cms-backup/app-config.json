@@ -1,0 +1,35 @@
+{
+  "endpoint": "app-config",
+  "type": "object",
+  "exportedAt": "2026-10-05T00:00:00Z",
+  "note": "LovelyMusic remote config_json (single object). Not An Nien. Safe to delete after user confirms.",
+  "fields": {
+    "config_json": {
+      "fieldId": "config_json",
+      "kind": "textArea",
+      "description": "Modular JSON Remote Configuration"
+    }
+  },
+  "contentSummary": {
+    "config_json_keys": [
+      "$schema_version",
+      "toggles",
+      "monetization",
+      "audio",
+      "animations",
+      "ui",
+      "update",
+      "playback_range",
+      "editorial",
+      "announcements",
+      "seasonal_theme",
+      "paywall_promo"
+    ],
+    "app_store_url": "https://apps.apple.com/us/app/lovelys-music/id6761626613",
+    "update_block": {
+      "min_required_version": "1.0.9",
+      "recommended_version": "1.0.9",
+      "force_update_message": "It's update time. We had release new version."
+    }
+  }
+}

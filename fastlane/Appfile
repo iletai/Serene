@@ -1,0 +1,16 @@
+app_identifier(ENV["APP_IDENTIFIER"] || "com.iletai.annien")
+apple_id(ENV["APPLE_ID"])
+team_id(ENV["APPLE_TEAM_ID"])
+itc_team_id(ENV["APPLE_ITC_TEAM_ID"])
+
+for_lane :beta_dev do
+  app_identifier("com.iletai.annien.dev")
+end
+
+for_lane :beta do
+  app_identifier("com.iletai.annien")
+end
+
+for_lane :release do
+  app_identifier("com.iletai.annien")
+end
