@@ -110,6 +110,26 @@ public actor SmartNotificationEngine {
         try await center.requestAuthorization(options: [.alert, .badge, .sound])
     }
 
+    public func generateCandidates(
+        for reminders: [ReminderEvent],
+        now: Date,
+        calendar: Calendar
+    ) async -> [NotificationCandidate] {
+        let currentYear = calendar.component(.year, from: now)
+        let targetYears = [currentYear, currentYear + 1]
+
+        var candidates: [NotificationCandidate] = []
+        for reminder in reminders {
+            let event = MemorialEvent(from: reminder)
+            let years = reminder.recurrence == .none ? [currentYear] : targetYears
+            for year in years {
+                let yearCandidates = await collectCandidates(for: event, year: year, now: now, calendar: calendar)
+                candidates.append(contentsOf: yearCandidates)
+            }
+        }
+        candidates.sort(by: >)
+        return candidates
+    }
     public func pruneAndSchedule(reminders: [ReminderEvent]) async throws {
         // N5: never schedule into a denied/restricted permission state.
         guard let settings = try? await center.notificationSettings(),
@@ -122,23 +142,7 @@ public actor SmartNotificationEngine {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
 
-        let currentYear = calendar.component(.year, from: now)
-        // Past year is always filtered out by `fireDate > now`; recurring events need next year.
-        let targetYears = [currentYear, currentYear + 1]
-
-        var candidates: [NotificationCandidate] = []
-        for reminder in reminders {
-            let event = MemorialEvent(from: reminder)
-            // One-shot events (recurrence == .none) only fire within the current-year window.
-            let years = reminder.recurrence == .none ? [currentYear] : targetYears
-            for year in years {
-                let yearCandidates = await collectCandidates(for: event, year: year, now: now, calendar: calendar)
-                candidates.append(contentsOf: yearCandidates)
-            }
-        }
-
-        // Sort descending by score
-        candidates.sort(by: >)
+        let candidates = await generateCandidates(for: reminders, now: now, calendar: calendar)
         let selectedCandidates = Array(candidates.prefix(Self.usableSlotLimit))
 
         await reconcilePendingNotifications(selectedCandidates: selectedCandidates)
@@ -249,7 +253,7 @@ public actor SmartNotificationEngine {
         }
     }
 
-    private func resolveTriggerDates(
+    public func resolveTriggerDates(
         event: MemorialEvent,
         targetYear: Int,
         calendar: Calendar
