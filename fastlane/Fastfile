@@ -177,15 +177,39 @@ platform :ios do
       xcargs: "CURRENT_PROJECT_VERSION=#{next_build_number(api_key)}"
     )
 
+    app_review_info = {
+      first_name: "Tai",
+      last_name: "Le",
+      phone_number: "+84326718280",
+      email_address: "iletai@hotmail.com",
+      notes: "App tra cứu Lịch Âm Dương và Quản lý Ngày Nhớ. Ứng dụng không yêu cầu đăng nhập tài khoản."
+    }
+
     upload_to_app_store(
       api_key: api_key,
       force: true,
-      skip_screenshots: true,
+      skip_screenshots: options[:skip_screenshots].nil? ? false : options[:skip_screenshots],
+      overwrite_screenshots: true,
       skip_metadata: ENV['SKIP_METADATA'] == 'true',
+      app_review_information: app_review_info,
       run_precheck_before_submit: false,
       precheck_include_in_app_purchases: false,
       submit_for_review: options[:submit_for_review] || false,
       automatic_release: options[:automatic_release] || false
+    )
+  end
+
+  desc "Upload screenshots to App Store Connect"
+  lane :upload_screenshots do
+    api_key = app_store_connect_auth
+    upload_to_app_store(
+      api_key: api_key,
+      app_identifier: PROD_SIGNING_TARGETS["AnNien"],
+      skip_binary_upload: true,
+      skip_screenshots: false,
+      overwrite_screenshots: true,
+      skip_metadata: true,
+      force: true
     )
   end
 end
