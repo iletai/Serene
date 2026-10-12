@@ -1,0 +1,10 @@
+# An Niên - Lịch Việt & Ngày Nhớ
+
+Ứng dụng Lịch Âm Dương, Tử Vi, Văn Khấn và Quản lý Ngày Nhớ truyền thống Việt Nam. Giao diện Neo-Minimalism tinh tế, hỗ trợ Widget thông minh và đồng bộ iCloud.
+
+Tính năng nổi bật:
+- Tra cứu Âm lịch chính xác tính toán theo GMT+7 (Jean Meeus & Hồ Ngọc Đức).
+- Đầy đủ 24 Tiết Khí, Giờ Hoàng Đạo, Can Chi.
+- Thư viện Văn Khấn truyền thống đầy đủ các dịp lễ tết, rằm, mùng một.
+- Nhắc nhở giỗ chạp, ngày tưởng niệm thông minh (tự động dịch chuyển ngày Âm sang Dương).
+- Widget màn hình chính và màn hình khóa đa dạng kích thước.
