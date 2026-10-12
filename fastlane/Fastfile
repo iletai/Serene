@@ -181,7 +181,7 @@ platform :ios do
       api_key: api_key,
       force: true,
       skip_screenshots: true,
-      skip_metadata: true,
+      skip_metadata: ENV['SKIP_METADATA'] == 'true',
       submit_for_review: options[:submit_for_review] || false,
       automatic_release: options[:automatic_release] || false
     )

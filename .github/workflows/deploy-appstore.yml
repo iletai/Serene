@@ -5,6 +5,12 @@ on:
     tags:
       - 'release-*'
   workflow_dispatch:
+    inputs:
+      skip_metadata:
+        description: 'Skip uploading metadata to App Store Connect'
+        required: false
+        type: boolean
+        default: true
 
 concurrency:
   group: deploy-appstore-${{ github.ref }}
@@ -55,6 +61,7 @@ jobs:
           APPLE_ITC_TEAM_ID: ${{ secrets.APPLE_ITC_TEAM_ID }}
           FASTLANE_KEYCHAIN_PASSWORD: ${{ secrets.FASTLANE_KEYCHAIN_PASSWORD }}
           GITHUB_SHA: ${{ github.sha }}
+          SKIP_METADATA: ${{ inputs.skip_metadata != null && inputs.skip_metadata || 'true' }}
 
       - name: Verify IPA Was Produced
         run: |
