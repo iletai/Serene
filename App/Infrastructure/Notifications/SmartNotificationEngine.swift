@@ -128,8 +128,9 @@ public actor SmartNotificationEngine {
             }
         }
         candidates.sort(by: >)
-        return candidates
+        return Array(candidates.prefix(Self.usableSlotLimit))
     }
+
     public func pruneAndSchedule(reminders: [ReminderEvent]) async throws {
         // N5: never schedule into a denied/restricted permission state.
         guard let settings = try? await center.notificationSettings(),
@@ -142,8 +143,7 @@ public actor SmartNotificationEngine {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
 
-        let candidates = await generateCandidates(for: reminders, now: now, calendar: calendar)
-        let selectedCandidates = Array(candidates.prefix(Self.usableSlotLimit))
+        let selectedCandidates = await generateCandidates(for: reminders, now: now, calendar: calendar)
 
         await reconcilePendingNotifications(selectedCandidates: selectedCandidates)
         try await scheduleRequests(candidates: selectedCandidates, calendar: calendar)
