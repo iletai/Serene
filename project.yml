@@ -90,6 +90,17 @@ targets:
     platform: iOS
     sources:
       - path: Tests
+        excludes:
+          - "UITests/**"
+        createIntermediateGroups: true
+    dependencies:
+      - target: AnNien
+
+  AnNienUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests/UITests
         createIntermediateGroups: true
     dependencies:
       - target: AnNien
@@ -101,12 +112,14 @@ schemes:
         AnNien: all
         AnNienWidget: all
         AnNienTests: [test]
+        AnNienUITests: [test]
     run:
       config: Debug-Development
     test:
       config: Debug-Development
       targets:
         - AnNienTests
+        - AnNienUITests
     profile:
       config: Release-Development
     analyze:

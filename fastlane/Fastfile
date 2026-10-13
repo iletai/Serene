@@ -212,4 +212,25 @@ platform :ios do
       force: true
     )
   end
+
+  desc "Capture real screenshots from simulator only (no ASC credentials needed)"
+  lane :capture_screenshots_only do
+    capture_screenshots
+  end
+
+  desc "Capture real screenshots from simulator, then upload to App Store Connect"
+  lane :screenshots do
+    capture_screenshots
+
+    api_key = app_store_connect_auth
+    upload_to_app_store(
+      api_key: api_key,
+      app_identifier: PROD_SIGNING_TARGETS["AnNien"],
+      skip_binary_upload: true,
+      skip_screenshots: false,
+      overwrite_screenshots: true,
+      skip_metadata: true,
+      force: true
+    )
+  end
 end

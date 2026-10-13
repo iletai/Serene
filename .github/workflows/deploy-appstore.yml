@@ -48,6 +48,16 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.MATCH_SSH_KEY }}
 
+      - name: Capture Screenshots via Simulator
+        run: bundle exec fastlane capture_screenshots_only
+
+      - name: Upload Screenshots Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Screenshots-${{ github.sha }}
+          path: fastlane/screenshots/vi/*.png
+          retention-days: 14
+
       - name: Deploy to App Store via Fastlane
         run: bundle exec fastlane release
         env:
