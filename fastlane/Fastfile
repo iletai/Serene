@@ -188,8 +188,7 @@ platform :ios do
     upload_to_app_store(
       api_key: api_key,
       force: true,
-      skip_screenshots: options[:skip_screenshots].nil? ? false : options[:skip_screenshots],
-      overwrite_screenshots: true,
+      skip_screenshots: true,
       skip_metadata: ENV['SKIP_METADATA'] == 'true',
       app_review_information: app_review_info,
       run_precheck_before_submit: false,
@@ -199,18 +198,32 @@ platform :ios do
     )
   end
 
-  desc "Upload screenshots to App Store Connect"
+  desc "Upload screenshots to App Store Connect (retry safe)"
   lane :upload_screenshots do
     api_key = app_store_connect_auth
-    upload_to_app_store(
-      api_key: api_key,
-      app_identifier: PROD_SIGNING_TARGETS["AnNien"],
-      skip_binary_upload: true,
-      skip_screenshots: false,
-      overwrite_screenshots: true,
-      skip_metadata: true,
-      force: true
-    )
+    begin
+      upload_to_app_store(
+        api_key: api_key,
+        app_identifier: PROD_SIGNING_TARGETS["AnNien"],
+        skip_binary_upload: true,
+        skip_screenshots: false,
+        overwrite_screenshots: true,
+        skip_metadata: true,
+        force: true
+      )
+    rescue StandardError => e
+      UI.message("First attempt failed (#{e.message}), retrying after 10s...")
+      sleep(10)
+      upload_to_app_store(
+        api_key: api_key,
+        app_identifier: PROD_SIGNING_TARGETS["AnNien"],
+        skip_binary_upload: true,
+        skip_screenshots: false,
+        overwrite_screenshots: true,
+        skip_metadata: true,
+        force: true
+      )
+    end
   end
 
   desc "Capture real screenshots from simulator only (no ASC credentials needed)"

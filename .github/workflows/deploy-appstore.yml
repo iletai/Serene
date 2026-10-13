@@ -73,6 +73,13 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           SKIP_METADATA: ${{ inputs.skip_metadata != null && inputs.skip_metadata || 'true' }}
 
+      - name: Upload Screenshots to App Store Connect
+        run: bundle exec fastlane upload_screenshots
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_CONTENT_BASE64: ${{ secrets.ASC_KEY_CONTENT_BASE64 }}
+
       - name: Verify IPA Was Produced
         run: |
           test -s build/AnNien-Release.ipa || { echo "::error::build/AnNien-Release.ipa missing"; exit 1; }
