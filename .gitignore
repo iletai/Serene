@@ -18,6 +18,7 @@ Config/Secrets.xcconfig
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
+fastlane/screenshots/screenshots.html
 fastlane/test_output
 fastlane/keys/
 *.p8
