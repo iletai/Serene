@@ -272,6 +272,7 @@ public struct DataBackupSettingsView: View {
     private func handleRefreshContent() {
         isSyncingContent = true
         Task {
+            await container.syncProverbs()
             do {
                 try await container.holidayRepository.synchronizeRemoteContent()
                 backupStatusMessage = String(localized: "settings.data.sync_success")
