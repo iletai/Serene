@@ -10,6 +10,11 @@ public struct VNFolkQuote: Sendable, Equatable, Hashable {
     }
 }
 
+extension Notification.Name {
+    /// Posted when `VNFolkQuotes.source` changes so cached calendar models refresh.
+    public static let annienFolkQuotesDidChange = Notification.Name("annienFolkQuotesDidChange")
+}
+
 public enum VNFolkQuotes {
     public static let allQuotes: [VNFolkQuote] = [
         VNFolkQuote(quote: "Ăn quả nhớ kẻ trồng cây\nĂn khoai nhớ kẻ cho dây mà trồng.", authorOrOrigin: "Ca dao Việt Nam"),
@@ -47,8 +52,20 @@ public enum VNFolkQuotes {
         VNFolkQuote(quote: "Nhất nghệ tinh, nhất thân vinh.", authorOrOrigin: "Tục ngữ Việt Nam")
     ]
 
+    // ponytail: single static injection point (app composition root sets it once per sync);
+    // move to a DI'd store if a second source or per-scene state ever appears.
+    // nonisolated(unsafe) because StrictConcurrency forbids mutable global state;
+    // writes happen on @MainActor (AppContainer), reads are index reads (safe in practice).
+    public nonisolated(unsafe) static var source: [VNFolkQuote] = allQuotes {
+        didSet {
+            VNMonthLunarCache.shared.removeAll()
+            NotificationCenter.default.post(name: .annienFolkQuotesDidChange, object: nil)
+        }
+    }
+
     public static func quote(for dateKey: DateKey) -> VNFolkQuote {
-        let index = abs(dateKey.rawValue) % allQuotes.count
-        return allQuotes[index]
+        let list = source.isEmpty ? allQuotes : source
+        let index = abs(dateKey.rawValue) % list.count
+        return list[index]
     }
 }

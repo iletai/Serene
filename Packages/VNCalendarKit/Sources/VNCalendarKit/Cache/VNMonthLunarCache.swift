@@ -32,6 +32,12 @@ public final class VNMonthLunarCache: @unchecked Sendable {
         os_unfair_lock_unlock(&unfairLock)
     }
 
+    public func removeAll() {
+        os_unfair_lock_lock(&unfairLock)
+        cache.removeAll()
+        os_unfair_lock_unlock(&unfairLock)
+    }
+
     public func precomputeMonthWindow(around centerDate: Date, reminders: [ReminderEvent] = []) {
         for offset in -1...1 {
             if let monthDate = calendar.date(byAdding: .month, value: offset, to: centerDate) {
