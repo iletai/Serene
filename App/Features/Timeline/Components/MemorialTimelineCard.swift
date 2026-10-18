@@ -20,7 +20,8 @@ struct MemorialTimelineCard: View {
         if isPassed { return .vnBackgroundTertiary }
         switch reminder.category {
         case .deathAnniversary, .ancestral: return .vnAccentRedSurface
-        case .worship: return .vnGoldContainer
+        // Spec: gold tint for seasonal / rite tiles
+        case .worship: return .vnAccentGoldSurface
         default: return .vnBackgroundTertiary
         }
     }
@@ -29,9 +30,18 @@ struct MemorialTimelineCard: View {
         if isPassed { return .vnTextSecondary }
         switch reminder.category {
         case .deathAnniversary, .ancestral: return .vnAccentHeritageRed
-        case .worship: return .vnOnGoldContainer
+        case .worship: return .vnImperialChrysanthemumGold
         default: return .vnTextSecondary
         }
+    }
+
+    // Spec: tile border matches tint (red / gold)
+    private var tileBorder: Color {
+        if isPassed || reminder.category == .other ||
+            reminder.category == .birthday || reminder.category == .wedding {
+            return .clear
+        }
+        return tileForeground.opacity(0.25)
     }
 
     private var tileIcon: String {
@@ -44,14 +54,15 @@ struct MemorialTimelineCard: View {
 
     private var pillBackground: Color {
         if isPassed { return .vnBackgroundTertiary }
+        // Spec: "Còn N ngày" solid red, "Hôm nay" gold container
         if isToday { return .vnGoldContainer }
-        return .vnAccentDeepPrimary
+        return .vnAccentHeritageRed
     }
 
     private var pillForeground: Color {
         if isPassed { return .vnTextSecondary }
         if isToday { return .vnOnGoldContainer }
-        return .white
+        return .vnRicePaperWhite
     }
 
     var body: some View {
@@ -83,6 +94,10 @@ struct MemorialTimelineCard: View {
             .frame(width: 40, height: 40)
             .background(tileBackground)
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
+            .overlay(
+                RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                    .strokeBorder(tileBorder, lineWidth: VNBorderWidth.hairline)
+            )
     }
 
     private var contentColumn: some View {
@@ -141,23 +156,7 @@ struct MemorialTimelineCard: View {
     }
 
     private var ritualButton: some View {
-        Button(action: onViewRitual) {
-            HStack(spacing: VNSpacing.xs) {
-                Image(systemName: "book.pages").font(.system(size: 11)).accessibilityHidden(true)
-                Text("Xem Văn Khấn").font(.system(size: 12, weight: .medium))
-            }
-            .foregroundColor(.vnAccentHeritageRed)
-            .frame(minHeight: 44)
-            .padding(.horizontal, VNSpacing.sm)
-            .contentShape(Rectangle())
-            .background(Color.vnBackgroundPrimary)
-            .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-            .overlay(
-                RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                    .stroke(Color.vnAccentHeritageRed.opacity(0.3), lineWidth: VNBorderWidth.regular)
-            )
-        }
-        .buttonStyle(.plain)
+        VNButton("Xem Văn Khấn", icon: "book.pages", variant: .secondary, size: .small, action: onViewRitual)
     }
 
     private var trailingChevron: some View {

@@ -39,7 +39,7 @@ public struct VNMoonPhaseView: View {
     public let size: CGFloat
     public let showTitle: Bool
 
-    public init(lunarDay: Int, size: CGFloat = 24, showTitle: Bool = false) {
+    public init(lunarDay: Int, size: CGFloat = VNSpacing.xxl, showTitle: Bool = false) {
         self.lunarDay = max(1, min(30, lunarDay))
         self.size = size
         self.showTitle = showTitle
@@ -74,7 +74,7 @@ public struct VNMoonPhaseView: View {
                     .foregroundColor(isFullMoon ? Color.vnOnGoldContainer : Color.vnTextSecondary)
                     .shadow(
                         color: isFullMoon ? Color.vnAccentImperialGold.opacity(0.35) : Color.clear,
-                        radius: isFullMoon ? 4 : 0
+                        radius: isFullMoon ? VNShadow.card.radius : 0
                     )
             }
 

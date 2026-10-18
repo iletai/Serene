@@ -70,7 +70,7 @@ struct VNDayDirectionsView: View {
     let dayModel: VNCalendarDayModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("HƯỚNG XUẤT HÀNH CÁT LỢI")
                 .font(.system(size: 11, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
@@ -84,11 +84,11 @@ struct VNDayDirectionsView: View {
     }
 
     private func directionPill(title: String, direction: String, color: Color) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: VNSpacing.sm) {
             Circle()
                 .fill(color)
                 .frame(width: 8, height: 8)
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(title)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
@@ -116,7 +116,7 @@ struct VNDayActivitiesView: View {
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: VNSpacing.sm) {
                 activityRow(
                     icon: "checkmark.circle.fill",
                     label: "Nên làm:",
@@ -151,7 +151,7 @@ struct VNDayActivitiesView: View {
                 .font(.system(size: 14))
                 .foregroundColor(color)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(label)
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(color)

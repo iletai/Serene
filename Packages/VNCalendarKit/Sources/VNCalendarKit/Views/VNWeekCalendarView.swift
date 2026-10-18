@@ -95,7 +95,7 @@ public struct VNWeekCalendarView: View {
                 Button {
                     onSelectDay(day.dateKey, day.solarDate)
                 } label: {
-                    VStack(spacing: 3) {
+                    VStack(spacing: VNSpacing.space2) {
                         // Thứ (T2, T3...)
                         Text(shortWeekday(from: day.weekdayName))
                             .font(.system(size: 11, weight: .semibold))
@@ -122,7 +122,7 @@ public struct VNWeekCalendarView: View {
                         )
                         .frame(height: 5)
                     }
-                    .padding(.vertical, 8)
+                    .padding(.vertical, VNSpacing.sm)
                     .frame(maxWidth: .infinity)
                     .background(
                         isSelected ? Color.vnAccentHeritageRed :
@@ -149,8 +149,8 @@ public struct VNWeekCalendarView: View {
     private func dayOverviewHeaderCard(for model: VNCalendarDayModel) -> some View {
         Button(action: onTapDayDetail) {
             HStack {
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 6) {
+                VStack(alignment: .leading, spacing: VNSpacing.space2) {
+                    HStack(spacing: VNSpacing.xs) {
                         Text("\(model.weekdayName), \(model.solarDay)/\(model.solarMonth)/\(model.solarYear)")
                             .font(.system(size: 15, weight: .bold, design: .serif))
                             .foregroundColor(.vnTextPrimary)
@@ -159,8 +159,8 @@ public struct VNWeekCalendarView: View {
                             Text("Hôm nay")
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.vnAccentHeritageRed)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
+                                .padding(.horizontal, VNSpacing.xs)
+                                .padding(.vertical, VNSpacing.space2)
                                 .background(Color.vnAccentHeritageRed.opacity(0.12))
                                 .clipShape(Capsule())
                         }
@@ -183,10 +183,10 @@ public struct VNWeekCalendarView: View {
             }
             .padding(VNSpacing.md)
             .background(Color.vnBackgroundSecondary)
-            .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.medium))
+            .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
             .overlay(
-                RoundedRectangle(cornerRadius: VNCornerRadius.medium)
-                    .stroke(Color.vnBorderSubtle.opacity(0.6), lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                    .stroke(Color.vnBorderSubtle.opacity(0.6), lineWidth: VNBorderWidth.hairlineThin)
             )
         }
         .buttonStyle(.plain)
@@ -195,29 +195,29 @@ public struct VNWeekCalendarView: View {
     // MARK: - 12 Lunar Hours Timeline
 
     private func lunarHoursTimeline(for model: VNCalendarDayModel) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("12 GIỜ ĐỊA CHI TRONG NGÀY")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.6)
 
             let columns = [
-                GridItem(.flexible(), spacing: 6),
-                GridItem(.flexible(), spacing: 6),
-                GridItem(.flexible(), spacing: 6),
-                GridItem(.flexible(), spacing: 6)
+                GridItem(.flexible(), spacing: VNSpacing.xs),
+                GridItem(.flexible(), spacing: VNSpacing.xs),
+                GridItem(.flexible(), spacing: VNSpacing.xs),
+                GridItem(.flexible(), spacing: VNSpacing.xs)
             ]
 
-            LazyVGrid(columns: columns, spacing: 6) {
+            LazyVGrid(columns: columns, spacing: VNSpacing.xs) {
                 ForEach(EarthlyBranch.allCases, id: \.self) { branch in
                     let isAuspicious = model.auspiciousHours.contains(branch)
 
-                    VStack(spacing: 2) {
-                        HStack(spacing: 2) {
+                    VStack(spacing: VNSpacing.space2) {
+                        HStack(spacing: VNSpacing.space2) {
                             if isAuspicious {
                                 Circle()
                                     .fill(Color.vnAccentImperialGold)
-                                    .frame(width: 4, height: 4)
+                                    .frame(width: VNSpacing.xs, height: VNSpacing.xs)
                             }
                             Text("Giờ \(branch.vietnameseName)")
                                 .font(.system(size: 11, weight: isAuspicious ? .bold : .medium, design: .serif))
@@ -229,7 +229,7 @@ public struct VNWeekCalendarView: View {
                             .foregroundColor(isAuspicious ? .vnAccentImperialGold : .vnTextTertiary)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
+                    .padding(.vertical, VNSpacing.xs)
                     .background(isAuspicious ? Color.vnAccentImperialGold.opacity(0.1) : Color.vnBackgroundSecondary)
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
                     .overlay(
@@ -237,7 +237,7 @@ public struct VNWeekCalendarView: View {
                             .stroke(
                                 isAuspicious ? Color.vnAccentImperialGold.opacity(0.4)
                                     : Color.vnBorderSubtle.opacity(0.4),
-                                lineWidth: 0.5
+                                lineWidth: VNBorderWidth.hairlineThin
                             )
                     )
                 }
@@ -255,7 +255,7 @@ public struct VNWeekCalendarView: View {
     // MARK: - Anniversaries Section
 
     private func anniversariesSection(for model: VNCalendarDayModel) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
             HStack {
                 Text("SỰ KIỆN & LỄ GIỖ TRONG NGÀY")
                     .font(.system(size: 10, weight: .bold))
@@ -275,7 +275,7 @@ public struct VNWeekCalendarView: View {
             }
 
             if model.anniversaries.isEmpty {
-                HStack(spacing: 8) {
+                HStack(spacing: VNSpacing.sm) {
                     Image(systemName: "calendar.badge.clock")
                         .font(.system(size: 14))
                         .foregroundColor(.vnTextTertiary)
@@ -284,16 +284,16 @@ public struct VNWeekCalendarView: View {
                         .font(.system(size: 12))
                         .foregroundColor(.vnTextSecondary)
                 }
-                .padding(.vertical, 8)
+                .padding(.vertical, VNSpacing.sm)
             } else {
-                VStack(spacing: 6) {
+                VStack(spacing: VNSpacing.xs) {
                     ForEach(model.anniversaries) { item in
-                        HStack(spacing: 10) {
+                        HStack(spacing: VNSpacing.md) {
                             Rectangle()
                                 .fill(item.isAncestorDeath ? Color.vnAccentHeritageRed : Color.vnAccentImperialGold)
                                 .frame(width: 3)
 
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: VNSpacing.space2) {
                                 Text(item.title)
                                     .font(.system(size: 13, weight: .semibold, design: .serif))
                                     .foregroundColor(.vnTextPrimary)
@@ -309,7 +309,7 @@ public struct VNWeekCalendarView: View {
                                 VNSealBadge.gio(size: .small)
                             }
                         }
-                        .padding(8)
+                        .padding(VNSpacing.sm)
                         .background(Color.vnBackgroundPrimary)
                         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
                     }

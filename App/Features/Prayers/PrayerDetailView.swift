@@ -103,7 +103,7 @@ public struct PrayerDetailView: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.white)
                         .padding(.horizontal, VNSpacing.lg)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, VNSpacing.sm)
                         .background(Color.vnVermilionDark.opacity(0.95))
                         .clipShape(Capsule())
                         .shadow(color: VNShadow.card.color, radius: VNShadow.card.radius,
@@ -169,7 +169,7 @@ public struct PrayerDetailView: View {
                 .font(.system(size: 11))
                 .foregroundColor(.vnTextSecondary)
 
-            Divider().background(Color.vnBorderSubtle)
+            VNRowDivider()
 
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 ForEach(prayer.offerings, id: \.self) { item in
@@ -177,7 +177,7 @@ public struct PrayerDetailView: View {
                         Circle()
                             .fill(Color.vnAccentImperialGold)
                             .frame(width: 5, height: 5)
-                            .padding(.top, 6)
+                            .padding(.top, VNSpacing.xs)
                             .accessibilityHidden(true)
 
                         Text(item)
@@ -275,7 +275,7 @@ public struct PrayerDetailView: View {
                 .font(.system(size: 18, weight: .semibold, design: .serif))
                 .foregroundColor(.vnTextPrimary)
 
-            Divider().background(Color.vnBorderSubtle)
+            VNRowDivider()
 
             Text(interpolatedPrayerText)
                 .font(.system(size: fontSize, weight: .medium, design: .serif))

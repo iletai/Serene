@@ -38,19 +38,8 @@ public struct OmniSearchView: View {
                 .padding(.bottom, VNSpacing.xxl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.vnBackgroundPrimary.opacity(0.9), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Tra Cứu Thông Minh")
-                        .font(.system(size: 18, weight: .semibold, design: .serif))
-                        .foregroundColor(.vnAccentDeepPrimary)
-                }
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Đóng") { dismiss() }
-                        .frame(minWidth: 44, minHeight: 44)
-                }
+            .vnNavBar(title: "Tra Cứu Thông Minh") {
+                VNDismissButton(style: .text("Đóng")) { dismiss() }
             }
         }
     }

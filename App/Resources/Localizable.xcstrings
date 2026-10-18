@@ -494,6 +494,23 @@
         }
       }
     },
+    "paywall.pending": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Purchase is awaiting approval (Ask to Buy)."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giao dịch đang chờ người mua phê duyệt (Ask to Buy)."
+          }
+        }
+      }
+    },
     "articles.category_all": {
       "extractionState": "manual",
       "localizations": {

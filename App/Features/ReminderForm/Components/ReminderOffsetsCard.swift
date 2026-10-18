@@ -44,7 +44,7 @@ struct ReminderOffsetsCard: View {
                     Image(systemName: selected ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(selected ? .vnAccentDeepPrimary : .vnTextSecondary)
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         Text(title)
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(selected ? .vnAccentDeepPrimary : .vnTextSecondary)

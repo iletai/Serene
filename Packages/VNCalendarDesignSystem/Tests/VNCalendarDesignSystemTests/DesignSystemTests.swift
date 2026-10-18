@@ -81,11 +81,10 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertEqual(VNSpacing.golden, 32)
         XCTAssertEqual(VNSpacing.hero, 48)
 
-        XCTAssertEqual(VNCornerRadius.small, 4)
-        XCTAssertEqual(VNCornerRadius.medium, 10)
-        XCTAssertEqual(VNCornerRadius.card, 8)
-        XCTAssertEqual(VNCornerRadius.large, 16)
-        XCTAssertEqual(VNCornerRadius.sheet, 24)
+        XCTAssertEqual(VNCornerRadius.micro, 4)
+        XCTAssertEqual(VNCornerRadius.small, 8)
+        XCTAssertEqual(VNCornerRadius.card, 12)
+        XCTAssertEqual(VNCornerRadius.sheet, 28)
         XCTAssertEqual(VNCornerRadius.pill, 999)
 
         XCTAssertEqual(VNBorderWidth.hairline, 1.0)
@@ -277,7 +276,7 @@ final class DesignSystemTests: XCTestCase {
 
         let customCard = VNCard(
             allPadding: VNSpacing.lg,
-            cornerRadius: VNCornerRadius.large,
+            cornerRadius: VNCornerRadius.sheet,
             backgroundColor: Color.vnAncientSand,
             borderColor: Color.vnAccentHeritageRed,
             borderWidth: VNBorderWidth.regular,
@@ -288,7 +287,7 @@ final class DesignSystemTests: XCTestCase {
                 Text("Chi tiết")
             }
         }
-        XCTAssertEqual(customCard.cornerRadius, VNCornerRadius.large)
+        XCTAssertEqual(customCard.cornerRadius, VNCornerRadius.sheet)
         XCTAssertEqual(customCard.backgroundColor, Color.vnAncientSand)
         XCTAssertEqual(customCard.borderColor, Color.vnAccentHeritageRed)
         XCTAssertEqual(customCard.borderWidth, VNBorderWidth.regular)

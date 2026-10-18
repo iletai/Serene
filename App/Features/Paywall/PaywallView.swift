@@ -3,17 +3,15 @@ import StoreKit
 import VNCalendarDesignSystem
 
 public struct PaywallView: View {
-    private static let termsOfUseURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")
-    // swiftlint:disable:next todo
-    // TODO: wire real privacy + ToS URLs before App Store submission (Guideline 3.1.2)
-    private static let privacyPolicyURL: URL? = nil
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @State private var subscriptionManager = SubscriptionManager.shared
+    // Legal URLs come from microCMS app-config; service holds live-URL fallbacks.
+    @State private var legalLinksService = LegalLinksService.shared
     @State private var selectedProductID: String = ProductID.yearly
     @State private var isPurchasing = false
     @State private var errorMessage: String?
+    @State private var pendingNotice: String?
 
     public init() {}
 
@@ -24,6 +22,14 @@ public struct PaywallView: View {
                     hero
                     featureList
                     productSelector
+
+                    if let pending = pendingNotice {
+                        Text(pending)
+                            .font(.vnCaption1)
+                            .foregroundColor(.vnTextSecondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, VNSpacing.lg)
+                    }
 
                     if let error = errorMessage {
                         Text(error)
@@ -39,6 +45,7 @@ public struct PaywallView: View {
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
+            .task { await legalLinksService.refresh() }
             .toolbarBackground(Color.vnBackgroundPrimary.opacity(0.9), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
@@ -56,7 +63,7 @@ public struct PaywallView: View {
                                 )
                                 .overlay(
                                     RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                                        .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                                        .stroke(Color.vnBorderSubtle.opacity(0.4), lineWidth: VNBorderWidth.hairline)
                                 )
                                 .frame(minWidth: 44, minHeight: 44)
                                 .contentShape(Rectangle())
@@ -171,9 +178,9 @@ public struct PaywallView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, VNSpacing.lg)
-                .background(Color.vnAccentDeepPrimary)
-                .foregroundColor(.white)
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
+                .background(Color.vnAccentHeritageRed)
+                .foregroundColor(.vnRicePaperWhite)
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
             }
         )
         .disabled(isPurchasing || subscriptionManager.products.isEmpty)
@@ -182,7 +189,10 @@ public struct PaywallView: View {
 
     private var restoreButton: some View {
         Button("Khôi phục gói mua") {
+            guard !isPurchasing else { return }
+            isPurchasing = true
             Task {
+                defer { isPurchasing = false }
                 do {
                     try await subscriptionManager.restorePurchases()
                     if subscriptionManager.entitlement.isPro {
@@ -203,8 +213,8 @@ public struct PaywallView: View {
     // Required by App Review Guideline 3.1.2
     private var legalLinks: some View {
         HStack(spacing: VNSpacing.lg) {
-            legalLink(title: "Điều khoản sử dụng", url: Self.termsOfUseURL)
-            legalLink(title: "Chính sách bảo mật", url: Self.privacyPolicyURL)
+            legalLink(title: "Điều khoản sử dụng", url: legalLinksService.termsOfUseURL)
+            legalLink(title: "Chính sách bảo mật", url: legalLinksService.privacyPolicyURL)
         }
         .padding(.bottom, VNSpacing.xxl)
     }
@@ -297,6 +307,7 @@ public struct PaywallView: View {
         }
         isPurchasing = true
         errorMessage = nil
+        pendingNotice = nil
 
         Task {
             defer { isPurchasing = false }
@@ -305,6 +316,9 @@ public struct PaywallView: View {
                 if subscriptionManager.entitlement.isPro {
                     dismiss()
                 }
+            } catch StoreError.pending {
+                // Ask to Buy is not a failure: show a neutral pending notice instead of the error style.
+                pendingNotice = String(localized: "paywall.pending")
             } catch {
                 errorMessage = error.localizedDescription
             }

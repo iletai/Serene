@@ -115,6 +115,7 @@ schemes:
         AnNienUITests: [test]
     run:
       config: Debug-Development
+      storeKitConfiguration: Config/Products.storekit
     test:
       config: Debug-Development
       targets:

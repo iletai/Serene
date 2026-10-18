@@ -24,7 +24,7 @@ public struct LunarWidgetEntryView: View {
     }
 
     private var smallWidgetView: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: VNSpacing.space2) {
             HStack {
                 Text(entry.weekdayName)
                     .font(.system(size: 13, weight: .bold))
@@ -44,7 +44,7 @@ public struct LunarWidgetEntryView: View {
             Spacer()
 
             HStack {
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: VNSpacing.space2) {
                     Text("\(entry.lunarDayText) ÂL")
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(Color.vnAccentHeritageRed)
@@ -56,22 +56,26 @@ public struct LunarWidgetEntryView: View {
                 if let term = entry.solarTermName {
                     Text(term)
                         .font(.system(size: 9, weight: .semibold))
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 2)
+                        .padding(.horizontal, VNSpacing.xs)
+                        .padding(.vertical, VNSpacing.space2)
                         .background(Color.vnAccentImperialGold.opacity(0.15))
                         .foregroundColor(Color.vnAccentImperialGold)
                         .clipShape(Capsule())
                 }
             }
         }
-        .padding(12)
+        .padding(VNSpacing.md)
         .background(Color.vnBackgroundPrimary)
+        .overlay(
+            RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                .stroke(Color.vnBorderSubtle.opacity(0.4), lineWidth: VNBorderWidth.hairline)
+        )
     }
 
     private var mediumWidgetView: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: VNSpacing.lg) {
             // Left: Date Info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text("\(entry.weekdayName), \(entry.solarDay)/\(entry.solarMonth)/\(entry.solarYear)")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(Color.vnTextSecondary)
@@ -92,9 +96,10 @@ public struct LunarWidgetEntryView: View {
             }
 
             Divider()
+                .background(Color.vnBorderSubtle.opacity(0.4))
 
             // Right: Upcoming Reminders / Info
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text("NGÀY NHỚ SẮP TỚI")
                     .font(.system(size: 9, weight: .bold))
                     .foregroundColor(Color.vnTextSecondary)
@@ -103,7 +108,7 @@ public struct LunarWidgetEntryView: View {
                     HStack {
                         Circle()
                             .fill(Color.vnAccentHeritageRed)
-                            .frame(width: 6, height: 6)
+                            .frame(width: 4, height: 4)
                         Text(title)
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(Color.vnTextPrimary)
@@ -119,8 +124,12 @@ public struct LunarWidgetEntryView: View {
                 }
             }
         }
-        .padding(14)
+        .padding(VNSpacing.lg)
         .background(Color.vnBackgroundPrimary)
+        .overlay(
+            RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                .stroke(Color.vnBorderSubtle.opacity(0.4), lineWidth: VNBorderWidth.hairline)
+        )
     }
 
     private var inlineLockScreenView: some View {
@@ -128,7 +137,7 @@ public struct LunarWidgetEntryView: View {
     }
 
     private var circularLockScreenView: some View {
-        VStack(spacing: 1) {
+        VStack(spacing: VNSpacing.space2) {
             Text("\(entry.lunarDay)")
                 .font(.system(size: 16, weight: .bold))
             Text("ÂL")
@@ -137,7 +146,7 @@ public struct LunarWidgetEntryView: View {
     }
 
     private var rectangularLockScreenView: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: VNSpacing.space2) {
             Text("\(entry.weekdayName), \(entry.solarDay)/\(entry.solarMonth)")
                 .font(.system(size: 11, weight: .bold))
             Text("Âm Lịch: \(entry.lunarDayText) • \(entry.lunarYearCanChi)")

@@ -70,7 +70,7 @@ public struct VNCalendarModePicker: View {
                         .background {
                             if isSelected {
                                 RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                                    .fill(Color.vnAccentDeepPrimary)
+                                    .fill(Color.vnAccentHeritageRed)
                                     .matchedGeometryEffect(id: "activeSegmentIndicator", in: modeAnimationNamespace)
                             }
                         }
@@ -84,9 +84,9 @@ public struct VNCalendarModePicker: View {
         .padding(VNSpacing.xs)
         .background(Color.vnBackgroundSecondary)
         .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.medium)
+            RoundedRectangle(cornerRadius: VNCornerRadius.card)
                 .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
         )
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.medium))
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
     }
 }

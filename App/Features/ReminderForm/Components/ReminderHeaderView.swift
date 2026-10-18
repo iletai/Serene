@@ -28,7 +28,7 @@ struct ReminderHeaderView: View {
             shadow: Self.folioShadow
         ) {
             VStack(alignment: .leading, spacing: VNSpacing.sm) {
-                HStack(spacing: 6) {
+                HStack(spacing: VNSpacing.xs) {
                     Circle()
                         .fill(Color.vnAccentImperialGold)
                         .frame(width: 6, height: 6)
@@ -49,7 +49,7 @@ struct ReminderHeaderView: View {
                     .italic()
                     .foregroundColor(.vnTextSecondary)
 
-                Divider().background(Color.vnBorderSubtle)
+                VNRowDivider()
 
                 datePreview
             }
@@ -65,7 +65,7 @@ struct ReminderHeaderView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(dateType == .lunar ? "DƯƠNG LỊCH" : "ÂM LỊCH")
                     .font(.vnCaption2)
                     .fontWeight(.medium)

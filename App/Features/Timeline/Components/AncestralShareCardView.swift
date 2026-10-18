@@ -85,8 +85,7 @@ public struct AncestralShareCardView: View {
                 .padding(.bottom, VNSpacing.xl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-            .navigationTitle("Thiệp Báo Kỵ Nhật")
-            .navigationBarTitleDisplayMode(.inline)
+            .vnNavBar(title: "Thiệp Báo Kỵ Nhật")
         }
     }
 
@@ -108,7 +107,7 @@ public struct AncestralShareCardView: View {
             .padding(.top, VNSpacing.sm)
 
             // Header Title
-            VStack(spacing: 4) {
+            VStack(spacing: VNSpacing.xs) {
                 Text("THÔNG BÁO NGÀY GIỖ GIA TIÊN")
                     .font(.system(size: 13, weight: .bold, design: .serif))
                     .foregroundColor(.vnAccentHeritageRed)
@@ -125,13 +124,13 @@ public struct AncestralShareCardView: View {
                 .padding(.horizontal, VNSpacing.md)
 
             // Member Info
-            VStack(spacing: 6) {
+            VStack(spacing: VNSpacing.xs) {
                 if let rel = reminder.relationship, !rel.isEmpty {
                     Text(rel.uppercased())
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.vnAccentImperialGold)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 3)
+                        .padding(.horizontal, VNSpacing.sm)
+                        .padding(.vertical, VNSpacing.space2)
                         .background(Color.vnAccentGoldSurface)
                         .clipShape(Capsule())
                 }
@@ -144,9 +143,9 @@ public struct AncestralShareCardView: View {
             .padding(.vertical, VNSpacing.xs)
 
             // Date Cluster Box
-            VStack(spacing: 8) {
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 2) {
+            VStack(spacing: VNSpacing.sm) {
+                HStack(spacing: VNSpacing.md) {
+                    VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         Text("NGÀY ÂM LỊCH")
                             .font(.system(size: 9, weight: .bold))
                             .foregroundColor(.vnTextSecondary)
@@ -157,7 +156,7 @@ public struct AncestralShareCardView: View {
 
                     Spacer()
 
-                    VStack(alignment: .trailing, spacing: 2) {
+                    VStack(alignment: .trailing, spacing: VNSpacing.space2) {
                         Text("DƯƠNG LỊCH NĂM NAY")
                             .font(.system(size: 9, weight: .bold))
                             .foregroundColor(.vnTextSecondary)
@@ -168,9 +167,9 @@ public struct AncestralShareCardView: View {
                 }
                 .padding(VNSpacing.md)
                 .background(Color.vnBackgroundPrimary)
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.medium))
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
                 .overlay(
-                    RoundedRectangle(cornerRadius: VNCornerRadius.medium)
+                    RoundedRectangle(cornerRadius: VNCornerRadius.card)
                         .strokeBorder(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                 )
             }

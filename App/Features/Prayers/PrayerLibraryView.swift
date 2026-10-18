@@ -149,7 +149,7 @@ public struct PrayerLibraryView: View {
 
     private var categoryPillsSection: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: VNSpacing.sm) {
                 // "Tất cả" Pill
                 Button {
                     triggerHaptic()
@@ -267,7 +267,7 @@ public struct PrayerLibraryView: View {
     private var folioShadow: VNShadow.ShadowConfig { VNShadow.folio }
 
     private var emptyState: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: VNSpacing.sm) {
             Image(systemName: "book.closed")
                 .font(.system(size: 36))
                 .foregroundColor(.vnTextTertiary)

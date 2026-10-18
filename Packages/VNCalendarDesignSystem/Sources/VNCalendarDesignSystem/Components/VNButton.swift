@@ -24,7 +24,7 @@ public enum VNButtonSize: Sendable {
 
     public var horizontalPadding: CGFloat {
         switch self {
-        case .small: return VNSpacing.md
+        case .small: return VNSpacing.sm
         case .medium: return VNSpacing.lg
         case .large: return VNSpacing.xl
         }
@@ -68,10 +68,10 @@ public struct VNButtonStyle: ButtonStyle {
                     .strokeBorder(borderColor, lineWidth: borderWidth)
             )
             .shadow(
-                color: VNShadow.card.color,
-                radius: VNShadow.card.radius,
-                x: VNShadow.card.x,
-                y: VNShadow.card.y
+                color: shadowColor,
+                radius: VNShadow.folio.radius,
+                x: VNShadow.folio.x,
+                y: VNShadow.folio.y
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(VNAnimation.cellSelection, value: configuration.isPressed)
@@ -80,7 +80,7 @@ public struct VNButtonStyle: ButtonStyle {
     private var foregroundColor: Color {
         switch variant {
         case .primary, .gold, .destructive:
-            return .white
+            return .vnRicePaperWhite
         case .secondary:
             return .vnTextPrimary
         case .tertiary:
@@ -91,7 +91,7 @@ public struct VNButtonStyle: ButtonStyle {
     private func backgroundColor(isPressed: Bool) -> Color {
         switch variant {
         case .primary:
-            return isPressed ? Color.vnAccentDeepPrimary.opacity(0.85) : Color.vnAccentDeepPrimary
+            return isPressed ? Color.vnAccentHeritageRed.opacity(0.85) : Color.vnAccentHeritageRed
         case .secondary:
             return isPressed ? Color.vnBackgroundTertiary : Color.clear
         case .tertiary:
@@ -108,7 +108,7 @@ public struct VNButtonStyle: ButtonStyle {
         case .primary, .gold, .destructive:
             return Color.clear
         case .secondary:
-            return Color.vnAccentImperialGold
+            return Color.vnBorderSubtle
         case .tertiary:
             return Color.clear
         }
@@ -117,7 +117,7 @@ public struct VNButtonStyle: ButtonStyle {
     private var borderWidth: CGFloat {
         switch variant {
         case .secondary:
-            return VNBorderWidth.regular
+            return VNBorderWidth.hairline
         default:
             return 0
         }
@@ -126,9 +126,9 @@ public struct VNButtonStyle: ButtonStyle {
     private var shadowColor: Color {
         switch variant {
         case .primary:
-            return Color.vnAccentDeepPrimary.opacity(0.25)
+            return Color.vnAccentHeritageRed.opacity(0.15)
         case .gold:
-            return Color.vnAccentImperialGold.opacity(0.2)
+            return Color.vnAccentImperialGold.opacity(0.15)
         default:
             return Color.clear
         }

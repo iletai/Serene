@@ -29,25 +29,8 @@ struct MemorialEmptyStateView: View {
                 .lineSpacing(4)
                 .padding(.horizontal, VNSpacing.xl)
 
-            Button(
-                action: onAdd,
-                label: {
-                    HStack(spacing: VNSpacing.xs) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 14))
-                        Text("Thêm Ngày Giỗ Đầu Tiên")
-                            .font(.system(size: 14, weight: .bold, design: .serif))
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, VNSpacing.xl)
-                    .padding(.vertical, VNSpacing.md)
-                    .frame(minHeight: 44)
-                    .background(Color.vnAccentHeritageRed)
-                    .clipShape(Capsule())
-                    .shadow(color: VNShadow.card.color, radius: VNShadow.card.radius, x: VNShadow.card.x, y: VNShadow.card.y)
-                }
-            )
-            .padding(.top, VNSpacing.sm)
+            VNButton("Thêm Ngày Giỗ Đầu Tiên", icon: "plus.circle.fill", variant: .primary, size: .medium, action: onAdd)
+                .padding(.top, VNSpacing.sm)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, VNSpacing.xl)

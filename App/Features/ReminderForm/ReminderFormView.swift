@@ -107,6 +107,8 @@ public struct ReminderFormView: View {
             .scrollDismissesKeyboard(.interactively)
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color.vnBackgroundPrimary.opacity(0.9), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Đóng", action: { dismiss() })
@@ -153,27 +155,15 @@ public struct ReminderFormView: View {
 
     @ViewBuilder
     private var saveActionButton: some View {
-        Button(
-            action: { saveAndDismiss() },
-            label: {
-                HStack(spacing: VNSpacing.xs) {
-                    Image(systemName: "checkmark.seal.fill")
-                        .font(.system(size: 15))
-                        .accessibilityHidden(true)
-                    Text(existingReminder != nil ? "Lưu Thay Đổi" : "Lưu Ngày Lễ")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(
-                    title.trimmingCharacters(in: .whitespaces).isEmpty
-                        ? Color.vnTextTertiary
-                        : Color.vnAccentDeepPrimary
-                )
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-            }
-        )
+        VNButton(
+            existingReminder != nil ? "Lưu Thay Đổi" : "Lưu Ngày Lễ",
+            icon: "checkmark.seal.fill",
+            variant: title.trimmingCharacters(in: .whitespaces).isEmpty ? .secondary : .primary,
+            size: .large,
+            isFullWidth: true
+        ) {
+            saveAndDismiss()
+        }
         .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
         .padding(.top, VNSpacing.md)
     }

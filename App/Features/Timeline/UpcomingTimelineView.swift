@@ -102,24 +102,9 @@ public struct UpcomingTimelineView: View {
 
                 Spacer()
 
-                Button {
+                VNButton("Thêm Mới", icon: "plus", variant: .primary, size: .small) {
                     checkAndCreate()
-                } label: {
-                    HStack(spacing: VNSpacing.xs) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 13, weight: .bold))
-                        Text("Thêm Mới")
-                            .font(.system(size: 12, weight: .bold, design: .serif))
-                    }
-                    .foregroundColor(.white)
-                    .frame(minHeight: 44)
-                    .padding(.horizontal, VNSpacing.lg)
-                    .background(Color.vnAccentHeritageRed)
-                    .clipShape(Capsule())
-                    .shadow(color: VNShadow.card.color, radius: VNShadow.card.radius, x: VNShadow.card.x, y: VNShadow.card.y)
                 }
-                .buttonStyle(.plain)
-                .contentShape(Capsule())
             }
 
             HStack(alignment: .lastTextBaseline) {
@@ -181,9 +166,9 @@ public struct UpcomingTimelineView: View {
         .padding(.vertical, VNSpacing.md)
         .frame(minHeight: 44)
         .background(Color.vnBackgroundSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.medium))
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.medium)
+            RoundedRectangle(cornerRadius: VNCornerRadius.card)
                 .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
         )
         .padding(.horizontal, VNSpacing.xl)
@@ -352,8 +337,8 @@ private struct RitualPrayerModal: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: VNSpacing.lg) {
                     // Ceremonial Header
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(spacing: 6) {
+                    VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                        HStack(spacing: VNSpacing.xs) {
                             VNSealBadge.gio(size: .medium)
 
                             Text("VĂN KHẤN TRUYỀN THỐNG")
@@ -372,7 +357,7 @@ private struct RitualPrayerModal: View {
                             .foregroundColor(.vnTextSecondary)
                     }
 
-                    Divider().background(Color.vnBorderSubtle)
+                    VNRowDivider()
 
                     // Prayer Scroll
                     VStack(alignment: .leading, spacing: VNSpacing.md) {
@@ -403,9 +388,9 @@ private struct RitualPrayerModal: View {
                         .lineSpacing(7)
                         .padding(VNSpacing.lg)
                         .background(Color.vnBackgroundSecondary)
-                        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.medium))
+                        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
                         .overlay(
-                            RoundedRectangle(cornerRadius: VNCornerRadius.medium)
+                            RoundedRectangle(cornerRadius: VNCornerRadius.card)
                                 .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                         )
                     }
@@ -413,14 +398,8 @@ private struct RitualPrayerModal: View {
                 .padding(VNSpacing.lg)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-            .navigationTitle("Văn Khấn Gia Tiên")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Đóng") { dismiss() }
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.vnAccentHeritageRed)
-                }
+            .vnNavBar(title: "Văn Khấn Gia Tiên") {
+                VNDismissButton(style: .text("Đóng")) { dismiss() }
             }
         }
     }

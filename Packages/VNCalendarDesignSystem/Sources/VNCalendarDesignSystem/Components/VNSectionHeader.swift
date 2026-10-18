@@ -3,8 +3,17 @@ import SwiftUI
 /// Editorial section header embodying the "Vietnamese Lunar Editorial" aesthetic.
 /// Features a vertical Cinnabar accent bar or calligraphy seal icon alongside New York Serif typography.
 public struct VNSectionHeader: View {
+    /// Canonical accent-bar geometry (DESIGN §4). No spacing token matches 3.5/18pt.
+    /// nonisolated: enum-case default args live outside MainActor, and `View` is MainActor-isolated.
+    public nonisolated static let accentBarWidth: CGFloat = 3.5
+    public nonisolated static let accentBarHeight: CGFloat = 18
+
     public enum AccentStyle: Sendable, Equatable {
-        case verticalBar(color: Color = .vnAccentDeepPrimary, width: CGFloat = 3.5, height: CGFloat = 18)
+        case verticalBar(
+            color: Color = .vnAccentDeepPrimary,
+            width: CGFloat = VNSectionHeader.accentBarWidth,
+            height: CGFloat = VNSectionHeader.accentBarHeight
+        )
         case seal(text: String = "ẤN", color: Color = .vnAccentDeepPrimary)
         case icon(systemName: String, color: Color = .vnAccentImperialGold)
         case none

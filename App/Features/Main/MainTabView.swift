@@ -25,13 +25,14 @@ public enum MainTab: Int, CaseIterable, Identifiable {
     public func icon(isSelected: Bool) -> String {
         switch self {
         case .calendar:
-            return isSelected ? "calendar.circle.fill" : "calendar"
+            // No filled SF Symbol for plain calendar; active state rides color + weight.
+            return "calendar"
         case .memorial:
             return isSelected ? "flame.fill" : "flame"
         case .rituals:
-            return isSelected ? "book.pages.fill" : "book.closed"
+            return isSelected ? "book.closed.fill" : "book.closed"
         case .family:
-            return isSelected ? "person.3.sequence.fill" : "person.3.sequence"
+            return isSelected ? "person.3.fill" : "person.3"
         }
     }
 }
@@ -77,13 +78,17 @@ public struct MainTabView: View {
         .padding(.horizontal, VNSpacing.lg)
         .padding(.vertical, VNSpacing.md)
         .frame(maxWidth: 520)
-        .background(Color.vnSurfaceElevated.opacity(0.85), in: Capsule())
-        .background(.ultraThinMaterial, in: Capsule())
+        .background {
+            Capsule()
+                .fill(Color.vnSurfaceElevated.opacity(0.85))
+                .background(.ultraThinMaterial, in: Capsule())
+        }
         .overlay(Capsule().stroke(Color.vnBorderSubtle.opacity(0.4), lineWidth: VNBorderWidth.hairline))
+        // Canonical float shadow (DESIGN §4): red-tinted float, not folio card shadow.
         .shadow(color: VNShadow.floating.color, radius: VNShadow.floating.radius,
                 x: VNShadow.floating.x, y: VNShadow.floating.y)
         .padding(.horizontal, VNSpacing.lg)
-        .padding(.bottom, VNSpacing.md)
+        .padding(.bottom, 14)
     }
 
     private func tabButton(for tab: MainTab) -> some View {
@@ -95,7 +100,7 @@ public struct MainTabView: View {
                 selectedTab = tab.rawValue
             }
         } label: {
-            VStack(spacing: 2) {
+            VStack(spacing: VNSpacing.space2) {
                 Image(systemName: tab.icon(isSelected: isSelected))
                     .font(.system(size: 22, weight: isSelected ? .semibold : .regular))
                     .symbolRenderingMode(.hierarchical)

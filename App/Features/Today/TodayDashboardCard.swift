@@ -144,8 +144,8 @@ public struct TodayDashboardCard: View {
     }
 
     private var hoangDaoPill: some View {
-        VStack(alignment: .trailing, spacing: 4) {
-            HStack(spacing: 4) {
+        VStack(alignment: .trailing, spacing: VNSpacing.xs) {
+            HStack(spacing: VNSpacing.xs) {
                 Image(systemName: "sun.max")
                     .font(.system(size: 11, weight: .semibold))
                 Text(dayStar.isAuspicious ? "HOÀNG ĐẠO" : "HẮC ĐẠO")
@@ -153,8 +153,8 @@ public struct TodayDashboardCard: View {
                     .tracking(0.66)
             }
             .foregroundColor(.vnAccentDeepPrimary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
+            .padding(.horizontal, VNSpacing.sm)
+            .padding(.vertical, VNSpacing.xs)
             .background(Color.vnAccentRedSurface)
             .clipShape(Capsule())
             .overlay(
@@ -174,7 +174,7 @@ public struct TodayDashboardCard: View {
                 .font(.system(size: 56, weight: .light))
                 .foregroundColor(.vnTextPrimary)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("DƯƠNG LỊCH")
                     .font(.system(size: 11, weight: .semibold))
                     .tracking(0.66)
@@ -192,16 +192,23 @@ public struct TodayDashboardCard: View {
         .padding(.top, VNSpacing.xs)
     }
 
+    // Centered sun ornament breaking the hairline (canonical hero divider).
     private var hairlineDivider: some View {
-        Divider()
-            .background(Color.vnBorderSubtle.opacity(0.6))
-            .padding(.vertical, VNSpacing.sm)
+        ZStack {
+            Divider().background(Color.vnBorderSubtle.opacity(0.6))
+            Image(systemName: "sun.max.fill")
+                .font(.system(size: 12))
+                .foregroundColor(Color.vnBorderSubtle.opacity(0.6))
+                .padding(.horizontal, VNSpacing.xs)
+                .background(Color.vnBackgroundSecondary)
+        }
+        .padding(.vertical, VNSpacing.sm)
     }
 
     // MARK: - Lunar Callout + Can Chi
     private var lunarCalloutGrid: some View {
         HStack(spacing: VNSpacing.md) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text("ÂM LỊCH")
                     .font(.system(size: 11, weight: .medium))
                     .tracking(0.66)
@@ -220,7 +227,7 @@ public struct TodayDashboardCard: View {
                 .fill(Color.vnBorderSubtle.opacity(0.6))
                 .frame(width: 1)
 
-            VStack(spacing: 6) {
+            VStack(spacing: VNSpacing.xs) {
                 canChiRow(label: "Ngày", value: currentCanChi.day.description)
                 canChiRow(label: "Tháng", value: currentCanChi.month.description)
                 canChiRow(label: "Năm", value: currentCanChi.year.description)
@@ -277,7 +284,7 @@ private struct TodayHeroGuidance: View {
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
+                HStack(spacing: VNSpacing.xs) {
                     ForEach(hours, id: \.self) { branch in
                         hourChip(for: branch)
                     }
@@ -287,7 +294,7 @@ private struct TodayHeroGuidance: View {
     }
 
     private func hourChip(for branch: EarthlyBranch) -> some View {
-        VStack(spacing: 1) {
+        VStack(spacing: VNSpacing.space2) {
             Text(branch.vietnameseName)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(.vnAccentDeepPrimary)
@@ -296,8 +303,8 @@ private struct TodayHeroGuidance: View {
                 .font(.system(size: 10, weight: .regular))
                 .foregroundColor(.vnTextSecondary)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .padding(.horizontal, VNSpacing.sm)
+        .padding(.vertical, VNSpacing.sm)
         .background(Color.vnBackgroundTertiary)
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
         .overlay(
@@ -333,8 +340,8 @@ private struct TodayHeroGuidance: View {
     }
 
     private func guidancePanel(title: String, icon: String, tint: Color, background: Color, text: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
+            HStack(spacing: VNSpacing.xs) {
                 Image(systemName: icon)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(tint)
@@ -368,37 +375,13 @@ private struct TodayCardActions: View {
 
     var body: some View {
         HStack(spacing: VNSpacing.sm) {
-            Button(action: onAddReminder) {
-                Label("Thêm Ngày Nhớ", systemImage: "plus")
-                    .font(.system(size: 13, weight: .semibold))
-                    .padding(.vertical, 13)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 44)
-                    .background(Color.vnAccentHeritageRed)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
-                    .shadow(color: Color.vnAccentHeritageRed.opacity(0.2), radius: 4, x: 0, y: 2)
-            }
-
-            Button(action: onQuickSearch) {
-                Label("Tra Cứu", systemImage: "magnifyingglass")
-                    .font(.system(size: 13, weight: .semibold))
-                    .padding(.vertical, 13)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 44)
-                    .background(Color.vnBackgroundSecondary)
-                    .foregroundColor(.vnTextPrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                            .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
-                    )
-            }
+            VNButton("Thêm Ngày Nhớ", icon: "plus", variant: .primary, size: .small, isFullWidth: true, action: onAddReminder)
+            VNButton("Tra Cứu", icon: "magnifyingglass", variant: .secondary, size: .small, isFullWidth: true, action: onQuickSearch)
         }
     }
 }
 
-// Four L-shaped corner strokes framing top-left and bottom-right corners of the hero almanac card (DESIGN §4: dual corner framing marks).
+// Four L-shaped 12x12 corner strokes framing the hero almanac card (canonical.html: top/bottom × left/right marks).
 private struct HeroCornerMarks: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -410,12 +393,17 @@ private struct HeroCornerMarks: Shape {
         let right = rect.maxX - inset
         let top = rect.minY + inset
         let bottom = rect.maxY - inset
-        // Top-Left corner mark
-        path.addRect(CGRect(x: left, y: top, width: arm, height: width))
-        path.addRect(CGRect(x: left, y: top, width: width, height: arm))
-        // Bottom-Right corner mark
-        path.addRect(CGRect(x: right - arm, y: bottom - width, width: arm, height: width))
-        path.addRect(CGRect(x: right - width, y: bottom - arm, width: width, height: arm))
+        // Each corner draws a horizontal + vertical arm forming an "L".
+        for corner in [(left, top), (right, top), (left, bottom), (right, bottom)] {
+            let isRight = corner.0 == right
+            let isBottom = corner.1 == bottom
+            let hx = isRight ? corner.0 - arm : corner.0
+            let hy = isBottom ? corner.1 - width : corner.1
+            let vx = isRight ? corner.0 - width : corner.0
+            let vy = isBottom ? corner.1 - arm : corner.1
+            path.addRect(CGRect(x: hx, y: hy, width: arm, height: width))
+            path.addRect(CGRect(x: vx, y: vy, width: width, height: arm))
+        }
         return path
     }
 }

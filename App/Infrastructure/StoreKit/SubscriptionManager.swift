@@ -40,6 +40,7 @@ public enum StoreError: LocalizedError {
     case productNotFound
     case userCancelled
     case pending
+    case timedOut
 
     public var errorDescription: String? {
         switch self {
@@ -47,6 +48,7 @@ public enum StoreError: LocalizedError {
         case .productNotFound: return "Không tìm thấy sản phẩm yêu cầu."
         case .userCancelled: return "Giao dịch đã bị huỷ."
         case .pending: return "Giao dịch đang chờ duyệt (Ask to Buy)."
+        case .timedOut: return "Kết nối App Store quá lâu."
         }
     }
 }
@@ -86,11 +88,37 @@ public final class SubscriptionManager {
     public func loadProducts() async {
         isLoading = true
         defer { isLoading = false }
-        do {
-            let fetched = try await Product.products(for: ProductID.all)
-            self.products = fetched.sorted { $0.price < $1.price }
-        } catch {
-            logger.error("Failed to load products: \(error.localizedDescription)")
+
+        // Product.products can hang on a flaky network; bound each fetch with a
+        // timeout and retry twice so the paywall can still show a result.
+        for attempt in 1...2 {
+            do {
+                let fetched = try await withTimeout(.seconds(10)) {
+                    try await Product.products(for: ProductID.all)
+                }
+                self.products = fetched.sorted { $0.price < $1.price }
+                return
+            } catch {
+                logger.error("Failed to load products (attempt \(attempt)): \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // Races the fetch against a timeout clock. On timeout the fetch task is
+    // cancelled so it cannot keep holding StoreKit work in the background.
+    private func withTimeout<T: Sendable>(
+        _ duration: Duration,
+        operation: @escaping @Sendable () async throws -> T
+    ) async throws -> T {
+        try await withThrowingTaskGroup(of: T.self) { group in
+            group.addTask { try await operation() }
+            group.addTask {
+                try await Task.sleep(for: duration)
+                throw StoreError.timedOut
+            }
+            guard let result = try await group.next() else { throw StoreError.timedOut }
+            group.cancelAll()
+            return result
         }
     }
 
@@ -118,6 +146,13 @@ public final class SubscriptionManager {
     public func restorePurchases() async throws {
         try await AppStore.sync()
         await updatePurchasedProducts()
+        // AppStore.sync() can return before Transaction.currentEntitlements reflects the
+        // restored transactions, so a single refresh may still read .free and the user
+        // would be asked to pay again. Poll briefly until the entitlement turns Pro.
+        for _ in 0..<4 where !entitlement.isPro {
+            try await Task.sleep(for: .seconds(0.5))
+            await updatePurchasedProducts()
+        }
     }
 
     public func updatePurchasedProducts() async {

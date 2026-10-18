@@ -51,7 +51,7 @@ struct ReminderDatePickerCard: View {
                             }
                         }
 
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             Text("Năm (tùy chọn)")
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(.vnTextSecondary)
@@ -60,7 +60,7 @@ struct ReminderDatePickerCard: View {
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.vnTextPrimary)
                                 .focused($isYearFocused)
-                                .padding(.bottom, 7)
+                                .padding(.bottom, VNSpacing.sm)
                                 .background(Color.clear)
                                 .overlay(alignment: .bottom) {
                                     Rectangle()
@@ -78,7 +78,7 @@ struct ReminderDatePickerCard: View {
                     }
 
                     // Live Astronomical Preview
-                    HStack(spacing: 6) {
+                    HStack(spacing: VNSpacing.xs) {
                         Image(systemName: "sparkles")
                             .font(.system(size: 11))
                             .foregroundColor(.vnAccentHeritageRed)
@@ -88,7 +88,7 @@ struct ReminderDatePickerCard: View {
                             .lineLimit(1)
                     }
                     .padding(.horizontal, VNSpacing.sm)
-                    .padding(.vertical, 6)
+                    .padding(.vertical, VNSpacing.sm)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.vnAccentRedSurface.opacity(0.6))
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
@@ -98,7 +98,7 @@ struct ReminderDatePickerCard: View {
     }
 
     private func pickerColumn<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text(title)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.vnTextSecondary)
@@ -106,7 +106,7 @@ struct ReminderDatePickerCard: View {
                 .pickerStyle(.menu)
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
-                .padding(.bottom, 4)
+                .padding(.bottom, VNSpacing.xs)
                 .background(Color.clear)
                 .overlay(alignment: .bottom) {
                     Rectangle()

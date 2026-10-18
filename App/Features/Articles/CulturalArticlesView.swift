@@ -198,7 +198,7 @@ public struct CulturalArticlesView: View {
     @ViewBuilder
     private var categoryChipsSection: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: VNSpacing.sm) {
                 ForEach(categories, id: \.self) { cat in
                     let isSelected = selectedCategory == cat
                     Button {
@@ -246,20 +246,10 @@ public struct CulturalArticlesView: View {
                 .foregroundColor(.vnTextSecondary)
                 .padding(.horizontal, VNSpacing.xl)
 
-            Button {
+            VNButton("Xem Tất Cả", variant: .primary, size: .medium) {
                 selectedCategory = "Tất cả"
                 searchQuery = ""
-            } label: {
-                Text("Xem Tất Cả")
-                    .font(.system(size: 14, weight: .bold, design: .serif))
-                    .padding(.horizontal, VNSpacing.xxl)
-                    .padding(.vertical, VNSpacing.md)
-                    .frame(minHeight: 44)
-                    .background(Color.vnAccentHeritageRed)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
             }
-            .buttonStyle(.plain)
             .padding(.top, VNSpacing.xs)
         }
         .frame(maxWidth: .infinity)
@@ -272,7 +262,7 @@ public struct CulturalArticlesView: View {
         let isLunar = holiday.calendarType == .lunar
 
         return VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: VNSpacing.sm) {
                 HStack(alignment: .top) {
                     Text(holiday.title)
                         .font(.system(size: 17, weight: .semibold, design: .serif))
@@ -295,7 +285,7 @@ public struct CulturalArticlesView: View {
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(2)
 
-                HStack(spacing: 4) {
+                HStack(spacing: VNSpacing.xs) {
                     if holiday.rituals != nil {
                         Label("Có Bài Văn Khấn", systemImage: "book.pages.fill")
                             .font(.system(size: 11, weight: .semibold))
@@ -313,7 +303,7 @@ public struct CulturalArticlesView: View {
                         .foregroundColor(.vnTextTertiary)
                         .accessibilityHidden(true)
                 }
-                .padding(.top, 2)
+                .padding(.top, VNSpacing.space2)
             }
             .padding(VNSpacing.xl)
         }
@@ -347,10 +337,10 @@ public struct HolidayDetailSheet: View {
                             .foregroundColor(.vnTextPrimary)
                     }
 
-                    Divider().background(Color.vnBorderSubtle)
+                    VNRowDivider()
 
                     // Summary / Meaning
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: VNSpacing.xs) {
                         Text("Ý NGHĨA & NGUỒN GỐC")
                             .font(.system(size: 11, weight: .bold))
                             .foregroundColor(.vnTextSecondary)
@@ -363,7 +353,7 @@ public struct HolidayDetailSheet: View {
                     }
 
                     if let customs = holiday.customs {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             Text("PHONG TỤC NÊN LÀM")
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(.vnStatusSuccess)
@@ -385,7 +375,7 @@ public struct HolidayDetailSheet: View {
                     }
 
                     if let taboos = holiday.taboos {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             Text("ĐIỀU KIÊNG KỴ")
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(.vnStatusError)

@@ -7,7 +7,7 @@ public struct VNDayCellView: View, Equatable {
     public let isCurrentMonth: Bool
     public let onSelect: () -> Void
 
-    @ScaledMetric(relativeTo: .body) private var solarFontSize: CGFloat = 15
+    @ScaledMetric(relativeTo: .body) private var solarFontSize: CGFloat = 14
     @ScaledMetric(relativeTo: .caption2) private var lunarFontSize: CGFloat = 10
 
     public init(
@@ -30,7 +30,7 @@ public struct VNDayCellView: View, Equatable {
 
     public var body: some View {
         Button(action: onSelect) {
-            VStack(spacing: 1) {
+            VStack(spacing: VNSpacing.space2) {
                 if let model = dayModel {
                     Text("\(model.solarDay)")
                         .font(.system(size: solarFontSize, weight: solarWeight))
@@ -38,6 +38,7 @@ public struct VNDayCellView: View, Equatable {
 
                     Text(model.lunarDayText)
                         .font(.system(size: lunarFontSize, weight: lunarWeight))
+                        .italic()
                         .foregroundColor(lunarColor)
 
                     indicatorDot
@@ -69,7 +70,7 @@ public struct VNDayCellView: View, Equatable {
     private var indicatorDot: some View {
         if dayModel?.hasAncestorDeathAnniversary == true {
             Circle()
-                .fill(isToday ? Color.vnRicePaperWhite : Color.vnAccentHeritageRed)
+                .fill(isToday ? Color.white : Color.vnAccentHeritageRed)
                 .frame(width: 4, height: 4)
         } else if dayModel?.isAuspiciousDay == true {
             Circle()
@@ -136,7 +137,7 @@ public struct VNDayCellView: View, Equatable {
 
     private var borderWidth: CGFloat {
         if isToday { return 0 }
-        if isFullMoon || isFirstLunarDay || isSelected { return 1 }
+        if isFullMoon || isFirstLunarDay || isSelected { return VNBorderWidth.hairline }
         return 0
     }
 

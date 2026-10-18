@@ -63,8 +63,8 @@ struct ReminderTitleSection: View {
                 Text(role)
                     .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? .vnAccentDeepPrimary : .vnTextSecondary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
+                    .padding(.horizontal, VNSpacing.sm)
+                    .padding(.vertical, VNSpacing.xs)
                     .background(isSelected ? Color.vnAccentRedSurface : Color.clear)
                     .clipShape(Capsule())
                     .overlay(

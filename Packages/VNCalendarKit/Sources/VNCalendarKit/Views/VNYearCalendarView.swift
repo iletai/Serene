@@ -12,7 +12,7 @@ public struct VNYearCalendarView: View {
     private let columns = [
         GridItem(.flexible(), spacing: VNSpacing.sm),
         GridItem(.flexible(), spacing: VNSpacing.sm),
-        GridItem(.flexible(), spacing: 10)
+        GridItem(.flexible(), spacing: VNSpacing.sm)
     ]
 
     public init(
@@ -46,7 +46,7 @@ public struct VNYearCalendarView: View {
     }
 
     private func miniMonthCard(_ monthModel: VNYearMonthModel) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
             // Month Header
             HStack {
                 Text(monthModel.monthName)
@@ -99,7 +99,7 @@ public struct VNYearCalendarView: View {
             .foregroundColor(
                 isSelected ? .white :
                 (isToday ? .vnAccentImperialGold :
-                (isCurrentMonth ? (isSpecialLunar ? .vnAccentHeritageRed : .vnTextPrimary) : .vnTextTertiary.opacity(0.3)))
+                (isCurrentMonth ? (isSpecialLunar ? .vnAccentHeritageRed : .vnTextPrimary) : .vnTextTertiary.opacity(0.35)))
             )
             .frame(maxWidth: .infinity, minHeight: 14)
             .background(

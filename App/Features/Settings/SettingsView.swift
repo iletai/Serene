@@ -28,20 +28,8 @@ public struct SettingsView: View {
                 .padding(.bottom, VNSpacing.xxl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.vnBackgroundPrimary.opacity(0.9), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(String(localized: "tab.settings"))
-                        .font(.vnTitleCeremonial)
-                        .foregroundColor(.vnAccentDeepPrimary)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(String(localized: "settings.action.done")) { dismiss() }
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
-                }
+            .vnNavBar(title: String(localized: "tab.settings")) {
+                VNDismissButton(style: .text(String(localized: "settings.action.done"))) { dismiss() }
             }
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView()
@@ -52,8 +40,8 @@ public struct SettingsView: View {
     // MARK: - Membership Banner Card
     private var membershipCard: some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            sectionHeader(String(localized: "settings.membership.header"))
-            settingsCard {
+            VNSectionLabel(String(localized: "settings.membership.header"))
+            VNGroupCard {
                 HStack {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         let proTitle = String(localized: "settings.membership.pro_title")
@@ -69,17 +57,9 @@ public struct SettingsView: View {
                     }
                     Spacer()
                     if !subscriptionManager.entitlement.isPro {
-                        Button(String(localized: "settings.action.upgrade")) {
+                        VNButton(String(localized: "settings.action.upgrade"), variant: .primary, size: .small) {
                             isShowingPaywall = true
                         }
-                        .font(.vnCaption1)
-                        .fontWeight(.bold)
-                        .frame(minHeight: 44)
-                        .padding(.horizontal, VNSpacing.md)
-                        .contentShape(Capsule())
-                        .background(Color.vnAccentHeritageRed)
-                        .foregroundColor(.white)
-                        .clipShape(Capsule())
                     } else {
                         Image(systemName: "checkmark.seal.fill")
                             .foregroundColor(.vnAccentHeritageRed)
@@ -97,10 +77,10 @@ public struct SettingsView: View {
         VStack(alignment: .leading, spacing: VNSpacing.xl) {
             // 1. Calendar & Astronomy Sub-menu
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                sectionHeader(String(localized: "settings.timezone.header"))
-                settingsCard {
+                VNSectionLabel(String(localized: "settings.timezone.header"))
+                VNGroupCard {
                     NavigationLink(destination: CalendarSettingsView()) {
-                        menuRow(icon: "calendar.badge.clock", title: String(localized: "settings.calendar.title"), subtitle: String(localized: "settings.calendar.subtitle_desc"), tint: .vnAccentHeritageRed)
+                        VNSettingsRow(icon: "calendar.badge.clock", title: String(localized: "settings.calendar.title"), subtitle: String(localized: "settings.calendar.subtitle_desc"), tint: .vnAccentHeritageRed)
                     }
                     .buttonStyle(.plain)
                 }
@@ -108,10 +88,11 @@ public struct SettingsView: View {
 
             // 2. Appearance & Language Sub-menu
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                sectionHeader(String(localized: "settings.appearance.header"))
-                settingsCard {
+                VNSectionLabel(String(localized: "settings.appearance.header"))
+                VNGroupCard {
                     NavigationLink(destination: AppearanceLanguageSettingsView()) {
-                        menuRow(icon: "paintpalette.fill", title: String(localized: "settings.appearance.mode"), subtitle: appThemeAppearance == 1 ? String(localized: "settings.appearance.light") : (appThemeAppearance == 2 ? String(localized: "settings.appearance.dark") : String(localized: "settings.appearance.auto")), tint: .vnAccentImperialGold)
+                        let modeSubtitle = appThemeAppearance == 1 ? String(localized: "settings.appearance.light") : (appThemeAppearance == 2 ? String(localized: "settings.appearance.dark") : String(localized: "settings.appearance.auto"))
+                        VNSettingsRow(icon: "paintpalette.fill", title: String(localized: "settings.appearance.mode"), subtitle: modeSubtitle, tint: .vnAccentImperialGold)
                     }
                     .buttonStyle(.plain)
                 }
@@ -119,10 +100,10 @@ public struct SettingsView: View {
 
             // 3. Data & Sync Sub-menu
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                sectionHeader(String(localized: "settings.data.header"))
-                settingsCard {
+                VNSectionLabel(String(localized: "settings.data.header"))
+                VNGroupCard {
                     NavigationLink(destination: DataBackupSettingsView()) {
-                        menuRow(icon: "arrow.triangle.2.circlepath.cloud.fill", title: String(localized: "settings.data.header"), subtitle: String(localized: "settings.data.refresh"), tint: .vnStatusSuccess)
+                        VNSettingsRow(icon: "arrow.triangle.2.circlepath.cloud.fill", title: String(localized: "settings.data.header"), subtitle: String(localized: "settings.data.refresh"), tint: .vnStatusSuccess)
                     }
                     .buttonStyle(.plain)
                 }
@@ -130,10 +111,10 @@ public struct SettingsView: View {
 
             // 4. Privacy Sub-menu
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                sectionHeader(String(localized: "settings.privacy.header"))
-                settingsCard {
+                VNSectionLabel(String(localized: "settings.privacy.header"))
+                VNGroupCard {
                     NavigationLink(destination: PrivacySecuritySettingsView()) {
-                        menuRow(icon: "lock.shield.fill", title: String(localized: "settings.privacy.zero_knowledge_title"), subtitle: "Zero-Knowledge Privacy", tint: .vnAccentDeepPrimary)
+                        VNSettingsRow(icon: "lock.shield.fill", title: String(localized: "settings.privacy.zero_knowledge_title"), subtitle: "Zero-Knowledge Privacy", tint: .vnAccentDeepPrimary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -141,67 +122,15 @@ public struct SettingsView: View {
 
             // 5. About Sub-menu
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                sectionHeader(String(localized: "settings.about.header"))
-                settingsCard {
+                VNSectionLabel(String(localized: "settings.about.header"))
+                VNGroupCard {
                     NavigationLink(destination: AboutSettingsView()) {
-                        menuRow(icon: "info.circle.fill", title: String(localized: "settings.about.version"), subtitle: "1.0.0 (Build 1)", tint: .vnAccentImperialGold)
+                        VNSettingsRow(icon: "info.circle.fill", title: String(localized: "settings.about.version"), subtitle: "1.0.0 (Build 1)", tint: .vnAccentImperialGold)
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-    }
-
-    private func menuRow(icon: String, title: String, subtitle: String, tint: Color) -> some View {
-        HStack(spacing: VNSpacing.md) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(tint)
-                .frame(width: 40, height: 40)
-                .background(tint.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.vnTextPrimary)
-                Text(subtitle)
-                    .font(.system(size: 12))
-                    .foregroundColor(.vnTextSecondary)
-                    .lineLimit(1)
-            }
-
-            Spacer()
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(.vnTextSecondary.opacity(0.6))
-        }
-        .padding(.horizontal, VNSpacing.lg)
-        .padding(.vertical, VNSpacing.md)
-        .contentShape(Rectangle())
-    }
-
-    private func sectionHeader(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.system(size: 11, weight: .medium))
-            .tracking(0.7)
-            .foregroundColor(.vnOnGoldContainer)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 4)
-            .accessibilityAddTraits(.isHeader)
-    }
-
-    private func settingsCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(spacing: 0) {
-            content()
-        }
-        .background(Color.vnBackgroundSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
-        )
     }
 }
 
@@ -219,7 +148,7 @@ public struct AppearanceLanguageSettingsView: View {
                     Text(String(localized: "settings.appearance.header").uppercased())
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, 4)
+                        .padding(.horizontal, VNSpacing.xs)
 
                     VStack(spacing: 0) {
                         Picker(String(localized: "settings.appearance.mode"), selection: $appThemeAppearance) {
@@ -239,7 +168,7 @@ public struct AppearanceLanguageSettingsView: View {
                     Text("NGÔN NGỮ ỨNG DỤNG / APP LANGUAGE".uppercased())
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, 4)
+                        .padding(.horizontal, VNSpacing.xs)
 
                     VStack(spacing: 0) {
                         Picker("Ngôn ngữ", selection: $appLanguage) {
@@ -258,8 +187,7 @@ public struct AppearanceLanguageSettingsView: View {
             .padding(.top, VNSpacing.xl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-        .navigationTitle(String(localized: "settings.appearance.header"))
-        .navigationBarTitleDisplayMode(.inline)
+        .vnNavBar(title: String(localized: "settings.appearance.header"))
     }
 }
 
@@ -277,7 +205,7 @@ public struct DataBackupSettingsView: View {
                     Text(String(localized: "settings.data.header").uppercased())
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, 4)
+                        .padding(.horizontal, VNSpacing.xs)
 
                     VStack(spacing: 0) {
                         Button(action: handleRefreshContent) {
@@ -292,7 +220,7 @@ public struct DataBackupSettingsView: View {
                             .padding(.vertical, VNSpacing.md)
                         }
 
-                        Divider().background(Color.vnBorderSubtle).padding(.leading, VNSpacing.lg)
+                        VNRowDivider(leadingInset: VNSpacing.lg)
 
                         Button(action: handleExportJSON) {
                             HStack {
@@ -305,7 +233,7 @@ public struct DataBackupSettingsView: View {
                             .padding(.vertical, VNSpacing.md)
                         }
 
-                        Divider().background(Color.vnBorderSubtle).padding(.leading, VNSpacing.lg)
+                        VNRowDivider(leadingInset: VNSpacing.lg)
 
                         Button(action: handleExportICS) {
                             HStack {
@@ -319,7 +247,7 @@ public struct DataBackupSettingsView: View {
                         }
 
                         if let msg = backupStatusMessage {
-                            Divider().background(Color.vnBorderSubtle)
+                            VNRowDivider()
                             Text(msg)
                                 .font(.system(size: 12))
                                 .foregroundColor(.vnStatusSuccess)
@@ -335,8 +263,7 @@ public struct DataBackupSettingsView: View {
             .padding(.top, VNSpacing.xl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-        .navigationTitle(String(localized: "settings.data.header"))
-        .navigationBarTitleDisplayMode(.inline)
+        .vnNavBar(title: String(localized: "settings.data.header"))
         .sheet(isPresented: $isShowingExportSheet) {
             ShareSheet(activityItems: [exportText])
         }
@@ -390,7 +317,7 @@ public struct PrivacySecuritySettingsView: View {
                     Text(String(localized: "settings.privacy.header").uppercased())
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, 4)
+                        .padding(.horizontal, VNSpacing.xs)
 
                     VStack(alignment: .leading, spacing: VNSpacing.md) {
                         Text(String(localized: "settings.privacy.zero_knowledge_title"))
@@ -411,8 +338,7 @@ public struct PrivacySecuritySettingsView: View {
             .padding(.top, VNSpacing.xl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-        .navigationTitle(String(localized: "settings.privacy.header"))
-        .navigationBarTitleDisplayMode(.inline)
+        .vnNavBar(title: String(localized: "settings.privacy.header"))
     }
 }
 
@@ -424,7 +350,7 @@ public struct AboutSettingsView: View {
                     Text(String(localized: "settings.about.header").uppercased())
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, 4)
+                        .padding(.horizontal, VNSpacing.xs)
 
                     VStack(spacing: 0) {
                         HStack {
@@ -439,7 +365,7 @@ public struct AboutSettingsView: View {
                         .padding(.horizontal, VNSpacing.lg)
                         .padding(.vertical, VNSpacing.md)
 
-                        Divider().background(Color.vnBorderSubtle).padding(.leading, VNSpacing.lg)
+                        VNRowDivider(leadingInset: VNSpacing.lg)
 
                         HStack {
                             Text(String(localized: "settings.about.copyright"))
@@ -461,8 +387,7 @@ public struct AboutSettingsView: View {
             .padding(.top, VNSpacing.xl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-        .navigationTitle(String(localized: "settings.about.header"))
-        .navigationBarTitleDisplayMode(.inline)
+        .vnNavBar(title: String(localized: "settings.about.header"))
     }
 }
 

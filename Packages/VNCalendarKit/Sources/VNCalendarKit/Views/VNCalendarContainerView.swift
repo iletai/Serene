@@ -111,31 +111,37 @@ public struct VNCalendarContainerView: View {
     private var legendRow: some View {
         HStack(spacing: VNSpacing.md) {
             legendItem(dot: .vnAccentImperialGold, label: "Ngày Hoàng Đạo")
-            legendItem(dot: .vnAccentHeritageRed, label: "Giỗ / Sự Kiện")
-            legendItem(dot: .vnAccentImperialGold, label: "Rằm / Mùng 1", ring: true)
+            legendItem(dot: .vnAccentHeritageRed, label: "Giỗ / Sự Kiện Gia Đình")
+            legendItem(symbol: "🌕", label: "Rằm / Mùng Một")
         }
         .padding(.top, VNSpacing.xs)
         .padding(.bottom, VNSpacing.sm)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Chú thích: chấm vàng là ngày Hoàng Đạo, chấm đỏ là Giỗ, viền là Rằm Mùng Một")
+        .accessibilityLabel("Chú thích: chấm vàng là ngày Hoàng Đạo, chấm đỏ là Giỗ, mặt trăng là Rằm Mùng Một")
     }
 
-    private func legendItem(dot: Color, label: String, ring: Bool = false) -> some View {
-        HStack(spacing: 4) {
-            if ring {
-                RoundedRectangle(cornerRadius: 2)
-                    .stroke(dot, lineWidth: VNBorderWidth.active)
-                    .frame(width: 10, height: 10)
-            } else {
-                Circle()
-                    .fill(dot)
-                    .frame(width: 8, height: 8)
-            }
-
-            Text(label)
-                .font(.system(size: 11, weight: .regular))
-                .foregroundColor(.vnTextSecondary)
+    private func legendItem(symbol: String, label: String) -> some View {
+        HStack(spacing: VNSpacing.xs) {
+            Text(symbol)
+                .font(.system(size: 11))
+            legendLabel(label)
         }
+    }
+
+    private func legendItem(dot: Color, label: String) -> some View {
+        HStack(spacing: VNSpacing.xs) {
+            // Spec: legend dot exactly 8pt
+            Circle()
+                .fill(dot)
+                .frame(width: 8, height: 8)
+            legendLabel(label)
+        }
+    }
+
+    private func legendLabel(_ label: String) -> Text {
+        Text(label)
+            .font(.system(size: 11, weight: .regular))
+            .foregroundColor(.vnTextSecondary)
     }
 
     // MARK: - Month Grid View (SwiftUICalendarView 6x7 Matrix)

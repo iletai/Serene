@@ -26,7 +26,7 @@ public struct VNDayDetailBottomSheet: View {
                     actionButton
                 }
                 .padding(.horizontal, VNSpacing.xl)
-                .padding(.vertical, VNSpacing.md)
+                .padding(.vertical, VNSpacing.xl)
             }
             .background(Color.vnBackgroundPrimary)
             #if os(iOS)
@@ -66,12 +66,12 @@ public struct VNDayDetailBottomSheet: View {
 
     // MARK: - Header Date Cluster
     private var headerDateCluster: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text(solarDateText)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(.vnTextSecondary)
 
-            HStack(spacing: 8) {
+            HStack(spacing: VNSpacing.sm) {
                 Text(lunarHeroText)
                     .font(.system(size: 26, weight: .bold, design: .serif))
                     .foregroundColor(.vnAccentHeritageRed)
@@ -90,7 +90,7 @@ public struct VNDayDetailBottomSheet: View {
                 .foregroundColor(.vnTextSecondary)
 
             culturalBadgesRow
-                .padding(.top, 2)
+                .padding(.top, VNSpacing.space2)
         }
         .padding(.top, VNSpacing.xs)
     }
@@ -111,13 +111,13 @@ public struct VNDayDetailBottomSheet: View {
     }
 
     private var culturalBadgesRow: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: VNSpacing.xs) {
             if let term = dayModel.solarTermName {
                 Text("Tiết \(term)")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.vnAccentImperialGold)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
+                    .padding(.horizontal, VNSpacing.sm)
+                    .padding(.vertical, VNSpacing.xs)
                     .background(Color.vnAccentImperialGold.opacity(0.15))
                     .clipShape(Capsule())
             }
@@ -126,8 +126,8 @@ public struct VNDayDetailBottomSheet: View {
                 Text("Hôm nay")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.vnAccentHeritageRed)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
+                    .padding(.horizontal, VNSpacing.sm)
+                    .padding(.vertical, VNSpacing.xs)
                     .background(Color.vnAccentHeritageRed.opacity(0.12))
                     .clipShape(Capsule())
             }
@@ -136,8 +136,8 @@ public struct VNDayDetailBottomSheet: View {
                 Text("Hoàng Đạo")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.vnStatusSuccess)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
+                    .padding(.horizontal, VNSpacing.sm)
+                    .padding(.vertical, VNSpacing.xs)
                     .background(Color.vnStatusSuccess.opacity(0.12))
                     .clipShape(Capsule())
             }
@@ -146,24 +146,24 @@ public struct VNDayDetailBottomSheet: View {
 
     // MARK: - Auspicious Hours Grid
     private var auspiciousHoursSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("KHUNG GIỜ HOÀNG ĐẠO")
                 .font(.system(size: 11, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
             let columns = [
-                GridItem(.flexible(), spacing: 8),
-                GridItem(.flexible(), spacing: 8),
-                GridItem(.flexible(), spacing: 8)
+                GridItem(.flexible(), spacing: VNSpacing.sm),
+                GridItem(.flexible(), spacing: VNSpacing.sm),
+                GridItem(.flexible(), spacing: VNSpacing.sm)
             ]
 
-            LazyVGrid(columns: columns, spacing: 8) {
+            LazyVGrid(columns: columns, spacing: VNSpacing.sm) {
                 ForEach(dayModel.auspiciousHours, id: \.self) { branch in
                     HStack(spacing: VNSpacing.xs) {
                         Circle()
                             .fill(Color.vnAccentImperialGold)
-                            .frame(width: 5, height: 5)
+                            .frame(width: VNSpacing.xs, height: VNSpacing.xs)
 
                         Text("\(branch.vietnameseName) (\(branch.timeRange))")
                             .font(.system(size: 11, weight: .medium))
@@ -186,7 +186,7 @@ public struct VNDayDetailBottomSheet: View {
 
     // MARK: - Folk Quote Card
     private var folkQuoteCard: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
                 Image(systemName: "quote.opening")
                     .font(.system(size: 12))
@@ -224,14 +224,14 @@ public struct VNDayDetailBottomSheet: View {
 
     // MARK: - Family Events
     private var familyEventsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("SỰ KIỆN & GIA ĐÌNH")
                 .font(.system(size: 11, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
             if dayModel.anniversaries.isEmpty {
-                HStack(spacing: 8) {
+                HStack(spacing: VNSpacing.sm) {
                     Image(systemName: "calendar.badge.clock")
                         .font(.system(size: 16))
                         .foregroundColor(.vnTextTertiary)
@@ -243,16 +243,16 @@ public struct VNDayDetailBottomSheet: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(VNSpacing.md)
                 .background(Color.vnBackgroundSecondary.opacity(0.6))
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.medium))
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
             } else {
-                VStack(spacing: 6) {
+                VStack(spacing: VNSpacing.xs) {
                     ForEach(dayModel.anniversaries) { item in
                         HStack(spacing: 0) {
-                            RoundedRectangle(cornerRadius: 2)
+                            RoundedRectangle(cornerRadius: VNCornerRadius.micro)
                                 .fill(item.isAncestorDeath ? Color.vnAccentHeritageRed : Color.vnAccentImperialGold)
                                 .frame(width: 3)
 
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: VNSpacing.space2) {
                                 Text(item.title)
                                     .font(.system(size: 14, weight: .semibold, design: .serif))
                                     .foregroundColor(.vnTextPrimary)
@@ -272,7 +272,7 @@ public struct VNDayDetailBottomSheet: View {
                         }
                         .padding(VNSpacing.xs)
                         .background(Color.vnBackgroundSecondary)
-                        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.medium))
+                        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
                     }
                 }
             }
@@ -287,7 +287,7 @@ public struct VNDayDetailBottomSheet: View {
                 Label("Thêm Ngày Nhớ Cho Ngày Này", systemImage: "plus")
                     .font(.system(size: 14, weight: .semibold))
                     .frame(maxWidth: .infinity)
-                    .frame(minHeight: 46)
+                    .frame(minHeight: 44)
                     .background(Color.vnAccentHeritageRed)
                     .foregroundColor(.white)
                     .clipShape(Capsule())

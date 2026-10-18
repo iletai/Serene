@@ -4,7 +4,6 @@ import VNCalendarDesignSystem
 import VNCalendarKit
 
 public struct CalendarSettingsView: View {
-    @Environment(\.dismiss) private var dismiss
     @State private var container = AppContainer.shared
 
     // Calendar Display Preferences
@@ -53,16 +52,7 @@ public struct CalendarSettingsView: View {
             .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Color.vnBackgroundPrimary.opacity(0.9), for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text(String(localized: "settings.calendar.title"))
-                    .font(.vnTitleCeremonial)
-                    .foregroundColor(.vnAccentDeepPrimary)
-            }
-        }
+        .vnNavBar(title: String(localized: "settings.calendar.title"))
     }
 
     // MARK: - Header Summary Banner
@@ -273,9 +263,13 @@ public struct CalendarSettingsView: View {
                 Spacer()
             }
             .padding(.vertical, VNSpacing.md)
-            .background(Color.vnAccentDeepPrimary)
-            .foregroundColor(.white)
+            .background(Color.vnAccentHeritageRed)
+            .foregroundColor(.vnRicePaperWhite)
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous)
+                    .stroke(Color.vnBorderSubtle.opacity(0.4), lineWidth: VNBorderWidth.hairline)
+            )
         }
         .disabled(isSyncing)
     }
@@ -332,7 +326,7 @@ public struct CalendarSettingsView: View {
                         .font(.system(size: 12))
                         .foregroundColor(.vnTextSecondary)
                         .lineSpacing(3)
-                        .padding(.top, 2)
+                        .padding(.top, VNSpacing.space2)
                 }
                 .padding(VNSpacing.lg)
             }
@@ -396,9 +390,7 @@ public struct CalendarSettingsView: View {
     }
 
     private var rowDivider: some View {
-        Divider()
-            .background(Color.vnBorderSubtle)
-            .padding(.leading, Self.settingsRowDividerLeadingInset)
+        VNRowDivider(leadingInset: Self.settingsRowDividerLeadingInset)
     }
 
     // MARK: - Sync Action

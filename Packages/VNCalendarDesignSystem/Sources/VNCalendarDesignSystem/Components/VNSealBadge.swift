@@ -30,9 +30,12 @@ public struct VNSealBadge: View {
             }
         }
 
+        /// Canonical 40x40 seal square (DESIGN §4). Only the medium square enforces this frame.
+        public static let canonicalSquareSize: CGFloat = 40
+
         public var paddingHorizontal: CGFloat {
             switch self {
-            case .small: VNSpacing.xs + 2
+            case .small: VNSpacing.xs
             case .medium: VNSpacing.sm
             case .large: VNSpacing.md
             }
@@ -40,9 +43,9 @@ public struct VNSealBadge: View {
 
         public var paddingVertical: CGFloat {
             switch self {
-            case .small: 2
-            case .medium: 4
-            case .large: 6
+            case .small: VNSpacing.space2
+            case .medium: VNSpacing.xs
+            case .large: VNSpacing.sm
             }
         }
     }
@@ -129,7 +132,10 @@ public struct VNSealBadge: View {
         .foregroundColor(foregroundColor)
         .padding(.horizontal, size.paddingHorizontal)
         .padding(.vertical, size.paddingVertical)
-        .frame(minWidth: isCanonicalSquare ? 40 : nil, minHeight: isCanonicalSquare ? 40 : nil)
+        .frame(
+            minWidth: isCanonicalSquare ? Size.canonicalSquareSize : nil,
+            minHeight: isCanonicalSquare ? Size.canonicalSquareSize : nil
+        )
         .background(backgroundColor)
         .clipShape(SealBadgeShape(shape: shape))
         .overlay(shapeStroke)

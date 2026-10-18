@@ -50,8 +50,8 @@ struct MemorialHeroCard: View {
                 .padding(.top, VNSpacing.xs)
 
             // Date & Info Strip
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                HStack(spacing: VNSpacing.xs) {
                     Image(systemName: "calendar")
                         .font(.system(size: 13))
                         .foregroundColor(.vnAccentHeritageRed)
@@ -61,7 +61,7 @@ struct MemorialHeroCard: View {
                 }
 
                 if let note = reminder.note, !note.isEmpty {
-                    HStack(alignment: .top, spacing: 6) {
+                    HStack(alignment: .top, spacing: VNSpacing.xs) {
                         Image(systemName: "pencil.and.list.clipboard")
                             .font(.system(size: 12))
                             .foregroundColor(.vnTextSecondary)
@@ -86,39 +86,8 @@ struct MemorialHeroCard: View {
 
             // Bottom Actions
             HStack(spacing: VNSpacing.sm) {
-                Button(action: onQuickRitual) {
-                    HStack(spacing: 5) {
-                        Image(systemName: "book.pages.fill")
-                            .font(.system(size: 12))
-                        Text("Xem Văn Khấn")
-                            .font(.system(size: 13, weight: .bold, design: .serif))
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 44)
-                    .background(Color.vnAccentHeritageRed)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-                }
-                .buttonStyle(.plain)
-
-                Button(action: onEdit) {
-                    HStack(spacing: 5) {
-                        Image(systemName: "slider.horizontal.3")
-                            .font(.system(size: 12))
-                        Text("Chi Tiết")
-                            .font(.system(size: 13, weight: .medium))
-                    }
-                    .foregroundColor(.vnTextPrimary)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 44)
-                    .background(Color.vnBackgroundPrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                            .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
-                    )
-                }
-                .buttonStyle(.plain)
+                VNButton("Xem Văn Khấn", icon: "book.pages.fill", variant: .primary, size: .small, isFullWidth: true, action: onQuickRitual)
+                VNButton("Chi Tiết", icon: "slider.horizontal.3", variant: .secondary, size: .small, isFullWidth: true, action: onEdit)
             }
             .padding(VNSpacing.xl)
         }
@@ -126,9 +95,9 @@ struct MemorialHeroCard: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnAccentHeritageRed.opacity(0.4), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.hairline)
         )
-        .shadow(color: VNShadow.floating.color, radius: VNShadow.floating.radius,
-                x: VNShadow.floating.x, y: VNShadow.floating.y)
+        .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius,
+                x: VNShadow.folio.x, y: VNShadow.folio.y)
     }
 }

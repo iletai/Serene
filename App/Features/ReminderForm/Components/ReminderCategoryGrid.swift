@@ -39,7 +39,7 @@ struct ReminderCategoryGrid: View {
                                 .fill(isSelected ? Color.vnAccentRedSurface : Color.vnBackgroundPrimary)
                         )
 
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         Text(cat.title)
                             .font(.system(size: 13, weight: .semibold, design: .serif))
                             .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextPrimary)
@@ -56,8 +56,8 @@ struct ReminderCategoryGrid: View {
                         Text("Chính")
                             .font(.system(size: 9, weight: .semibold, design: .serif))
                             .foregroundColor(.vnAccentHeritageRed)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 2)
+                            .padding(.horizontal, VNSpacing.xs)
+                            .padding(.vertical, VNSpacing.space2)
                             .background(Capsule().fill(Color.vnAccentHeritageRed.opacity(0.12)))
                     }
                 }

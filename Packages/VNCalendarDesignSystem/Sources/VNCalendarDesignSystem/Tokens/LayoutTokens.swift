@@ -15,11 +15,15 @@ public enum VNSpacing {
 }
 
 public enum VNCornerRadius {
-    public static let small: CGFloat = 4
-    public static let medium: CGFloat = 10
-    public static let card: CGFloat = 8
-    public static let large: CGFloat = 16
-    public static let sheet: CGFloat = 24
+    /// Micro shape below the spacing scale: 3pt accent bars, 10×10 legend swatches (DESIGN §4.3).
+    /// Bumped +2 for a softer edge on tiny shapes.
+    public static let micro: CGFloat = 4
+    /// Buttons, grid cells, mode segments, seal-rounded, chips. Uniform +4 across the scale.
+    public static let small: CGFloat = 8
+    /// Cards, fields, inner panels. Same hierarchy, rounder corners.
+    public static let card: CGFloat = 12
+    /// Bottom sheets. Keeps the modal layer clearly above card radius.
+    public static let sheet: CGFloat = 28
     public static let pill: CGFloat = 999
 }
 

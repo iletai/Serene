@@ -79,7 +79,7 @@ public struct VNBlockCalendarView: View {
 
                 Rectangle()
                     .fill(Color.vnBorderSubtle)
-                    .frame(height: 1)
+                    .frame(height: VNBorderWidth.hairline)
                     .padding(.horizontal, VNSpacing.lg)
                     .padding(.vertical, VNSpacing.xs)
 
@@ -111,7 +111,7 @@ public struct VNBlockCalendarView: View {
         HStack {
             Circle()
                 .fill(Color.vnImperialChrysanthemumGold)
-                .frame(width: 8, height: 8)
+                .frame(width: VNSpacing.sm, height: VNSpacing.sm)
                 .shadow(color: .black.opacity(0.3), radius: 1)
 
             Spacer()
@@ -125,16 +125,16 @@ public struct VNBlockCalendarView: View {
 
             Circle()
                 .fill(Color.vnImperialChrysanthemumGold)
-                .frame(width: 8, height: 8)
+                .frame(width: VNSpacing.sm, height: VNSpacing.sm)
                 .shadow(color: .black.opacity(0.3), radius: 1)
         }
         .padding(.horizontal, VNSpacing.lg)
-        .padding(.vertical, 8)
+        .padding(.vertical, VNSpacing.sm)
         .background(Color.vnAccentHeritageRed)
     }
 
     private func blocSolarSection(for model: VNCalendarDayModel) -> some View {
-        VStack(spacing: 2) {
+        VStack(spacing: VNSpacing.space2) {
             Text(model.weekdayName.uppercased())
                 .font(.system(size: 16, weight: .bold, design: .serif))
                 .foregroundColor(isWeekend(model.weekdayName) ? .vnAccentHeritageRed : .vnTextSecondary)
@@ -184,8 +184,8 @@ public struct VNBlockCalendarView: View {
                 Text("Tiết \(term)")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.vnAccentImperialGold)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
+                    .padding(.horizontal, VNSpacing.sm)
+                    .padding(.vertical, VNSpacing.xs)
                     .background(Color.vnAccentImperialGold.opacity(0.12))
                     .clipShape(Capsule())
             }
@@ -193,16 +193,16 @@ public struct VNBlockCalendarView: View {
             Text(model.zodiacStar.fullTitle)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(model.isAuspiciousDay ? .vnStatusSuccess : .vnTextSecondary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 3)
+                .padding(.horizontal, VNSpacing.sm)
+                .padding(.vertical, VNSpacing.xs)
                 .background(model.isAuspiciousDay ? Color.vnStatusSuccess.opacity(0.12) : Color.vnBackgroundSecondary)
                 .clipShape(Capsule())
 
             Text(model.lunarOfficer.title)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(.vnAccentHeritageRed)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 3)
+                .padding(.horizontal, VNSpacing.sm)
+                .padding(.vertical, VNSpacing.xs)
                 .background(Color.vnAccentHeritageRed.opacity(0.1))
                 .clipShape(Capsule())
         }
@@ -211,7 +211,7 @@ public struct VNBlockCalendarView: View {
     // MARK: - Ca Dao / Tục Ngữ Card
 
     private func quoteCard(for model: VNCalendarDayModel) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
                 Image(systemName: "quote.opening")
                     .font(.system(size: 12))
@@ -275,7 +275,7 @@ public struct VNBlockCalendarView: View {
 
     private func directionsRow(for model: VNCalendarDayModel) -> some View {
         HStack(spacing: VNSpacing.md) {
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("HỶ THẦN")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
@@ -285,9 +285,9 @@ public struct VNBlockCalendarView: View {
             }
 
             Divider()
-                .frame(height: 24)
+                .frame(height: VNSpacing.xxl)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("TÀI THẦN")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
@@ -299,7 +299,7 @@ public struct VNBlockCalendarView: View {
             Spacer()
 
             Button(action: onTapDetails) {
-                HStack(spacing: 4) {
+                HStack(spacing: VNSpacing.xs) {
                     Text("Chi tiết")
                         .font(.system(size: 12, weight: .medium))
                     Image(systemName: "chevron.right")
@@ -312,7 +312,7 @@ public struct VNBlockCalendarView: View {
     }
 
     private func auspiciousHoursSection(for model: VNCalendarDayModel) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text("GIỜ HOÀNG ĐẠO")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
@@ -326,9 +326,9 @@ public struct VNBlockCalendarView: View {
     }
 
     private func suitableTabooSummary(for model: VNCalendarDayModel) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
             if !model.suitableActivities.isEmpty {
-                HStack(alignment: .top, spacing: 4) {
+                HStack(alignment: .top, spacing: VNSpacing.xs) {
                     Text("Nên:")
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(.vnStatusSuccess)
@@ -339,7 +339,7 @@ public struct VNBlockCalendarView: View {
             }
 
             if !model.tabooActivities.isEmpty {
-                HStack(alignment: .top, spacing: 4) {
+                HStack(alignment: .top, spacing: VNSpacing.xs) {
                     Text("Kiêng:")
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(.vnStatusError)

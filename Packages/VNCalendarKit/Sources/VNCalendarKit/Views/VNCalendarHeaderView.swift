@@ -28,10 +28,13 @@ public struct VNCalendarHeaderView: View {
             Button(action: onPrevious) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.vnTextPrimary)
-                    .frame(width: 32, height: 32)
-                    .background(Color.vnBackgroundSecondary)
-                    .clipShape(Circle())
+                    .foregroundColor(.vnTextSecondary)
+                    .frame(width: 36, height: 36)
+                    .background(Color.vnBackgroundSecondary, in: RoundedRectangle(cornerRadius: VNCornerRadius.card))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                            .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
+                    )
             }
             .frame(minWidth: 44, minHeight: 44)
             .contentShape(Rectangle())
@@ -40,7 +43,7 @@ public struct VNCalendarHeaderView: View {
 
             Spacer()
 
-            VStack(spacing: 2) {
+            VStack(spacing: VNSpacing.space2) {
                 Text(headerTitle)
                     .font(.system(size: 19, weight: .bold, design: .serif))
                     .foregroundColor(.vnTextPrimary)
@@ -60,12 +63,12 @@ public struct VNCalendarHeaderView: View {
                         .font(.system(size: 12, weight: .semibold, design: .serif))
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.xs)
-                        .background(Color.vnBackgroundSecondary)
-                        .foregroundColor(.vnAccentHeritageRed)
+                        .background(Color.vnGoldContainer)
+                        .foregroundColor(.vnOnGoldContainer)
                         .clipShape(Capsule())
                         .overlay(
                             Capsule()
-                                .stroke(Color.vnAccentHeritageRed.opacity(0.3), lineWidth: VNBorderWidth.hairline)
+                                .stroke(Color.vnAccentImperialGold.opacity(0.4), lineWidth: VNBorderWidth.hairline)
                         )
                 }
                 .frame(minHeight: 44)
@@ -76,10 +79,13 @@ public struct VNCalendarHeaderView: View {
                 Button(action: onNext) {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(.vnTextPrimary)
-                        .frame(width: 32, height: 32)
-                        .background(Color.vnBackgroundSecondary)
-                        .clipShape(Circle())
+                        .foregroundColor(.vnTextSecondary)
+                        .frame(width: 36, height: 36)
+                        .background(Color.vnBackgroundSecondary, in: RoundedRectangle(cornerRadius: VNCornerRadius.card))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
+                        )
                 }
                 .frame(minWidth: 44, minHeight: 44)
                 .contentShape(Rectangle())

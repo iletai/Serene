@@ -200,20 +200,8 @@ public struct FamilyHierarchyView: View {
                 .lineSpacing(4)
                 .padding(.horizontal, VNSpacing.xl)
 
-            Button {
-                checkAndAddMember()
-            } label: {
-                Text("+ Thêm Tiền Nhân Gia Tộc")
-                    .font(.system(size: 14, weight: .bold, design: .serif))
-                    .padding(.horizontal, VNSpacing.xxl)
-                    .padding(.vertical, VNSpacing.md)
-                    .frame(minHeight: 44)
-                    .background(Color.vnAccentHeritageRed)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-            }
-            .buttonStyle(.plain)
-            .padding(.top, VNSpacing.xs)
+            VNButton("Thêm Tiền Nhân Gia Tộc", icon: "plus", variant: .primary, size: .medium, action: checkAndAddMember)
+                .padding(.top, VNSpacing.xs)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, VNSpacing.xl)
@@ -317,8 +305,8 @@ public struct FamilyHierarchyView: View {
                 .font(.vnCaption2)
                 .fontWeight(.semibold)
                 .foregroundColor(isDeath ? .white : .vnTextSecondary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 3)
+                .padding(.horizontal, VNSpacing.sm)
+                .padding(.vertical, VNSpacing.space2)
                 .background(isDeath ? Color.vnAccentDeepPrimary : Color.vnBackgroundTertiary)
                 .clipShape(Capsule())
 

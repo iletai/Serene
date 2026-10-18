@@ -91,6 +91,14 @@ public struct CalendarMainView: View {
     // MARK: - Top Editorial Header
     private var topNavigationHeader: some View {
         HStack(alignment: .center, spacing: VNSpacing.sm) {
+            headerButton(
+                icon: "calendar.badge.clock",
+                accessibilityLabel: "Xem hôm nay"
+            ) {
+                triggerHaptic()
+                adapterViewModel.selectToday()
+            }
+
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("AN NIÊN")
                     .font(.system(size: 18, weight: .semibold, design: .serif))
@@ -104,22 +112,14 @@ public struct CalendarMainView: View {
 
             Spacer()
 
-            HStack(spacing: VNSpacing.xs) {
-                headerButton(
-                    icon: "magnifyingglass",
-                    accessibilityLabel: "Tìm kiếm ngày lễ, tiền nhân"
-                ) {
-                    triggerHaptic()
-                    isShowingSearch = true
-                }
+            yearSwitcherPill
 
-                headerButton(
-                    icon: "gearshape.fill",
-                    accessibilityLabel: "Cài đặt ứng dụng"
-                ) {
-                    triggerHaptic()
-                    isShowingSettings = true
-                }
+            headerButton(
+                icon: "gearshape",
+                accessibilityLabel: "Cài đặt ứng dụng"
+            ) {
+                triggerHaptic()
+                isShowingSettings = true
             }
         }
         .padding(.horizontal, VNSpacing.xl)
@@ -132,6 +132,48 @@ public struct CalendarMainView: View {
         .shadow(color: VNShadow.card.color, radius: VNShadow.card.radius, x: VNShadow.card.x, y: VNShadow.card.y)
     }
 
+    // Canonical trailing year pill: current year + chevron, opens a native year menu.
+    private var yearSwitcherPill: some View {
+        let currentYear = displaySolarYear
+        return Menu {
+            ForEach((currentYear - 5)...(currentYear + 5), id: \.self) { year in
+                Button {
+                    triggerHaptic()
+                    // Preserve the visible month; only the year changes.
+                    adapterViewModel.selectMonth(displaySolarMonth, year: year)
+                } label: {
+                    Text(String(year))
+                }
+            }
+        } label: {
+            HStack(spacing: VNSpacing.xs) {
+                Text(String(currentYear))
+                    .font(.system(size: 11, weight: .medium))
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 9, weight: .semibold))
+            }
+            .foregroundColor(.vnTextSecondary)
+            .padding(.horizontal, VNSpacing.sm)
+            .padding(.vertical, VNSpacing.xs)
+            .background(Color.vnAncientSand, in: RoundedRectangle(cornerRadius: VNCornerRadius.small))
+        }
+        .frame(minHeight: 44)
+        .accessibilityLabel("Đổi năm")
+        .accessibilityValue(String(currentYear))
+    }
+
+    private var displaySolarYear: Int {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        return cal.component(.year, from: adapterViewModel.displayMonthDate)
+    }
+
+    private var displaySolarMonth: Int {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        return cal.component(.month, from: adapterViewModel.displayMonthDate)
+    }
+
     // 36pt rounded hit target per canonical top bar.
     private func headerButton(
         icon: String,
@@ -141,12 +183,11 @@ public struct CalendarMainView: View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(.vnAccentDeepPrimary)
+                .foregroundColor(.vnTextSecondary)
                 .frame(width: 36, height: 36)
-                .background(Color.vnBackgroundSecondary)
-                .clipShape(Circle())
+                .background(Color.vnBackgroundSecondary, in: RoundedRectangle(cornerRadius: VNCornerRadius.card))
                 .overlay(
-                    Circle()
+                    RoundedRectangle(cornerRadius: VNCornerRadius.card)
                         .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                 )
                 .frame(minWidth: 44, minHeight: 44)
@@ -159,7 +200,7 @@ public struct CalendarMainView: View {
     // MARK: - Month Callout + Seal
     private var monthCalloutRow: some View {
         HStack(alignment: .center, spacing: VNSpacing.md) {
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(monthCalloutEyebrow)
                     .font(.system(size: 11, weight: .medium))
                     .tracking(1.1)

@@ -19,7 +19,7 @@ public struct VNIndicatorDotsView: View {
         HStack(spacing: VNSpacing.space2) {
             if hasAncestorDeath {
                 Circle()
-                    .fill(Color.vnAccentDeepPrimary)
+                    .fill(Color.vnAccentHeritageRed)
                     .frame(width: VNSpacing.xs, height: VNSpacing.xs)
             }
             if hasFestival {

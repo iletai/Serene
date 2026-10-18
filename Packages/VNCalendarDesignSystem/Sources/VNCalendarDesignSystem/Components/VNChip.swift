@@ -6,6 +6,13 @@ public enum VNChipVariant: Sendable {
     case inauspicious // Hắc đạo (Nền xám tro nhạt, chữ tro trầm)
     case heritage     // Đỏ Son Chu Sa (Nền son nhạt, chữ son)
     case custom(background: Color, foreground: Color, border: Color?)
+
+    var isPill: Bool {
+        switch self {
+        case .inauspicious: return false
+        default: return true
+        }
+    }
 }
 
 public struct VNChip: View {
@@ -40,11 +47,7 @@ public struct VNChip: View {
         .padding(.horizontal, VNSpacing.sm)
         .padding(.vertical, VNSpacing.xs)
         .background(backgroundColor)
-        .clipShape(Capsule())
-        .overlay(
-            Capsule()
-                .strokeBorder(borderColor, lineWidth: VNBorderWidth.hairlineThin)
-        )
+        .modifier(VNChipShapeModifier(isPill: variant.isPill, borderColor: borderColor))
         .accessibilityElement(children: .combine)
     }
 
@@ -84,6 +87,23 @@ public struct VNChip: View {
             return Color.vnAccentHeritageRed.opacity(0.25)
         case .custom(_, _, let border):
             return border ?? Color.clear
+        }
+    }
+}
+
+private struct VNChipShapeModifier: ViewModifier {
+    let isPill: Bool
+    let borderColor: Color
+
+    func body(content: Content) -> some View {
+        if isPill {
+            content
+                .clipShape(Capsule())
+                .overlay(Capsule().strokeBorder(borderColor, lineWidth: VNBorderWidth.hairline))
+        } else {
+            content
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
+                .overlay(RoundedRectangle(cornerRadius: VNCornerRadius.small).strokeBorder(borderColor, lineWidth: VNBorderWidth.hairline))
         }
     }
 }
