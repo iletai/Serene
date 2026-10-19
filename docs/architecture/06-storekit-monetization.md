@@ -67,9 +67,9 @@ StoreKit 2 cung cấp kiến trúc bất đồng bộ (Modern Async/Await API), 
 
 | Tên Gói | Product Identifier | Loại Sản Phẩm | Giá Tham Chiếu | Quyền Lợi & Ưu Đãi |
 |---|---|---|---|---|
-| **Gói Tháng** (Monthly) | `com.iletai.annien.sub.monthly` | Auto-Renewable Subscription | $1.99 / tháng (49.000 đ) | Mở khóa toàn bộ tính năng Pro theo từng tháng. |
-| **Gói Năm** (Yearly) | `com.iletai.annien.sub.yearly` | Auto-Renewable Subscription | $14.99 / năm (379.000 đ) | Tiết kiệm 37%, tặng **7 ngày dùng thử miễn phí (Free Trial)**. |
-| **Trọn Đời** (Lifetime) | `com.iletai.annien.nonconsumable.lifetime` | Non-Consumable | $39.99 (999.000 đ) | Thanh toán 1 lần duy nhất, sở hữu vĩnh viễn không giới hạn. |
+| **Gói Tháng** (Monthly) | `com.iletai.annien.sub.monthly` | Auto-Renewable Subscription | 39.000 đ / tháng | Mở khóa toàn bộ tính năng Pro theo từng tháng. |
+| **Gói Năm** (Yearly) | `com.iletai.annien.sub.yearly` | Auto-Renewable Subscription | 199.000 đ / năm | Tiết kiệm so với trả tháng, tặng **7 ngày dùng thử miễn phí (Free Trial)**. |
+| **Trọn Đời** (Lifetime) | `com.iletai.annien.nonconsumable.lifetime` | Non-Consumable | 499.000 đ | Thanh toán 1 lần duy nhất, sở hữu vĩnh viễn không giới hạn. |
 
 - **Subscription Group Identifier**: `21489012` (Tên nhóm: `AnNienProSubscriptions`). // xác minh lại với App Store Connect trước khi dùng — `Config/Products.storekit` cục bộ có thể lệch với ASC.
 - Cả 2 gói Tháng và Năm cùng thuộc một Subscription Group để người dùng có thể nâng cấp/hạ cấp tự do trong cài đặt iOS Settings.

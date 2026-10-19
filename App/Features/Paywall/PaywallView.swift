@@ -256,7 +256,7 @@ public struct PaywallView: View {
                             Text(product.displayName)
                                 .font(.vnHeadline)
                                 .foregroundColor(.vnTextPrimary)
-                            if product.id == ProductID.yearly {
+                            if hasFreeTrial(product) {
                                 Text("paywall.trial_badge")
                                     .font(.vnCaption2)
                                     .fontWeight(.bold)
@@ -294,10 +294,15 @@ public struct PaywallView: View {
     }
 
     private var ctaButtonTitle: LocalizedStringKey {
-        if selectedProductID == ProductID.yearly {
+        if let product = subscriptionManager.products.first(where: { $0.id == selectedProductID }),
+           hasFreeTrial(product) {
             return "paywall.cta_start_trial"
         }
         return "paywall.title"
+    }
+
+    private func hasFreeTrial(_ product: Product) -> Bool {
+        product.subscription?.introductoryOffer?.paymentMode == .freeTrial
     }
 
     private func handlePurchase() {

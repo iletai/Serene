@@ -114,6 +114,11 @@ Configuration files are in `Config/`:
 
 ## Code & Quality Guidelines
 
+### Mandatory Quality Gate
+- Before any commit, push, or PR: run `swiftlint --strict --quiet` and require exit 0. Warnings fail under `--strict`.
+- Do not rely on local SwiftLint being old: CI pins nothing (`brew install swiftlint` = latest). If local version differs from CI, trust CI and re-check after `brew upgrade swiftlint`.
+- A local pre-commit hook (`.git/hooks/pre-commit`) enforces this; never bypass with `git commit --no-verify`.
+
 - **Swift Version**: Swift 6 with complete concurrency checking (`SWIFT_STRICT_CONCURRENCY = complete`).
 - **SwiftLint Rules**: Strict linting enforced in CI (`.swiftlint.yml`). Key constraints:
   - Max line length: 140 (warning) / 200 (error)

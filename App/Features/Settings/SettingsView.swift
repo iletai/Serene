@@ -195,6 +195,7 @@ public struct DataBackupSettingsView: View {
     @State private var container = AppContainer.shared
     @State private var exportText: String = ""
     @State private var isShowingExportSheet = false
+    @State private var isShowingPaywall = false
     @State private var backupStatusMessage: String?
     @State private var isSyncingContent = false
 
@@ -267,6 +268,9 @@ public struct DataBackupSettingsView: View {
         .sheet(isPresented: $isShowingExportSheet) {
             ShareSheet(activityItems: [exportText])
         }
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView()
+        }
     }
 
     private func handleRefreshContent() {
@@ -301,6 +305,12 @@ public struct DataBackupSettingsView: View {
 
     private func handleExportICS() {
         Task {
+            // Batch ICS export is Pro-only (AppFeature.batchExportICS).
+            let unlocked = await container.evaluateFeatureGateUseCase.isFeatureAvailable(.batchExportICS)
+            guard unlocked else {
+                isShowingPaywall = true
+                return
+            }
             let reminders = (try? await container.reminderRepository.fetchAllReminders()) ?? []
             let ics = await DataBackupEngine.generateICS(reminders: reminders)
             exportText = ics

@@ -14,30 +14,101 @@ public final class AppContainer {
 
     private let logger = Logger(subsystem: "com.iletai.annien", category: "AppContainer")
 
-    public let modelContainer: ModelContainer
-    public let reminderRepository: ReminderRepositoryProtocol
-    public let holidayRepository: HolidayRepositoryProtocol
+    // Store-bound properties are `var`: an entitlement upgrade reopens the store.
+    public private(set) var modelContainer: ModelContainer
+    public private(set) var reminderRepository: ReminderRepositoryProtocol
+    public private(set) var holidayRepository: HolidayRepositoryProtocol
     public let prayerRepository: PrayerRepositoryProtocol
     public let proverbRepository: ProverbRepositoryProtocol
     public let subscriptionManager: SubscriptionManager
     public let notificationEngine: SmartNotificationEngine
 
-    public let getMonthCalendarUseCase: GetMonthCalendarUseCase
-    public let scheduleReminderUseCase: ScheduleReminderUseCase
-    public let naturalSearchUseCase: NaturalSearchUseCase
-    public let evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase
+    public private(set) var getMonthCalendarUseCase: GetMonthCalendarUseCase
+    public private(set) var scheduleReminderUseCase: ScheduleReminderUseCase
+    public private(set) var naturalSearchUseCase: NaturalSearchUseCase
+    public private(set) var evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase
+
+    private let inMemory: Bool
+    private let microClient: MicroCMSClient
 
     public init(inMemory: Bool = false) {
+        self.inMemory = inMemory
+        let config = AppConfiguration.current
+        let client = MicroCMSClient(
+            serviceDomain: config.microCMSServiceDomain,
+            apiKey: config.microCMSApiKey,
+            defaultsSuiteName: config.appGroupIdentifier
+        )
+        self.microClient = client
+
+        let sub = SubscriptionManager.shared
+
+        self.subscriptionManager = sub
+        self.notificationEngine = SmartNotificationEngine.shared
+        self.prayerRepository = LocalPrayerRepository()
+        self.proverbRepository = HybridProverbRepository(client: client)
+
+        let graph = Self.makeStoreGraph(
+            inMemory: inMemory,
+            cloudKitEnabled: sub.entitlement.isPro,
+            microClient: client,
+            subscriptionManager: sub
+        )
+        self.modelContainer = graph.modelContainer
+        self.reminderRepository = graph.reminderRepository
+        self.holidayRepository = graph.holidayRepository
+        self.getMonthCalendarUseCase = graph.getMonthCalendarUseCase
+        self.scheduleReminderUseCase = graph.scheduleReminderUseCase
+        self.naturalSearchUseCase = graph.naturalSearchUseCase
+        self.evaluateFeatureGateUseCase = graph.evaluateFeatureGateUseCase
+
+        // CloudKit is gated on entitlement at container creation, so a mid-session
+        // free -> pro purchase must reopen the store (previously required relaunch).
+        sub.onProUpgrade = { [weak self] in self?.rebuild() }
+    }
+
+    /// Reopens the store-bound graph with the current entitlement. Called when a
+    /// purchase flips free -> pro so CloudKit sync turns on without relaunching.
+    private func rebuild() {
+        let graph = Self.makeStoreGraph(
+            inMemory: inMemory,
+            cloudKitEnabled: subscriptionManager.entitlement.isPro,
+            microClient: microClient,
+            subscriptionManager: subscriptionManager
+        )
+        modelContainer = graph.modelContainer
+        reminderRepository = graph.reminderRepository
+        holidayRepository = graph.holidayRepository
+        getMonthCalendarUseCase = graph.getMonthCalendarUseCase
+        scheduleReminderUseCase = graph.scheduleReminderUseCase
+        naturalSearchUseCase = graph.naturalSearchUseCase
+        evaluateFeatureGateUseCase = graph.evaluateFeatureGateUseCase
+    }
+
+    private struct StoreGraph {
+        let modelContainer: ModelContainer
+        let reminderRepository: ReminderRepositoryProtocol
+        let holidayRepository: HolidayRepositoryProtocol
+        let getMonthCalendarUseCase: GetMonthCalendarUseCase
+        let scheduleReminderUseCase: ScheduleReminderUseCase
+        let naturalSearchUseCase: NaturalSearchUseCase
+        let evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase
+    }
+
+    private static func makeStoreGraph(
+        inMemory: Bool,
+        cloudKitEnabled: Bool,
+        microClient: MicroCMSClient,
+        subscriptionManager: SubscriptionManager
+    ) -> StoreGraph {
         let config = AppConfiguration.current
         let container: ModelContainer
         do {
-            // Gate CloudKit on entitlement at launch. Container is created once;
-            // purchasing Pro later requires recreating it (see TODO below).
             container = try ModelContainerFactory.createContainer(
                 inMemoryOnly: inMemory,
                 cloudKitContainerIdentifier: config.cloudKitContainerIdentifier,
                 appGroupIdentifier: config.appGroupIdentifier,
-                cloudKitEnabled: SubscriptionManager.shared.entitlement.isPro
+                cloudKitEnabled: cloudKitEnabled
             )
         } catch {
             // CloudKit store open/migrate can fail (network, schema, container mismatch).
@@ -53,36 +124,30 @@ public final class AppContainer {
                 fatalError("Failed to initialize SwiftData ModelContainer even locally: \(error)")
             }
         }
-        self.modelContainer = container
 
-        let microClient = MicroCMSClient(
-            serviceDomain: config.microCMSServiceDomain,
-            apiKey: config.microCMSApiKey,
-            defaultsSuiteName: config.appGroupIdentifier
-        )
+        let reminderRepository = SwiftDataReminderRepository(modelContainer: container)
+        let holidayRepository = HybridHolidayRepository(modelContainer: container, client: microClient)
 
-        self.reminderRepository = SwiftDataReminderRepository(modelContainer: self.modelContainer)
-        self.holidayRepository = HybridHolidayRepository(modelContainer: self.modelContainer, client: microClient)
-        self.prayerRepository = LocalPrayerRepository()
-        self.proverbRepository = HybridProverbRepository(client: microClient)
-        self.subscriptionManager = SubscriptionManager.shared
-        self.notificationEngine = SmartNotificationEngine.shared
-
-        self.getMonthCalendarUseCase = GetMonthCalendarUseCase(
-            reminderRepository: self.reminderRepository,
-            holidayRepository: self.holidayRepository
-        )
-        self.scheduleReminderUseCase = ScheduleReminderUseCase(
-            reminderRepository: self.reminderRepository,
-            subscriptionRepository: self.subscriptionManager
-        )
-        self.naturalSearchUseCase = NaturalSearchUseCase(
-            reminderRepository: self.reminderRepository,
-            holidayRepository: self.holidayRepository
-        )
-        self.evaluateFeatureGateUseCase = EvaluateFeatureGateUseCase(
-            subscriptionRepository: self.subscriptionManager,
-            reminderRepository: self.reminderRepository
+        return StoreGraph(
+            modelContainer: container,
+            reminderRepository: reminderRepository,
+            holidayRepository: holidayRepository,
+            getMonthCalendarUseCase: GetMonthCalendarUseCase(
+                reminderRepository: reminderRepository,
+                holidayRepository: holidayRepository
+            ),
+            scheduleReminderUseCase: ScheduleReminderUseCase(
+                reminderRepository: reminderRepository,
+                subscriptionRepository: subscriptionManager
+            ),
+            naturalSearchUseCase: NaturalSearchUseCase(
+                reminderRepository: reminderRepository,
+                holidayRepository: holidayRepository
+            ),
+            evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase(
+                subscriptionRepository: subscriptionManager,
+                reminderRepository: reminderRepository
+            )
         )
     }
 

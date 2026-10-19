@@ -11,12 +11,19 @@ public struct FamilyMemberGroup: Identifiable {
 
 public struct FamilyHierarchyView: View {
     @State private var container = AppContainer.shared
+    @State private var subscriptionManager = SubscriptionManager.shared
     @State private var reminders: [ReminderEvent] = []
+    @State private var pressedMemberID: UUID?
     @State private var isShowingCreateReminder = false
     @State private var isShowingPaywall = false
     @State private var selectedReminder: ReminderEvent?
 
     public init() {}
+
+    // Pro-only per FeatureGateRule / storekit spec Trigger E.
+    private var isGenealogyUnlocked: Bool {
+        FeatureGateRule.isFeatureAvailable(.genealogyMode, isPro: subscriptionManager.entitlement.isPro)
+    }
 
     public var groupedGenerations: [FamilyMemberGroup] {
         let gen1 = reminders.filter { $0.relationship?.contains("Cụ") == true }
@@ -79,17 +86,10 @@ public struct FamilyHierarchyView: View {
             VStack(spacing: 0) {
                 topBar
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: VNSpacing.xl) {
-                        headerSection
-
-                        if reminders.isEmpty {
-                            emptyStateSection
-                        } else {
-                            genealogyTreeSection
-                        }
-                    }
-                    .padding(.bottom, VNSpacing.xl)
+                if isGenealogyUnlocked {
+                    genealogyContent
+                } else {
+                    lockedContent
                 }
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
@@ -151,6 +151,51 @@ public struct FamilyHierarchyView: View {
         .overlay(alignment: .bottom) {
             Color.vnBorderSubtle.frame(height: VNBorderWidth.hairline)
         }
+    }
+
+    // MARK: - Genealogy Content (Pro)
+    private var genealogyContent: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: VNSpacing.xl) {
+                headerSection
+
+                if reminders.isEmpty {
+                    emptyStateSection
+                } else {
+                    genealogyTreeSection
+                }
+            }
+            .padding(.bottom, VNSpacing.xl)
+        }
+    }
+
+    // MARK: - Locked State (free tier) — same lock pattern as LunarWidgetEntryView.lockedWidgetView
+    private var lockedContent: some View {
+        VStack(spacing: VNSpacing.md) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 44, weight: .semibold))
+                .foregroundColor(.vnAccentImperialGold)
+                .padding(.top, VNSpacing.xxl)
+
+            Text("Chế Độ Gia Phả Pro")
+                .font(.system(size: 22, weight: .semibold, design: .serif))
+                .foregroundColor(.vnTextPrimary)
+
+            Text("Mở khoá cây gia phả nhiều thế hệ, vai vế tổ tiên và sơ đồ phụng thờ dòng tộc.")
+                .font(.system(size: 14))
+                .multilineTextAlignment(.center)
+                .foregroundColor(.vnTextSecondary)
+                .lineSpacing(4)
+                .padding(.horizontal, VNSpacing.xl)
+
+            VNButton("Nâng Cấp Pro", icon: "crown.fill", variant: .primary, size: .medium) {
+                isShowingPaywall = true
+            }
+            .padding(.top, VNSpacing.xs)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, VNSpacing.xl)
+        .padding(.bottom, VNSpacing.xxl)
     }
 
     // MARK: - Header Section
@@ -216,46 +261,104 @@ public struct FamilyHierarchyView: View {
         .padding(.horizontal, VNSpacing.xl)
     }
 
-    // MARK: - Genealogy Tree Section
+    // MARK: - Genealogy Tree Section (artwork rail — DESIGN.md §6)
     @ViewBuilder
     private var genealogyTreeSection: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.lg) {
+        VStack(alignment: .leading, spacing: VNSpacing.xl) {
             ForEach(groupedGenerations) { group in
-                VStack(alignment: .leading, spacing: VNSpacing.sm) {
-                    // Generation Tier Header
-                    HStack(spacing: VNSpacing.sm) {
-                        Text(group.generationRank)
-                            .font(.system(size: 11, weight: .bold))
-                            .tracking(0.66)
-                            .foregroundColor(.vnAccentImperialGold)
-
-                        Text(group.generationTitle)
-                            .font(.system(size: 17, weight: .bold, design: .serif))
-                            .foregroundColor(.vnTextPrimary)
-
-                        Spacer()
-
-                        Text("\(group.members.count) vị")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.vnTextSecondary)
-                    }
-
-                    // Members in Generation Tier
-                    VStack(spacing: VNSpacing.xs) {
-                        ForEach(group.members) { member in
-                            memberCard(member: member)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    selectedReminder = member
-                                }
-                                .accessibilityAddTraits(.isButton)
-                                .accessibilityHint("Chỉnh sửa chi tiết tiền nhân")
-                        }
-                    }
-                }
-                .padding(.horizontal, VNSpacing.xl)
+                generationBand(group)
             }
         }
+    }
+
+    // MARK: - Generation Band (rank seal + gold connector rail + member branches)
+    @ViewBuilder
+    private func generationBand(_ group: FamilyMemberGroup) -> some View {
+        HStack(alignment: .top, spacing: VNSpacing.md) {
+            generationRail(rank: group.generationRank)
+
+            VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                HStack(spacing: VNSpacing.sm) {
+                    Text(group.generationRank)
+                        .font(.system(size: 11, weight: .bold))
+                        .tracking(0.66)
+                        .foregroundColor(.vnAccentImperialGold)
+
+                    Text(group.generationTitle)
+                        .font(.system(size: 17, weight: .bold, design: .serif))
+                        .foregroundColor(.vnTextPrimary)
+
+                    Spacer()
+
+                    Text("\(group.members.count) vị")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.vnTextSecondary)
+                }
+
+                ForEach(group.members) { member in
+                    memberBranch(member)
+                }
+            }
+        }
+        .padding(.horizontal, VNSpacing.xl)
+    }
+
+    // Left rail: ấn triện rank marker + gold connector line (DESIGN §6.3)
+    private func generationRail(rank: String) -> some View {
+        VStack(spacing: VNSpacing.sm) {
+            Text(rankLetter(from: rank))
+                .font(.system(size: 13, weight: .bold, design: .serif))
+                .foregroundColor(.vnAccentHeritageRed)
+                .frame(width: 32, height: 32)
+                .background(Color.vnAccentRedSurface)
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.micro))
+                .overlay(
+                    RoundedRectangle(cornerRadius: VNCornerRadius.micro)
+                        .stroke(Color.vnAccentHeritageRed.opacity(0.4), lineWidth: 1)
+                )
+                .accessibilityHidden(true)
+
+            Rectangle()
+                .fill(Color.vnAccentImperialGold.opacity(0.45))
+                .frame(width: VNBorderWidth.regular)
+                .frame(maxHeight: .infinity)
+                .accessibilityHidden(true)
+        }
+        .frame(width: 32)
+    }
+
+    // Branch tick from rail to card + pressed vermilion ring (DESIGN §6.2)
+    @ViewBuilder
+    private func memberBranch(_ member: ReminderEvent) -> some View {
+        HStack(alignment: .top, spacing: VNSpacing.sm) {
+            Rectangle()
+                .fill(Color.vnAccentImperialGold.opacity(0.45))
+                .frame(width: VNSpacing.sm, height: VNBorderWidth.regular)
+                .padding(.top, 28)
+                .accessibilityHidden(true)
+
+            memberCard(member: member)
+                .overlay(
+                    RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                        .stroke(
+                            Color.vnAccentHeritageRed.opacity(pressedMemberID == member.id ? 0.5 : 0),
+                            lineWidth: VNBorderWidth.focus
+                        )
+                )
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    pressedMemberID = member.id
+                    selectedReminder = member
+                }
+                .accessibilityAddTraits(.isButton)
+                .accessibilityHint("Chỉnh sửa chi tiết tiền nhân")
+        }
+    }
+
+    // "ĐỜI I" → "I", "HẬU DUỆ" → "D"
+    private func rankLetter(from rank: String) -> String {
+        let last = rank.split(separator: " ").last.map(String.init) ?? String(rank.prefix(1))
+        return String(last.prefix(1))
     }
 
     // MARK: - Member Card
@@ -333,6 +436,12 @@ public struct FamilyHierarchyView: View {
 
     private func checkAndAddMember() {
         Task {
+            // Genealogy mode is Pro-only; the quota check below alone lets free users in.
+            let unlocked = await container.evaluateFeatureGateUseCase.isFeatureAvailable(.genealogyMode)
+            guard unlocked else {
+                isShowingPaywall = true
+                return
+            }
             do {
                 let canAdd = try await container.evaluateFeatureGateUseCase.canAddReminder()
                 if canAdd {
