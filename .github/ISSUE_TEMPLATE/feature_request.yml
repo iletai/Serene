@@ -1,0 +1,26 @@
+name: Feature Request
+description: Đề xuất tính năng mới hoặc cải tiến
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Vấn đề bạn muốn giải quyết
+      placeholder: Tôi gặp khó khăn khi...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Đề xuất giải pháp
+      placeholder: Thêm nút / màn hình / thao tác để...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Bối cảnh thêm
+      placeholder: Ứng dụng liên quan, hình ảnh tham chiếu...
+    validations:
+      required: false

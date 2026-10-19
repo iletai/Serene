@@ -1,0 +1,3 @@
+- Cập nhật và tối ưu thuật toán Lịch Âm Dương GMT+7.
+- Cải thiện độ chính xác thông báo nhắc nhở ngày giỗ, ngày lễ truyền thống.
+- Tối ưu hiệu năng và sửa các lỗi nhỏ khi đồng bộ dữ liệu.

@@ -40,6 +40,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## Branch & Release Model
+
+Git-Flow variant for release-grade mobile software:
+- `main` — Production branch. Always deployable. Protected: requires PR + CI pass. Tags cut from here.
+- `develop` — Integration branch (default branch). Protected: requires PR + CI pass.
+- `feat/*`, `fix/*`, `docs/*`, `ci/*` — Short-lived working branches merged via PR into `develop`.
+- `release/x.y.z` — Release candidate branch cut from `develop`. Bumps `MARKETING_VERSION` in `Config/Shared.xcconfig`. Merged into `main` via PR, then tagged, then back-merged to `develop`.
+- `hotfix/x.y.z` — Critical fixes branched from `main`, merged back to both `main` and `develop`.
+
+**Release Flow**:
+1. Cut `release/x.y.z` from `develop`.
+2. Bump `MARKETING_VERSION = x.y.z` in `Config/Shared.xcconfig`. Commit: `chore(release): bump version to x.y.z`.
+3. Open PR `release/x.y.z` -> `main`. Wait for CI gate.
+4. Merge into `main`.
+5. Run `scripts/release-tag.sh x.y.z` to create tag `vx.y.z`. Push tag to origin.
+6. Tag push triggers `.github/workflows/deploy-testflight.yml`.
+7. For App Store submission, create tag `release-x.y.z` on the same commit to trigger `.github/workflows/deploy-appstore.yml` (requires `production` environment approval).
+8. Back-merge `main` into `develop`.
+
+**Versioning Rules**:
+- `MARKETING_VERSION` (x.y.z): single source of truth in `Config/Shared.xcconfig`.
+- `CURRENT_PROJECT_VERSION`: monotonic integer supplied by CI via `GITHUB_RUN_NUMBER`. Never reset.
+
+---
+
 ## High-Level Architecture
 
 The project follows Clean Architecture with a multi-package SPM monorepo structure managed via `project.yml`:

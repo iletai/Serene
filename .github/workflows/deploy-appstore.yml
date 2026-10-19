@@ -10,18 +10,47 @@ on:
         description: 'Skip uploading metadata to App Store Connect'
         required: false
         type: boolean
-        default: true
+        default: false
 
 concurrency:
   group: deploy-appstore-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  gate:
+    name: Lint & Test
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Select latest stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - name: Setup Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Install Tooling
+        run: |
+          which xcodegen || brew install xcodegen
+          which swiftlint || brew install swiftlint
+          which xcbeautify || brew install xcbeautify
+      - name: SwiftLint Verification
+        run: swiftlint --strict --quiet
+      - name: Generate Xcode Project
+        run: xcodegen generate
+      - name: Run Unit & Integration Tests
+        run: set -o pipefail && bundle exec fastlane test 2>&1 | xcbeautify --renderer github-actions
+
   deploy-appstore:
     name: Build & Submit to App Store
+    needs: gate
     runs-on: macos-15
     timeout-minutes: 45
-
+    environment: production
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -71,7 +100,12 @@ jobs:
           APPLE_ITC_TEAM_ID: ${{ secrets.APPLE_ITC_TEAM_ID }}
           FASTLANE_KEYCHAIN_PASSWORD: ${{ secrets.FASTLANE_KEYCHAIN_PASSWORD }}
           GITHUB_SHA: ${{ github.sha }}
-          SKIP_METADATA: ${{ inputs.skip_metadata != null && inputs.skip_metadata || 'true' }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          SKIP_METADATA: ${{ inputs.skip_metadata != null && inputs.skip_metadata || 'false' }}
+          APP_REVIEW_FIRST_NAME: ${{ secrets.APP_REVIEW_FIRST_NAME }}
+          APP_REVIEW_LAST_NAME: ${{ secrets.APP_REVIEW_LAST_NAME }}
+          APP_REVIEW_PHONE: ${{ secrets.APP_REVIEW_PHONE }}
+          APP_REVIEW_EMAIL: ${{ secrets.APP_REVIEW_EMAIL }}
 
       - name: Upload Screenshots to App Store Connect
         run: bundle exec fastlane upload_screenshots

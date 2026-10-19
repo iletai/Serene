@@ -60,7 +60,15 @@ platform :ios do
     end
   end
 
-  # Next build number = latest TestFlight build + 1 (applied via xcargs to app + widget)
+  # Next build number = GITHUB_RUN_NUMBER on CI, else latest TestFlight + 1
+  def resolve_build_number(api_key)
+    if ENV["GITHUB_RUN_NUMBER"] && !ENV["GITHUB_RUN_NUMBER"].empty?
+      ENV["GITHUB_RUN_NUMBER"].to_i
+    else
+      next_build_number(api_key)
+    end
+  end
+
   def next_build_number(api_key)
     latest_testflight_build_number(
       api_key: api_key,
@@ -125,7 +133,7 @@ platform :ios do
     apply_manual_signing
 
     # Calculate incremented build number
-    next_build = next_build_number(api_key)
+    next_build = resolve_build_number(api_key)
 
     # Archive and export .ipa
     build_app(
@@ -140,8 +148,18 @@ platform :ios do
     )
 
     # Distribute to TestFlight
-    changelog_text = options[:changelog] || prompt(text: "Changelog: ") if !is_ci
-    changelog_text ||= "Automated CI/CD build from commit #{ENV['GITHUB_SHA'] ? ENV['GITHUB_SHA'][0..7] : 'local'}"
+    changelog_text = options[:changelog]
+    if changelog_text.nil? && !is_ci
+      changelog_text = prompt(text: "Changelog: ")
+    end
+    changelog_text ||= if ENV["RELEASE_NOTES_FILE"] && File.exist?(ENV["RELEASE_NOTES_FILE"])
+      File.read(ENV["RELEASE_NOTES_FILE"]).strip
+    else
+      previous_tag = sh("git describe --tags --abbrev=0 HEAD^ 2>/dev/null || true", log: false).strip
+      range = previous_tag.empty? ? "HEAD~20..HEAD" : "#{previous_tag}..HEAD"
+      commits = sh("git log --pretty=format:'- %s' #{range} 2>/dev/null || true", log: false).strip
+      commits.empty? ? "Pre-release build #{ENV['GITHUB_RUN_NUMBER'] || 'local'}" : commits
+    end
 
     upload_to_testflight(
       api_key: api_key,
@@ -174,14 +192,14 @@ platform :ios do
       clean: true,
       output_directory: "./build",
       output_name: "AnNien-Release.ipa",
-      xcargs: "CURRENT_PROJECT_VERSION=#{next_build_number(api_key)}"
+      xcargs: "CURRENT_PROJECT_VERSION=#{resolve_build_number(api_key)}"
     )
 
     app_review_info = {
-      first_name: "Tai",
-      last_name: "Le",
-      phone_number: "+84326718280",
-      email_address: "iletai@hotmail.com",
+      first_name: ENV.fetch("APP_REVIEW_FIRST_NAME"),
+      last_name: ENV.fetch("APP_REVIEW_LAST_NAME"),
+      phone_number: ENV.fetch("APP_REVIEW_PHONE"),
+      email_address: ENV.fetch("APP_REVIEW_EMAIL"),
       notes: "App tra cứu Lịch Âm Dương và Quản lý Ngày Nhớ. Ứng dụng không yêu cầu đăng nhập tài khoản."
     }
 

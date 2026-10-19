@@ -1,0 +1,21 @@
+changelog:
+  exclude:
+    labels:
+      - "skip-changelog"
+    authors:
+      - "dependabot"
+  categories:
+    - title: "Tính năng mới"
+      labels:
+        - "enhancement"
+        - "feat"
+    - title: "Sửa lỗi"
+      labels:
+        - "bug"
+        - "fix"
+    - title: "Kiến trúc & Tái cấu trúc"
+      labels:
+        - "refactor"
+    - title: "Khác"
+      labels:
+        - "*"

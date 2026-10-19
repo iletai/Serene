@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, develop]
   push:
-    branches: [develop]
+    branches: [develop, main]
   workflow_dispatch:
 
 concurrency:
@@ -36,6 +36,7 @@ jobs:
         run: |
           which xcodegen || brew install xcodegen
           which swiftlint || brew install swiftlint
+          which xcbeautify || brew install xcbeautify
 
       - name: SwiftLint Verification
         run: swiftlint --strict --quiet
@@ -52,7 +53,7 @@ jobs:
             ${{ runner.os }}-spm-
 
       - name: Run Unit & Integration Tests
-        run: bundle exec fastlane test
+        run: set -o pipefail && bundle exec fastlane test 2>&1 | xcbeautify --renderer github-actions
         env:
           FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
 

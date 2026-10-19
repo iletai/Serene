@@ -1,0 +1,37 @@
+name: Bug Report
+description: Báo cáo lỗi kỹ thuật hoặc hành vi sai
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Mô tả lỗi
+      description: Chuyện gì đã xảy ra và bạn mong đợi điều gì?
+      placeholder: Chi tiết lỗi...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Phiên bản app
+      placeholder: 1.0.0 (build 42)
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Thiết bị & phiên bản iOS
+      placeholder: iPhone 15 Pro, iOS 18.0
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Các bước tái hiện
+      placeholder: |
+        1. Mở màn hình...
+        2. Bấm vào nút...
+        3. Thấy lỗi...
+    validations:
+      required: false

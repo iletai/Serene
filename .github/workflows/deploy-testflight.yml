@@ -11,14 +11,44 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy-testflight:
-    name: Build & Distribute TestFlight
+  gate:
+    name: Lint & Test
     runs-on: macos-15
-    timeout-minutes: 45
-
+    timeout-minutes: 30
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Select latest stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - name: Setup Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Install Tooling
+        run: |
+          which xcodegen || brew install xcodegen
+          which swiftlint || brew install swiftlint
+          which xcbeautify || brew install xcbeautify
+      - name: SwiftLint Verification
+        run: swiftlint --strict --quiet
+      - name: Generate Xcode Project
+        run: xcodegen generate
+      - name: Run Unit & Integration Tests
+        run: set -o pipefail && bundle exec fastlane test 2>&1 | xcbeautify --renderer github-actions
+
+  deploy-testflight:
+    name: Build & Distribute TestFlight
+    needs: gate
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Select latest stable Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -55,6 +85,9 @@ jobs:
           APPLE_ITC_TEAM_ID: ${{ secrets.APPLE_ITC_TEAM_ID }}
           FASTLANE_KEYCHAIN_PASSWORD: ${{ secrets.FASTLANE_KEYCHAIN_PASSWORD }}
           GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          RELEASE_NOTES_FILE: fastlane/metadata/vi/release_notes.txt
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify IPA Was Produced
         run: |

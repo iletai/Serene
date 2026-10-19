@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# SwiftLint gate + secret guard. Registered via: git config core.hooksPath .githooks
+set -euo pipefail
+
+bash scripts/check-secrets.sh
+
+if ! command -v swiftlint >/dev/null 2>&1; then
+  echo "pre-commit: swiftlint not found, skipping lint gate" >&2
+  exit 0
+fi
+
+if ! swiftlint --strict --quiet; then
+  echo "pre-commit: SwiftLint failed. Fix violations (swiftlint --strict --quiet) before committing." >&2
+  exit 1
+fi
