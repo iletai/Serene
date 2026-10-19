@@ -1,6 +1,7 @@
 import SwiftUI
 import StoreKit
 import VNCalendarDesignSystem
+import VNCalendarData
 
 public struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss

@@ -1,4 +1,5 @@
 import XCTest
+import VNCalendarData
 @testable import AnNien
 
 final class StoreKitSubscriptionTests: XCTestCase {

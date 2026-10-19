@@ -1,6 +1,7 @@
 import SwiftUI
 import VNCalendarDomain
 import VNCalendarDesignSystem
+import VNCalendarData
 
 public struct FamilyMemberGroup: Identifiable {
     public let id: String

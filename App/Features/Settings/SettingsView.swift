@@ -3,6 +3,7 @@ import SwiftUI
 import VNCalendarDomain
 import VNCalendarDesignSystem
 import VNCalendarKit
+import VNCalendarData
 
 private let settingsLogger = Logger(subsystem: "com.iletai.annien", category: "SettingsView")
 
