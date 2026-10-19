@@ -4,7 +4,7 @@ import VNCalendarDesignSystem
 import VNCalendarKit
 
 public struct CalendarSettingsView: View {
-    @State private var container = AppContainer.shared
+    @Environment(AppContainer.self) private var container
 
     // Calendar Display Preferences
     @AppStorage("defaultCalendarDisplayMode") private var defaultDisplayModeRaw: String = "month"

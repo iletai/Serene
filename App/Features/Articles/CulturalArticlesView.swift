@@ -3,62 +3,37 @@ import VNCalendarDomain
 import VNCalendarDesignSystem
 
 public struct CulturalArticlesView: View {
-    @State private var container = AppContainer.shared
-    @State private var holidays: [Holiday] = []
-    @State private var selectedHoliday: Holiday?
-    @State private var searchQuery = ""
-    @State private var selectedCategory: String = "Tất cả"
+    @Environment(AppContainer.self) private var container
+    @State private var viewModel: CulturalArticlesViewModel?
 
     private let categories = ["Tất cả", "Cúng Giỗ", "Lễ Tiết & Tết", "Rằm & Mùng 1"]
 
     public init() {}
 
-    public var filteredHolidays: [Holiday] {
-        holidays.filter { holiday in
-            let matchesSearch = searchQuery.isEmpty ||
-                holiday.title.localizedCaseInsensitiveContains(searchQuery) ||
-                holiday.summary.localizedCaseInsensitiveContains(searchQuery)
-
-            let matchesCategory: Bool
-            switch selectedCategory {
-            case "Cúng Giỗ":
-                matchesCategory = holiday.title.localizedCaseInsensitiveContains("Giỗ") ||
-                    holiday.summary.localizedCaseInsensitiveContains("Giỗ") ||
-                    (holiday.rituals?.localizedCaseInsensitiveContains("Giỗ") == true)
-            case "Lễ Tiết & Tết":
-                matchesCategory = holiday.title.localizedCaseInsensitiveContains("Tết") ||
-                    holiday.title.localizedCaseInsensitiveContains("Tiết")
-            case "Rằm & Mùng 1":
-                matchesCategory = holiday.title.localizedCaseInsensitiveContains("Rằm") ||
-                    holiday.title.localizedCaseInsensitiveContains("Mùng 1") ||
-                    holiday.day == 1 || holiday.day == 15
-            default:
-                matchesCategory = true
-            }
-
-            return matchesSearch && matchesCategory
-        }
+    private var activeViewModel: CulturalArticlesViewModel {
+        if let existing = viewModel { return existing }
+        return CulturalArticlesViewModel(holidayRepository: container.holidayRepository)
     }
 
     public var body: some View {
+        @Bindable var vm = activeViewModel
         NavigationStack {
             VStack(spacing: 0) {
-                topBar
+                topBar(vm: vm)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: VNSpacing.xl) {
                         headerSection
-                        searchBarSection
-                        categoryChipsSection
+                        searchBarSection(vm: vm)
+                        categoryChipsSection(vm: vm)
 
-                        // Articles & Rituals Editorial Cards Grid
-                        if filteredHolidays.isEmpty {
-                            emptyStateSection
+                        if vm.filteredHolidays.isEmpty {
+                            emptyStateSection(vm: vm)
                         } else {
                             LazyVStack(spacing: VNSpacing.md) {
-                                ForEach(filteredHolidays) { holiday in
+                                ForEach(vm.filteredHolidays) { holiday in
                                     Button {
-                                        selectedHoliday = holiday
+                                        vm.selectedHoliday = holiday
                                     } label: {
                                         articleCard(holiday: holiday)
                                     }
@@ -74,20 +49,21 @@ public struct CulturalArticlesView: View {
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
-            .sheet(item: $selectedHoliday) { item in
+            .sheet(item: $vm.selectedHoliday) { item in
                 HolidayDetailSheet(holiday: item)
             }
             .task {
-                if let items = try? await container.holidayRepository.getHolidays() {
-                    self.holidays = items
+                if viewModel == nil {
+                    viewModel = activeViewModel
                 }
+                await viewModel?.load()
             }
         }
     }
 
-    // MARK: - Top Bar (canonical translucent bar)
+    // MARK: - Top Bar
     @ViewBuilder
-    private var topBar: some View {
+    private func topBar(vm: CulturalArticlesViewModel) -> some View {
         HStack(spacing: VNSpacing.sm) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("Văn Hoá")
@@ -102,8 +78,7 @@ public struct CulturalArticlesView: View {
             Spacer()
 
             Button {
-                selectedCategory = "Tất cả"
-                searchQuery = ""
+                vm.resetFilters()
             } label: {
                 Image(systemName: "arrow.counterclockwise")
                     .font(.system(size: 15, weight: .semibold))
@@ -158,19 +133,20 @@ public struct CulturalArticlesView: View {
 
     // MARK: - Search Bar
     @ViewBuilder
-    private var searchBarSection: some View {
+    private func searchBarSection(vm: CulturalArticlesViewModel) -> some View {
+        @Bindable var boundVM = vm
         HStack(spacing: VNSpacing.sm) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.vnTextSecondary)
                 .font(.vnFootnote)
                 .accessibilityHidden(true)
 
-            TextField("Tìm văn khấn, ngày lễ, phong tục tập quán...", text: $searchQuery)
+            TextField("Tìm văn khấn, ngày lễ, phong tục tập quán...", text: $boundVM.searchQuery)
                 .font(.vnFootnote)
 
-            if !searchQuery.isEmpty {
+            if !vm.searchQuery.isEmpty {
                 Button {
-                    searchQuery = ""
+                    vm.searchQuery = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.vnTextTertiary)
@@ -196,14 +172,14 @@ public struct CulturalArticlesView: View {
 
     // MARK: - Category Filter Chips
     @ViewBuilder
-    private var categoryChipsSection: some View {
+    private func categoryChipsSection(vm: CulturalArticlesViewModel) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: VNSpacing.sm) {
                 ForEach(categories, id: \.self) { cat in
-                    let isSelected = selectedCategory == cat
+                    let isSelected = vm.selectedCategory == cat
                     Button {
                         withAnimation(.easeInOut(duration: 0.15)) {
-                            selectedCategory = cat
+                            vm.selectedCategory = cat
                         }
                     } label: {
                         Text(cat)
@@ -234,7 +210,7 @@ public struct CulturalArticlesView: View {
 
     // MARK: - Empty State
     @ViewBuilder
-    private var emptyStateSection: some View {
+    private func emptyStateSection(vm: CulturalArticlesViewModel) -> some View {
         VStack(spacing: VNSpacing.md) {
             Text("Không Tìm Thấy Bài Viết")
                 .font(.system(size: 22, weight: .semibold, design: .serif))
@@ -247,8 +223,7 @@ public struct CulturalArticlesView: View {
                 .padding(.horizontal, VNSpacing.xl)
 
             VNButton("Xem Tất Cả", variant: .primary, size: .medium) {
-                selectedCategory = "Tất cả"
-                searchQuery = ""
+                vm.resetFilters()
             }
             .padding(.top, VNSpacing.xs)
         }

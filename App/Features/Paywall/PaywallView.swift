@@ -2,29 +2,32 @@ import SwiftUI
 import StoreKit
 import VNCalendarDesignSystem
 import VNCalendarData
+import VNCalendarDomain
 
 public struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
-    @State private var subscriptionManager = SubscriptionManager.shared
-    // Legal URLs come from microCMS app-config; service holds live-URL fallbacks.
+    @Environment(AppContainer.self) private var container
+    @State private var viewModel: PaywallViewModel?
     @State private var legalLinksService = LegalLinksService.shared
-    @State private var selectedProductID: String = ProductID.yearly
-    @State private var isPurchasing = false
-    @State private var errorMessage: String?
-    @State private var pendingNotice: String?
 
     public init() {}
 
+    private var activeViewModel: PaywallViewModel {
+        if let existing = viewModel { return existing }
+        return PaywallViewModel(subscriptionManager: container.subscriptionManager)
+    }
+
     public var body: some View {
+        @Bindable var vm = activeViewModel
         NavigationStack {
             ScrollView {
                 VStack(spacing: VNSpacing.xl) {
                     hero
                     featureList
-                    productSelector
+                    productSelector(vm: vm)
 
-                    if let pending = pendingNotice {
+                    if let pending = vm.pendingNotice {
                         Text(pending)
                             .font(.vnCaption1)
                             .foregroundColor(.vnTextSecondary)
@@ -32,21 +35,26 @@ public struct PaywallView: View {
                             .padding(.horizontal, VNSpacing.lg)
                     }
 
-                    if let error = errorMessage {
+                    if let error = vm.errorMessage {
                         Text(error)
                             .font(.vnCaption1)
                             .foregroundColor(.vnStatusError)
                             .padding(.horizontal, VNSpacing.lg)
                     }
 
-                    purchaseCTA
-                    restoreButton
+                    purchaseCTA(vm: vm)
+                    restoreButton(vm: vm)
                     legalLinks
                 }
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
-            .task { await legalLinksService.refresh() }
+            .task {
+                if viewModel == nil {
+                    viewModel = activeViewModel
+                }
+                await legalLinksService.refresh()
+            }
             .toolbarBackground(Color.vnBackgroundPrimary.opacity(0.9), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
@@ -58,67 +66,42 @@ public struct PaywallView: View {
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.vnTextPrimary)
                                 .frame(width: 36, height: 36)
-                                .background(
-                                    Color.vnBackgroundSecondary,
-                                    in: RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                                        .stroke(Color.vnBorderSubtle.opacity(0.4), lineWidth: VNBorderWidth.hairline)
-                                )
-                                .frame(minWidth: 44, minHeight: 44)
-                                .contentShape(Rectangle())
+                                .background(Color.vnBackgroundSecondary)
+                                .clipShape(Circle())
                         }
                     )
-                    .accessibilityLabel("Đóng")
+                    .accessibilityLabel("Đóng bảng nâng cấp")
                 }
             }
         }
     }
 
-    // Header Heritage Hero
+    // MARK: - Subviews
+
     private var hero: some View {
-        VStack(spacing: VNSpacing.sm) {
-            // Ceremonial crest: gold crown over cinnabar seal (Ấn Triện)
-            VStack(spacing: VNSpacing.sm) {
-                Image(systemName: "crown.fill")
-                    .font(.system(size: 26))
-                    .foregroundColor(.vnAccentImperialGold)
-                    .padding(.top, VNSpacing.xl)
+        VStack(spacing: VNSpacing.md) {
+            VNSealBadge.gio(size: .large)
+                .padding(.top, VNSpacing.xl)
 
-                VNSealBadge(
-                    text: "AN NIÊN",
-                    shape: .square,
-                    color: .custom(
-                        background: Color.vnSurfaceElevated,
-                        foreground: Color.vnAccentDeepPrimary,
-                        border: Color.vnAccentHeritageRed
-                    ),
-                    size: .large
-                )
-            }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("Ấn triện An Niên")
+            Text("paywall.title")
+                .font(.vnTitleHero)
+                .foregroundColor(.vnAccentDeepPrimary)
 
-            Text("paywall.hero_title")
-                .font(.vnDisplayLarge)
-                .foregroundColor(.vnTextPrimary)
-
-            Text("paywall.hero_subtitle")
+            Text("paywall.subtitle")
                 .font(.vnBody)
-                .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
+                .multilineTextAlignment(.center)
                 .padding(.horizontal, VNSpacing.xl)
         }
     }
 
-    // Features List
     private var featureList: some View {
         VStack(alignment: .leading, spacing: VNSpacing.md) {
-            featureRow(icon: "bell.badge.fill", title: "paywall.unlimited_reminders")
-            featureRow(icon: "icloud.fill", title: "paywall.cloudkit_sync")
-            featureRow(icon: "person.3.sequence.fill", title: "paywall.genealogy_mode")
-            featureRow(icon: "square.grid.2x2.fill", title: "paywall.lockscreen_widgets")
+            featureRow(icon: "checkmark", title: "paywall.feature.unlimited_reminders")
+            featureRow(icon: "checkmark", title: "paywall.feature.cloudkit_sync")
+            featureRow(icon: "checkmark", title: "paywall.feature.heritage_mode")
+            featureRow(icon: "checkmark", title: "paywall.feature.pro_widgets")
+            featureRow(icon: "checkmark", title: "paywall.feature.ics_export")
         }
         .padding(VNSpacing.xl)
         .background(Color.vnBackgroundSecondary)
@@ -130,12 +113,11 @@ public struct PaywallView: View {
         .padding(.horizontal, VNSpacing.xl)
     }
 
-    // Products Selector
     @ViewBuilder
-    private var productSelector: some View {
+    private func productSelector(vm: PaywallViewModel) -> some View {
         VStack(spacing: VNSpacing.sm) {
-            if subscriptionManager.products.isEmpty {
-                if subscriptionManager.isLoading {
+            if vm.products.isEmpty {
+                if vm.isLoading {
                     ProgressView()
                     Text("paywall.loading")
                         .font(.vnFootnote)
@@ -145,7 +127,7 @@ public struct PaywallView: View {
                         .font(.vnFootnote)
                         .foregroundColor(.vnStatusError)
                     Button("paywall.retry") {
-                        Task { await subscriptionManager.loadProducts() }
+                        Task { await vm.loadProducts() }
                     }
                     .font(.vnFootnote)
                     .foregroundColor(.vnAccentImperialGold)
@@ -153,26 +135,27 @@ public struct PaywallView: View {
                     .contentShape(Rectangle())
                 }
             } else {
-                ForEach(subscriptionManager.products, id: \.id) { product in
-                    productCard(product: product)
+                ForEach(vm.products, id: \.id) { product in
+                    productCard(product: product, vm: vm)
                 }
             }
         }
         .padding(.horizontal, VNSpacing.xl)
     }
 
-    // Main Action CTA Button
-    private var purchaseCTA: some View {
+    private func purchaseCTA(vm: PaywallViewModel) -> some View {
         Button(
-            action: handlePurchase,
+            action: {
+                vm.purchase { dismiss() }
+            },
             label: {
                 HStack {
-                    if isPurchasing {
+                    if vm.isPurchasing {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             .accessibilityLabel("Đang xử lý thanh toán")
                     } else {
-                        Text(ctaButtonTitle)
+                        Text(ctaButtonTitle(vm: vm))
                             .font(.vnHeadline)
                             .fontWeight(.bold)
                     }
@@ -184,25 +167,13 @@ public struct PaywallView: View {
                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
             }
         )
-        .disabled(isPurchasing || subscriptionManager.products.isEmpty)
+        .disabled(vm.isPurchasing || vm.products.isEmpty)
         .padding(.horizontal, VNSpacing.xl)
     }
 
-    private var restoreButton: some View {
+    private func restoreButton(vm: PaywallViewModel) -> some View {
         Button("Khôi phục gói mua") {
-            guard !isPurchasing else { return }
-            isPurchasing = true
-            Task {
-                defer { isPurchasing = false }
-                do {
-                    try await subscriptionManager.restorePurchases()
-                    if subscriptionManager.entitlement.isPro {
-                        dismiss()
-                    }
-                } catch {
-                    errorMessage = error.localizedDescription
-                }
-            }
+            vm.restorePurchases { dismiss() }
         }
         .font(.vnFootnote)
         .foregroundColor(.vnTextSecondary)
@@ -211,7 +182,6 @@ public struct PaywallView: View {
         .padding(.bottom, VNSpacing.md)
     }
 
-    // Required by App Review Guideline 3.1.2
     private var legalLinks: some View {
         HStack(spacing: VNSpacing.lg) {
             legalLink(title: "Điều khoản sử dụng", url: legalLinksService.termsOfUseURL)
@@ -246,10 +216,10 @@ public struct PaywallView: View {
         }
     }
 
-    private func productCard(product: Product) -> some View {
-        let isSelected = (selectedProductID == product.id)
+    private func productCard(product: Product, vm: PaywallViewModel) -> some View {
+        let isSelected = (vm.selectedProductID == product.id)
         return Button(
-            action: { selectedProductID = product.id },
+            action: { vm.selectedProductID = product.id },
             label: {
                 HStack {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
@@ -294,8 +264,8 @@ public struct PaywallView: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
-    private var ctaButtonTitle: LocalizedStringKey {
-        if let product = subscriptionManager.products.first(where: { $0.id == selectedProductID }),
+    private func ctaButtonTitle(vm: PaywallViewModel) -> LocalizedStringKey {
+        if let product = vm.products.first(where: { $0.id == vm.selectedProductID }),
            hasFreeTrial(product) {
             return "paywall.cta_start_trial"
         }
@@ -304,30 +274,5 @@ public struct PaywallView: View {
 
     private func hasFreeTrial(_ product: Product) -> Bool {
         product.subscription?.introductoryOffer?.paymentMode == .freeTrial
-    }
-
-    private func handlePurchase() {
-        guard let product = subscriptionManager.products.first(where: { $0.id == selectedProductID }) else {
-            errorMessage = String(localized: "paywall.load_error")
-            return
-        }
-        isPurchasing = true
-        errorMessage = nil
-        pendingNotice = nil
-
-        Task {
-            defer { isPurchasing = false }
-            do {
-                _ = try await subscriptionManager.purchase(product)
-                if subscriptionManager.entitlement.isPro {
-                    dismiss()
-                }
-            } catch StoreError.pending {
-                // Ask to Buy is not a failure: show a neutral pending notice instead of the error style.
-                pendingNotice = String(localized: "paywall.pending")
-            } catch {
-                errorMessage = error.localizedDescription
-            }
-        }
     }
 }

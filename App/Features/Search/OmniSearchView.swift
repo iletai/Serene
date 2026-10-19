@@ -5,29 +5,32 @@ import VNCalendarLunar
 
 public struct OmniSearchView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var container = AppContainer.shared
-    @State private var searchText: String = ""
-    @State private var searchResults: [SearchResultItem] = []
-    @State private var parsedDate: ParsedDateResult?
-    @State private var resolvedConvertedDateText: String?
+    @Environment(AppContainer.self) private var container
+    @State private var viewModel: OmniSearchViewModel?
     @FocusState private var isSearchFocused: Bool
 
     public init() {}
 
+    private var activeViewModel: OmniSearchViewModel {
+        if let existing = viewModel { return existing }
+        return OmniSearchViewModel(naturalSearchUseCase: container.naturalSearchUseCase)
+    }
+
     public var body: some View {
+        @Bindable var vm = activeViewModel
         NavigationStack {
             ScrollView {
                 VStack(spacing: VNSpacing.xl) {
-                    searchField
+                    searchField(vm: vm)
 
-                    if let parsed = parsedDate {
-                        parsedDateCard(parsed)
+                    if let parsed = vm.parsedDate {
+                        parsedDateCard(parsed, vm: vm)
                     }
 
-                    if !searchResults.isEmpty {
-                        resultsList
-                    } else if !searchText.isEmpty && parsedDate == nil {
-                        Text("Không tìm thấy kết quả phù hợp cho \"\(searchText)\".")
+                    if !vm.searchResults.isEmpty {
+                        resultsList(vm: vm)
+                    } else if !vm.searchText.isEmpty && vm.parsedDate == nil {
+                        Text("Không tìm thấy kết quả phù hợp cho \"\(vm.searchText)\".")
                             .font(.vnFootnote)
                             .foregroundColor(.vnTextSecondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -41,27 +44,34 @@ public struct OmniSearchView: View {
             .vnNavBar(title: "Tra Cứu Thông Minh") {
                 VNDismissButton(style: .text("Đóng")) { dismiss() }
             }
+            .task {
+                if viewModel == nil {
+                    viewModel = activeViewModel
+                }
+            }
         }
     }
 
-    // MARK: - Search Field (bottom hairline turns red on focus)
-    private var searchField: some View {
+    // MARK: - Search Field
+    @ViewBuilder
+    private func searchField(vm: OmniSearchViewModel) -> some View {
+        @Bindable var boundVM = vm
         VStack(spacing: 0) {
             HStack(spacing: VNSpacing.sm) {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 15))
                     .foregroundColor(isSearchFocused ? .vnAccentHeritageRed : .vnTextTertiary)
 
-                TextField("", text: $searchText, prompt: Text("Tìm giỗ ông, 15/8 âm, rằm tháng 7..."))
+                TextField("", text: $boundVM.searchText, prompt: Text("Tìm giỗ ông, 15/8 âm, rằm tháng 7..."))
                     .font(.system(size: 15))
                     .foregroundColor(.vnTextPrimary)
                     .focused($isSearchFocused)
                     .submitLabel(.search)
 
-                if !searchText.isEmpty {
+                if !vm.searchText.isEmpty {
                     Button {
-                        searchText = ""
-                        performSearch(query: "")
+                        vm.searchText = ""
+                        vm.performSearch(query: "")
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 15))
@@ -82,13 +92,13 @@ public struct OmniSearchView: View {
                 .fill(isSearchFocused ? Color.vnAccentHeritageRed : Color.vnBorderSubtle)
                 .frame(height: isSearchFocused ? VNBorderWidth.active : VNBorderWidth.regular)
         }
-        .onChange(of: searchText) { _, newValue in
-            performSearch(query: newValue)
+        .onChange(of: vm.searchText) { _, newValue in
+            vm.performSearch(query: newValue)
         }
     }
 
     // MARK: - Deterministic Date Parser Result
-    private func parsedDateCard(_ parsed: ParsedDateResult) -> some View {
+    private func parsedDateCard(_ parsed: ParsedDateResult, vm: OmniSearchViewModel) -> some View {
         folioCard {
             HStack(alignment: .top, spacing: VNSpacing.md) {
                 Image(systemName: "sparkles")
@@ -118,7 +128,7 @@ public struct OmniSearchView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.vnTextPrimary)
 
-                    if let conv = resolvedConvertedDateText {
+                    if let conv = vm.resolvedConvertedDateText {
                         Text(conv)
                             .font(.system(size: 13))
                             .foregroundColor(.vnAccentHeritageRed)
@@ -130,7 +140,7 @@ public struct OmniSearchView: View {
     }
 
     // MARK: - Matched Events & Holidays
-    private var resultsList: some View {
+    private func resultsList(vm: OmniSearchViewModel) -> some View {
         VStack(spacing: VNSpacing.sm) {
             Text("Sự Kiện & Ngày Lễ Trùng Khớp")
                 .font(.system(size: 11, weight: .medium))
@@ -140,7 +150,7 @@ public struct OmniSearchView: View {
                 .padding(.horizontal, VNSpacing.xs)
                 .accessibilityAddTraits(.isHeader)
 
-            ForEach(searchResults) { item in
+            ForEach(vm.searchResults) { item in
                 switch item {
                 case .reminder(let r):
                     resultCard(
@@ -179,67 +189,26 @@ public struct OmniSearchView: View {
                     Text(title)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.vnTextPrimary)
+
                     Text(detail)
-                        .font(.system(size: 12))
+                        .font(.system(size: 13))
                         .foregroundColor(.vnTextSecondary)
+                        .lineLimit(2)
                 }
-                Spacer(minLength: 0)
             }
             .padding(VNSpacing.lg)
         }
     }
 
-    // Rice-paper folio card: 8pt radius + gold hairline
     private func folioCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(spacing: 0) {
-            content()
-        }
-        .background(Color.vnBackgroundSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
-        )
-        .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
-    }
-
-    private func performSearch(query: String) {
-        let trimmed = query.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty else {
-            searchResults = []
-            parsedDate = nil
-            resolvedConvertedDateText = nil
-            return
-        }
-
-        // 1. Parse deterministic natural date
-        let parsed = DeterministicDateParser.parse(query: trimmed)
-        self.parsedDate = parsed
-
-        if let p = parsed {
-            Task {
-                let engine = LunarAstronomicalEngine.shared
-                if let lunar = p.lunarDate {
-                    let solar = await engine.convertToSolar(from: lunar)
-                    let canChi = await engine.computeCanChi(for: solar)
-                    resolvedConvertedDateText = "Tương ứng Dương lịch: \(solar.day)/\(solar.month)/\(solar.year) " +
-                        "(Năm \(canChi.year.description))"
-                } else if let solar = p.solarDate {
-                    let lunar = await engine.convertToLunar(from: solar)
-                    let canChi = await engine.computeCanChi(for: solar)
-                    resolvedConvertedDateText = "Tương ứng Âm lịch: \(lunar.day)/\(lunar.month)/\(lunar.year) ÂL " +
-                        "(Năm \(canChi.year.description))"
-                }
-            }
-        } else {
-            resolvedConvertedDateText = nil
-        }
-
-        // 2. Perform natural search in repositories
-        Task {
-            if let results = try? await container.naturalSearchUseCase.execute(query: trimmed) {
-                self.searchResults = results
-            }
-        }
+        content()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.vnSurfaceElevated)
+            .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
+                    .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+            )
+            .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
     }
 }
