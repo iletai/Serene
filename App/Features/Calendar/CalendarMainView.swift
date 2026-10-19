@@ -5,40 +5,46 @@ import VNCalendarKit
 import VNCalendarLunar
 
 public struct CalendarMainView: View {
-    @State private var container = AppContainer.shared
-    @State private var adapterViewModel = VNCalendarAdapterViewModel()
-    @State private var todayDetails: DayCalendarDetails?
-    @State private var isShowingCreateReminder = false
-    @State private var isShowingPaywall = false
-    @State private var isShowingSearch = false
-    @State private var isShowingSettings = false
+    @Environment(AppContainer.self) private var container
+    @State private var viewModel: CalendarMainViewModel?
 
     public init() {}
 
+    private var activeViewModel: CalendarMainViewModel {
+        if let existing = viewModel { return existing }
+        return CalendarMainViewModel(
+            getMonthCalendarUseCase: container.getMonthCalendarUseCase,
+            reminderRepository: container.reminderRepository,
+            scheduleReminderUseCase: container.scheduleReminderUseCase,
+            evaluateFeatureGateUseCase: container.evaluateFeatureGateUseCase
+        )
+    }
+
     public var body: some View {
+        @Bindable var vm = activeViewModel
         NavigationStack {
             ScrollView {
                 VStack(spacing: VNSpacing.xl) {
                     // Month callout: tiết khí eyebrow + month/year headline + Can Chi seal
-                    monthCalloutRow
+                    monthCalloutRow(vm: vm)
 
                     // Hero almanac card (selected day dashboard)
                     TodayDashboardCard(
-                        details: todayDetails,
+                        details: vm.todayDetails,
                         onAddReminder: {
-                            checkAndShowReminderForm()
+                            vm.checkAndShowReminderForm()
                         },
                         onQuickSearch: {
-                            isShowingSearch = true
+                            vm.isShowingSearch = true
                         }
                     )
                     .padding(.horizontal, VNSpacing.xl)
 
                     // Multi-Mode Calendar Container (Nhật Lịch • Tháng • Tuần • Năm)
                     VNCalendarContainerView(
-                        viewModel: adapterViewModel,
+                        viewModel: vm.adapterViewModel,
                         onAddReminderForSelectedDate: {
-                            checkAndShowReminderForm()
+                            vm.checkAndShowReminderForm()
                         }
                     )
                     .background(Color.vnSurfaceElevated.opacity(0.8))
@@ -55,48 +61,50 @@ public struct CalendarMainView: View {
                     )
                     .padding(.horizontal, VNSpacing.xl)
                 }
-                // Pill space is reserved by MainTabView.safeAreaInset; this is just a section gap.
                 .padding(.bottom, VNSpacing.xl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
             .safeAreaInset(edge: .top, spacing: 0) {
-                topNavigationHeader
+                topNavigationHeader(vm: vm)
             }
-            .sheet(isPresented: $isShowingCreateReminder) {
+            .sheet(isPresented: $vm.isShowingCreateReminder) {
                 ReminderFormView(
-                    initialDate: adapterViewModel.selectedDate,
+                    initialDate: vm.adapterViewModel.selectedDate,
                     onSave: { newReminder in
-                        saveReminder(newReminder)
+                        vm.saveReminder(newReminder)
                     }
                 )
                 .presentationDetents([.fraction(0.92), .large])
                 .presentationDragIndicator(.visible)
             }
-            .sheet(isPresented: $isShowingPaywall) {
+            .sheet(isPresented: $vm.isShowingPaywall) {
                 PaywallView()
             }
-            .sheet(isPresented: $isShowingSearch) {
+            .sheet(isPresented: $vm.isShowingSearch) {
                 OmniSearchView()
             }
-            .sheet(isPresented: $isShowingSettings) {
+            .sheet(isPresented: $vm.isShowingSettings) {
                 SettingsView()
             }
             .task {
-                await loadData()
+                if viewModel == nil {
+                    viewModel = activeViewModel
+                }
+                await viewModel?.loadData()
             }
         }
     }
 
     // MARK: - Top Editorial Header
-    private var topNavigationHeader: some View {
+    private func topNavigationHeader(vm: CalendarMainViewModel) -> some View {
         HStack(alignment: .center, spacing: VNSpacing.sm) {
             headerButton(
                 icon: "calendar.badge.clock",
                 accessibilityLabel: "Xem hôm nay"
             ) {
                 triggerHaptic()
-                adapterViewModel.selectToday()
+                vm.adapterViewModel.selectToday()
             }
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
@@ -104,7 +112,7 @@ public struct CalendarMainView: View {
                     .font(.system(size: 18, weight: .semibold, design: .serif))
                     .foregroundColor(.vnAccentDeepPrimary)
 
-                Text(lunarSubtitle)
+                Text(lunarSubtitle(vm: vm))
                     .font(.system(size: 11, weight: .medium))
                     .tracking(0.66)
                     .foregroundColor(.vnTextSecondary)
@@ -112,14 +120,14 @@ public struct CalendarMainView: View {
 
             Spacer()
 
-            yearSwitcherPill
+            yearSwitcherPill(vm: vm)
 
             headerButton(
                 icon: "gearshape",
                 accessibilityLabel: "Cài đặt ứng dụng"
             ) {
                 triggerHaptic()
-                isShowingSettings = true
+                vm.isShowingSettings = true
             }
         }
         .padding(.horizontal, VNSpacing.xl)
@@ -132,15 +140,13 @@ public struct CalendarMainView: View {
         .shadow(color: VNShadow.card.color, radius: VNShadow.card.radius, x: VNShadow.card.x, y: VNShadow.card.y)
     }
 
-    // Canonical trailing year pill: current year + chevron, opens a native year menu.
-    private var yearSwitcherPill: some View {
-        let currentYear = displaySolarYear
+    private func yearSwitcherPill(vm: CalendarMainViewModel) -> some View {
+        let currentYear = displaySolarYear(vm: vm)
         return Menu {
             ForEach((currentYear - 5)...(currentYear + 5), id: \.self) { year in
                 Button {
                     triggerHaptic()
-                    // Preserve the visible month; only the year changes.
-                    adapterViewModel.selectMonth(displaySolarMonth, year: year)
+                    vm.adapterViewModel.selectMonth(displaySolarMonth(vm: vm), year: year)
                 } label: {
                     Text(String(year))
                 }
@@ -162,19 +168,18 @@ public struct CalendarMainView: View {
         .accessibilityValue(String(currentYear))
     }
 
-    private var displaySolarYear: Int {
+    private func displaySolarYear(vm: CalendarMainViewModel) -> Int {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = VNTime.vietnam
-        return cal.component(.year, from: adapterViewModel.displayMonthDate)
+        return cal.component(.year, from: vm.adapterViewModel.displayMonthDate)
     }
 
-    private var displaySolarMonth: Int {
+    private func displaySolarMonth(vm: CalendarMainViewModel) -> Int {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = VNTime.vietnam
-        return cal.component(.month, from: adapterViewModel.displayMonthDate)
+        return cal.component(.month, from: vm.adapterViewModel.displayMonthDate)
     }
 
-    // 36pt rounded hit target per canonical top bar.
     private func headerButton(
         icon: String,
         accessibilityLabel: String,
@@ -198,29 +203,29 @@ public struct CalendarMainView: View {
     }
 
     // MARK: - Month Callout + Seal
-    private var monthCalloutRow: some View {
+    private func monthCalloutRow(vm: CalendarMainViewModel) -> some View {
         HStack(alignment: .center, spacing: VNSpacing.md) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                Text(monthCalloutEyebrow)
+                Text(monthCalloutEyebrow(vm: vm))
                     .font(.system(size: 11, weight: .medium))
                     .tracking(1.1)
                     .foregroundColor(.vnAccentImperialGold)
 
-                Text(monthCalloutTitle)
+                Text(monthCalloutTitle(vm: vm))
                     .font(.system(size: 22, weight: .semibold, design: .serif))
                     .foregroundColor(.vnTextPrimary)
             }
 
             Spacer(minLength: VNSpacing.sm)
 
-            monthSealBadge
+            monthSealBadge(vm: vm)
         }
         .padding(.horizontal, VNSpacing.xl)
         .padding(.top, VNSpacing.xs)
     }
 
-    private var monthSealBadge: some View {
-        let yearPair = displayYearCanChi
+    private func monthSealBadge(vm: CalendarMainViewModel) -> some View {
+        let yearPair = displayYearCanChi(vm: vm)
         return VStack(spacing: VNSpacing.space2) {
             Text(yearPair.stem.vietnameseName.uppercased())
             Text(yearPair.branch.vietnameseName.uppercased())
@@ -243,31 +248,31 @@ public struct CalendarMainView: View {
         .accessibilityLabel("Ấn triện năm \(yearPair.description)")
     }
 
-    private var monthCalloutEyebrow: String {
-        let name = AstronomicalMath.solarTerm(at: AstronomicalMath.julianDay(from: solarTermAnchorDate))
+    private func monthCalloutEyebrow(vm: CalendarMainViewModel) -> String {
+        let name = AstronomicalMath.solarTerm(at: AstronomicalMath.julianDay(from: solarTermAnchorDate(vm: vm)))
             .vietnameseName.uppercased()
         return "TIẾT KHÍ · TIẾT \(name)"
     }
 
-    private var monthCalloutTitle: String {
+    private func monthCalloutTitle(vm: CalendarMainViewModel) -> String {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = VNTime.vietnam
-        let month = cal.component(.month, from: adapterViewModel.displayMonthDate)
-        let year = cal.component(.year, from: adapterViewModel.displayMonthDate)
+        let month = cal.component(.month, from: vm.adapterViewModel.displayMonthDate)
+        let year = cal.component(.year, from: vm.adapterViewModel.displayMonthDate)
         return "\(solarMonthNames[month - 1]) · \(year)"
     }
 
-    private var displayYearCanChi: CanChiPair {
+    private func displayYearCanChi(vm: CalendarMainViewModel) -> CanChiPair {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = VNTime.vietnam
-        let year = cal.component(.year, from: adapterViewModel.displayMonthDate)
+        let year = cal.component(.year, from: vm.adapterViewModel.displayMonthDate)
         return CanChiPair.year(for: year)
     }
 
-    private var solarTermAnchorDate: SolarDate {
+    private func solarTermAnchorDate(vm: CalendarMainViewModel) -> SolarDate {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = VNTime.vietnam
-        return SolarDate(from: adapterViewModel.displayMonthDate, calendar: cal)
+        return SolarDate(from: vm.adapterViewModel.displayMonthDate, calendar: cal)
     }
 
     private var solarMonthNames: [String] {
@@ -278,10 +283,10 @@ public struct CalendarMainView: View {
         ]
     }
 
-    private var lunarSubtitle: String {
+    private func lunarSubtitle(vm: CalendarMainViewModel) -> String {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = VNTime.vietnam
-        let year = cal.component(.year, from: adapterViewModel.displayMonthDate)
+        let year = cal.component(.year, from: vm.adapterViewModel.displayMonthDate)
         let yearPair = CanChiPair.year(for: year)
         return "Năm \(yearPair.description) • Âm Dương Hợp Lịch"
     }
@@ -291,43 +296,5 @@ public struct CalendarMainView: View {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
         #endif
-    }
-
-    private func loadData() async {
-        let now = Date()
-        let solar = SolarDate(from: now)
-        todayDetails = try? await container.getMonthCalendarUseCase.execute(solarDate: solar)
-
-        if let reminders = try? await container.reminderRepository.fetchAllReminders() {
-            adapterViewModel.updateReminders(reminders)
-            try? await container.notificationEngine.pruneAndSchedule(reminders: reminders)
-        }
-    }
-
-    private func checkAndShowReminderForm() {
-        Task {
-            do {
-                let canAdd = try await container.evaluateFeatureGateUseCase.canAddReminder()
-                if canAdd {
-                    isShowingCreateReminder = true
-                } else {
-                    isShowingPaywall = true
-                }
-            } catch {
-                // Fail closed: a gate error must not open the create form.
-                isShowingPaywall = true
-            }
-        }
-    }
-
-    private func saveReminder(_ reminder: ReminderEvent) {
-        Task {
-            do {
-                try await container.scheduleReminderUseCase.execute(save: reminder)
-            } catch {
-                // Surface save failures instead of silently dropping the reminder.
-            }
-            await loadData()
-        }
     }
 }
