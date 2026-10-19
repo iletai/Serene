@@ -3,64 +3,47 @@ import VNCalendarDesignSystem
 import VNCalendarDomain
 
 public struct PrayerLibraryView: View {
-    @State private var container = AppContainer.shared
-    @State private var prayers: [Prayer] = []
-    @State private var searchQuery: String = ""
-    @State private var selectedCategory: PrayerCategory?
-    @State private var selectedPrayer: Prayer?
+    @Environment(AppContainer.self) private var container
+    @State private var viewModel: PrayerLibraryViewModel?
 
     public init() {}
 
-    private var filteredPrayers: [Prayer] {
-        var list = prayers
-        if let cat = selectedCategory {
-            list = list.filter { $0.category == cat }
-        }
-        let query = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !query.isEmpty {
-            list = list.filter { prayer in
-                prayer.title.localizedCaseInsensitiveContains(query) ||
-                prayer.occasion.localizedCaseInsensitiveContains(query) ||
-                prayer.tags.contains(where: { $0.localizedCaseInsensitiveContains(query) })
-            }
-        }
-        return list
+    private var activeViewModel: PrayerLibraryViewModel {
+        if let existing = viewModel { return existing }
+        return PrayerLibraryViewModel(prayerRepository: container.prayerRepository)
     }
 
     public var body: some View {
+        @Bindable var vm = activeViewModel
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: VNSpacing.xl) {
-                    // Header Section
-                    headerSection
-
-                    // Search Bar
-                    searchBarSection
-
-                    // Category Filter Pills
-                    categoryPillsSection
-
-                    // Prayer Items List
-                    prayerListSection
+                    headerSection(vm: vm)
+                    searchBarSection(vm: vm)
+                    categoryPillsSection(vm: vm)
+                    prayerListSection(vm: vm)
                 }
                 .padding(.bottom, VNSpacing.xxl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
-            .sheet(item: $selectedPrayer) { prayer in
+            .sheet(item: $vm.selectedPrayer) { prayer in
                 PrayerDetailView(prayer: prayer)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
             }
             .task {
-                await loadPrayers()
+                if viewModel == nil {
+                    viewModel = activeViewModel
+                }
+                await viewModel?.load()
             }
         }
     }
 
     // MARK: - Header Section
-
-    private var headerSection: some View {
+    @ViewBuilder
+    private func headerSection(vm: PrayerLibraryViewModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
                 HStack(spacing: VNSpacing.xs) {
@@ -81,8 +64,8 @@ public struct PrayerLibraryView: View {
 
                 Spacer()
 
-                if !prayers.isEmpty {
-                    Text("\(prayers.count) bài khấn")
+                if !vm.prayers.isEmpty {
+                    Text("\(vm.prayers.count) bài khấn")
                         .font(.vnCaption2)
                         .fontWeight(.semibold)
                         .foregroundColor(.vnAccentDeepPrimary)
@@ -108,20 +91,21 @@ public struct PrayerLibraryView: View {
     }
 
     // MARK: - Search Bar
-
-    private var searchBarSection: some View {
+    @ViewBuilder
+    private func searchBarSection(vm: PrayerLibraryViewModel) -> some View {
+        @Bindable var boundVM = vm
         HStack(spacing: VNSpacing.sm) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.vnTextSecondary)
                 .font(.vnFootnote)
                 .accessibilityHidden(true)
 
-            TextField("Tìm văn khấn Mùng 1, Rằm, Giỗ, Táo Quân...", text: $searchQuery)
+            TextField("Tìm văn khấn Mùng 1, Rằm, Giỗ, Táo Quân...", text: $boundVM.searchQuery)
                 .font(.vnFootnote)
 
-            if !searchQuery.isEmpty {
+            if !vm.searchQuery.isEmpty {
                 Button {
-                    searchQuery = ""
+                    vm.searchQuery = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.vnTextTertiary)
@@ -146,41 +130,39 @@ public struct PrayerLibraryView: View {
     }
 
     // MARK: - Category Filter Pills
-
-    private var categoryPillsSection: some View {
+    @ViewBuilder
+    private func categoryPillsSection(vm: PrayerLibraryViewModel) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: VNSpacing.sm) {
-                // "Tất cả" Pill
                 Button {
                     triggerHaptic()
-                    selectedCategory = nil
+                    vm.selectedCategory = nil
                 } label: {
                     Text("Tất cả")
                         .font(.system(size: 12, weight: .semibold, design: .serif))
-                        .foregroundColor(selectedCategory == nil ? .vnAccentDeepPrimary : .vnTextSecondary)
+                        .foregroundColor(vm.selectedCategory == nil ? .vnAccentDeepPrimary : .vnTextSecondary)
                         .frame(minHeight: 44)
                         .padding(.horizontal, VNSpacing.lg)
-                        .background(selectedCategory == nil ? Color.vnAccentRedSurface : Color.clear)
+                        .background(vm.selectedCategory == nil ? Color.vnAccentRedSurface : Color.clear)
                         .clipShape(Capsule())
                         .overlay(
                             Capsule().strokeBorder(
-                                selectedCategory == nil ? Color.vnAccentHeritageRed.opacity(0.25) : Color.vnBorderSubtle,
-                                lineWidth: selectedCategory == nil ? 1 : 0.5
+                                vm.selectedCategory == nil ? Color.vnAccentHeritageRed.opacity(0.25) : Color.vnBorderSubtle,
+                                lineWidth: vm.selectedCategory == nil ? 1 : 0.5
                             )
                         )
                 }
                 .buttonStyle(.plain)
                 .contentShape(Capsule())
-                .accessibilityAddTraits(selectedCategory == nil ? [.isSelected, .isButton] : .isButton)
+                .accessibilityAddTraits(vm.selectedCategory == nil ? [.isSelected, .isButton] : .isButton)
 
-                // Each Category
                 ForEach(PrayerCategory.allCases, id: \.self) { cat in
                     PrayerCategoryCard(
                         category: cat,
-                        count: prayers.filter { $0.category == cat }.count,
-                        isSelected: selectedCategory == cat,
+                        count: vm.prayers.filter { $0.category == cat }.count,
+                        isSelected: vm.selectedCategory == cat,
                         action: {
-                            selectedCategory = (selectedCategory == cat) ? nil : cat
+                            vm.selectedCategory = (vm.selectedCategory == cat) ? nil : cat
                         }
                     )
                 }
@@ -191,17 +173,17 @@ public struct PrayerLibraryView: View {
     }
 
     // MARK: - Prayer List
-
-    private var prayerListSection: some View {
+    @ViewBuilder
+    private func prayerListSection(vm: PrayerLibraryViewModel) -> some View {
         VStack(spacing: VNSpacing.sm) {
-            if filteredPrayers.isEmpty {
+            if vm.filteredPrayers.isEmpty {
                 emptyState
             } else {
-                ForEach(filteredPrayers) { prayer in
+                ForEach(vm.filteredPrayers) { prayer in
                     prayerRowCard(for: prayer)
                         .onTapGesture {
                             triggerHaptic()
-                            selectedPrayer = prayer
+                            vm.selectedPrayer = prayer
                         }
                         .accessibilityAddTraits(.isButton)
                         .accessibilityHint("Xem chi tiết bài văn khấn")
@@ -211,48 +193,36 @@ public struct PrayerLibraryView: View {
         .padding(.horizontal, VNSpacing.xl)
     }
 
+    @ViewBuilder
     private func prayerRowCard(for prayer: Prayer) -> some View {
         HStack(spacing: VNSpacing.md) {
-            // Category icon tile: 40x40, 8pt radius, red tint from canonical brief
-            Image(systemName: prayer.category.iconName)
-                .font(.system(size: 17))
-                .foregroundColor(.vnAccentDeepPrimary)
-                .frame(width: 40, height: 40)
+            Image(systemName: "flame.fill")
+                .font(.system(size: 16))
+                .foregroundColor(.vnAccentHeritageRed)
+                .frame(width: 44, height: 44)
                 .background(Color.vnAccentRedSurface)
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
-                .overlay(
-                    RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                        .strokeBorder(Color.vnAccentHeritageRed.opacity(0.28), lineWidth: VNBorderWidth.regular)
-                )
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(prayer.title)
-                    .font(.system(size: 16, weight: .semibold, design: .serif))
+                    .font(.system(size: 15, weight: .semibold, design: .serif))
                     .foregroundColor(.vnTextPrimary)
-                    .lineLimit(2)
+                    .lineLimit(1)
 
-                HStack(spacing: VNSpacing.xs) {
-                    Text(prayer.occasion)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.vnTextSecondary)
-
-                    if !prayer.offerings.isEmpty {
-                        Text("• \(prayer.offerings.count) lễ vật")
-                            .font(.system(size: 11))
-                            .foregroundColor(.vnAccentImperialGold)
-                    }
-                }
-                .lineLimit(1)
+                Text(prayer.occasion)
+                    .font(.system(size: 12))
+                    .foregroundColor(.vnTextSecondary)
+                    .lineLimit(1)
             }
 
-            Spacer(minLength: 4)
+            Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(.vnTextTertiary)
                 .accessibilityHidden(true)
         }
-        .padding(VNSpacing.xl)
+        .padding(VNSpacing.lg)
         .background(Color.vnBackgroundSecondary)
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
@@ -263,7 +233,6 @@ public struct PrayerLibraryView: View {
         .contentShape(Rectangle())
     }
 
-    // Faint folio shadow from canonical: 0 4px 20px -2px rgba(90,84,79,0.05).
     private var folioShadow: VNShadow.ShadowConfig { VNShadow.folio }
 
     private var emptyState: some View {
@@ -279,14 +248,6 @@ public struct PrayerLibraryView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, VNSpacing.xxl)
-    }
-
-    // MARK: - Helpers
-
-    private func loadPrayers() async {
-        if let items = try? await container.prayerRepository.fetchAllPrayers() {
-            self.prayers = items
-        }
     }
 
     private func triggerHaptic() {

@@ -9,13 +9,16 @@ private let settingsLogger = Logger(subsystem: "com.iletai.annien", category: "S
 
 public struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var subscriptionManager = SubscriptionManager.shared
-    @State private var container = AppContainer.shared
+    @Environment(AppContainer.self) private var container
     @State private var isShowingPaywall = false
     @AppStorage("appThemeAppearance") private var appThemeAppearance: Int = 0 // 0: Auto, 1: Rice Paper Light, 2: Lacquer Charcoal Dark
     @AppStorage("appLanguage") private var appLanguage: String = "system"
 
     public init() {}
+
+    private var isPro: Bool {
+        container.subscriptionManager.entitlement.isPro
+    }
 
     public var body: some View {
         NavigationStack {
@@ -47,17 +50,17 @@ public struct SettingsView: View {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         let proTitle = String(localized: "settings.membership.pro_title")
                         let freeTitle = String(localized: "settings.membership.free_title")
-                        Text(subscriptionManager.entitlement.isPro ? proTitle : freeTitle)
+                        Text(isPro ? proTitle : freeTitle)
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.vnTextPrimary)
                         let proSubtitle = String(localized: "settings.membership.pro_subtitle")
                         let freeSubtitle = String(localized: "settings.membership.free_subtitle")
-                        Text(subscriptionManager.entitlement.isPro ? proSubtitle : freeSubtitle)
+                        Text(isPro ? proSubtitle : freeSubtitle)
                             .font(.system(size: 12))
                             .foregroundColor(.vnTextSecondary)
                     }
                     Spacer()
-                    if !subscriptionManager.entitlement.isPro {
+                    if !isPro {
                         VNButton(String(localized: "settings.action.upgrade"), variant: .primary, size: .small) {
                             isShowingPaywall = true
                         }
@@ -193,14 +196,18 @@ public struct AppearanceLanguageSettingsView: View {
 }
 
 public struct DataBackupSettingsView: View {
-    @State private var container = AppContainer.shared
-    @State private var exportText: String = ""
-    @State private var isShowingExportSheet = false
-    @State private var isShowingPaywall = false
-    @State private var backupStatusMessage: String?
-    @State private var isSyncingContent = false
+    @Environment(AppContainer.self) private var container
+    @State private var viewModel: SettingsViewModel?
+
+    public init() {}
+
+    private var activeViewModel: SettingsViewModel {
+        if let existing = viewModel { return existing }
+        return SettingsViewModel(container: container)
+    }
 
     public var body: some View {
+        @Bindable var vm = activeViewModel
         ScrollView {
             VStack(alignment: .leading, spacing: VNSpacing.xl) {
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
@@ -210,13 +217,15 @@ public struct DataBackupSettingsView: View {
                         .padding(.horizontal, VNSpacing.xs)
 
                     VStack(spacing: 0) {
-                        Button(action: handleRefreshContent) {
+                        Button {
+                            vm.syncContent()
+                        } label: {
                             HStack {
                                 Label(String(localized: "settings.data.refresh"), systemImage: "arrow.triangle.2.circlepath")
                                     .font(.system(size: 16))
                                     .foregroundColor(.vnTextPrimary)
                                 Spacer()
-                                if isSyncingContent { ProgressView().scaleEffect(0.8) }
+                                if vm.isSyncingContent { ProgressView().scaleEffect(0.8) }
                             }
                             .padding(.horizontal, VNSpacing.lg)
                             .padding(.vertical, VNSpacing.md)
@@ -224,7 +233,9 @@ public struct DataBackupSettingsView: View {
 
                         VNRowDivider(leadingInset: VNSpacing.lg)
 
-                        Button(action: handleExportJSON) {
+                        Button {
+                            vm.exportJSON()
+                        } label: {
                             HStack {
                                 Label(String(localized: "settings.data.export_json"), systemImage: "square.and.arrow.up")
                                     .font(.system(size: 16))
@@ -237,7 +248,9 @@ public struct DataBackupSettingsView: View {
 
                         VNRowDivider(leadingInset: VNSpacing.lg)
 
-                        Button(action: handleExportICS) {
+                        Button {
+                            vm.exportICS()
+                        } label: {
                             HStack {
                                 Label(String(localized: "settings.data.export_ics"), systemImage: "calendar.badge.plus")
                                     .font(.system(size: 16))
@@ -248,7 +261,7 @@ public struct DataBackupSettingsView: View {
                             .padding(.vertical, VNSpacing.md)
                         }
 
-                        if let msg = backupStatusMessage {
+                        if let msg = vm.backupStatusMessage {
                             VNRowDivider()
                             Text(msg)
                                 .font(.system(size: 12))
@@ -266,57 +279,16 @@ public struct DataBackupSettingsView: View {
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
         .vnNavBar(title: String(localized: "settings.data.header"))
-        .sheet(isPresented: $isShowingExportSheet) {
-            ShareSheet(activityItems: [exportText])
+        .sheet(isPresented: $vm.isShowingExportSheet) {
+            ShareSheet(activityItems: [vm.exportText])
         }
-        .sheet(isPresented: $isShowingPaywall) {
+        .sheet(isPresented: $vm.isShowingPaywall) {
             PaywallView()
         }
-    }
-
-    private func handleRefreshContent() {
-        isSyncingContent = true
-        Task {
-            await container.syncProverbs()
-            do {
-                try await container.holidayRepository.synchronizeRemoteContent()
-                backupStatusMessage = String(localized: "settings.data.sync_success")
-            } catch {
-                backupStatusMessage = String(localized: "settings.data.sync_offline")
+        .task {
+            if viewModel == nil {
+                viewModel = activeViewModel
             }
-            isSyncingContent = false
-        }
-    }
-
-    private func handleExportJSON() {
-        Task {
-            do {
-                let reminders = try await container.reminderRepository.fetchAllReminders()
-                let data = try DataBackupEngine.exportJSON(reminders: reminders)
-                if let str = String(data: data, encoding: .utf8) {
-                    exportText = str
-                    isShowingExportSheet = true
-                    backupStatusMessage = String(format: String(localized: "settings.data.export_done"), reminders.count)
-                }
-            } catch {
-                backupStatusMessage = String(format: String(localized: "settings.data.export_error"), error.localizedDescription)
-            }
-        }
-    }
-
-    private func handleExportICS() {
-        Task {
-            // Batch ICS export is Pro-only (AppFeature.batchExportICS).
-            let unlocked = await container.evaluateFeatureGateUseCase.isFeatureAvailable(.batchExportICS)
-            guard unlocked else {
-                isShowingPaywall = true
-                return
-            }
-            let reminders = (try? await container.reminderRepository.fetchAllReminders()) ?? []
-            let ics = await DataBackupEngine.generateICS(reminders: reminders)
-            exportText = ics
-            isShowingExportSheet = true
-            backupStatusMessage = String(localized: "settings.data.ics_done")
         }
     }
 }

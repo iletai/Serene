@@ -11,116 +11,65 @@ public struct FamilyMemberGroup: Identifiable {
 }
 
 public struct FamilyHierarchyView: View {
-    @State private var container = AppContainer.shared
-    @State private var subscriptionManager = SubscriptionManager.shared
-    @State private var reminders: [ReminderEvent] = []
+    @Environment(AppContainer.self) private var container
+    @State private var viewModel: FamilyHierarchyViewModel?
     @State private var pressedMemberID: UUID?
-    @State private var isShowingCreateReminder = false
-    @State private var isShowingPaywall = false
-    @State private var selectedReminder: ReminderEvent?
 
     public init() {}
 
-    // Pro-only per FeatureGateRule / storekit spec Trigger E.
-    private var isGenealogyUnlocked: Bool {
-        FeatureGateRule.isFeatureAvailable(.genealogyMode, isPro: subscriptionManager.entitlement.isPro)
-    }
-
-    public var groupedGenerations: [FamilyMemberGroup] {
-        let gen1 = reminders.filter { $0.relationship?.contains("Cụ") == true }
-        let gen1IDs = Set(gen1.map(\.id))
-
-        let gen2 = reminders.filter { item in
-            guard !gen1IDs.contains(item.id) else { return false }
-            return item.relationship?.contains("Ông") == true || item.relationship?.contains("Bà") == true
-        }
-        let gen2IDs = Set(gen2.map(\.id))
-
-        let gen3Keys = ["Cha", "Bố", "Mẹ", "Bác", "Chú", "Cô", "Dì"]
-        let gen3 = reminders.filter { item in
-            guard !gen1IDs.contains(item.id), !gen2IDs.contains(item.id) else { return false }
-            guard let rel = item.relationship else { return false }
-            return gen3Keys.contains(where: { rel.contains($0) })
-        }
-        let gen3IDs = Set(gen3.map(\.id))
-
-        let others = reminders.filter { !gen1IDs.contains($0.id) && !gen2IDs.contains($0.id) && !gen3IDs.contains($0.id) }
-
-        var groups: [FamilyMemberGroup] = []
-        if !gen1.isEmpty {
-            groups.append(FamilyMemberGroup(
-                id: "gen1",
-                generationTitle: "Thế Hệ Tiên Tổ",
-                generationRank: "ĐỜI I",
-                members: gen1
-            ))
-        }
-        if !gen2.isEmpty {
-            groups.append(FamilyMemberGroup(
-                id: "gen2",
-                generationTitle: "Thế Hệ Ông Bà",
-                generationRank: "ĐỜI II",
-                members: gen2
-            ))
-        }
-        if !gen3.isEmpty {
-            groups.append(FamilyMemberGroup(
-                id: "gen3",
-                generationTitle: "Thế Hệ Cha Mẹ & Cô Chú",
-                generationRank: "ĐỜI III",
-                members: gen3
-            ))
-        }
-        if !others.isEmpty {
-            groups.append(FamilyMemberGroup(
-                id: "others",
-                generationTitle: "Họ Hàng & Kỷ Niệm Khác",
-                generationRank: "HẬU DUỆ",
-                members: others
-            ))
-        }
-        return groups
+    private var activeViewModel: FamilyHierarchyViewModel {
+        if let existing = viewModel { return existing }
+        return FamilyHierarchyViewModel(
+            reminderRepository: container.reminderRepository,
+            subscriptionManager: container.subscriptionManager,
+            scheduleReminderUseCase: container.scheduleReminderUseCase,
+            evaluateFeatureGateUseCase: container.evaluateFeatureGateUseCase
+        )
     }
 
     public var body: some View {
+        @Bindable var vm = activeViewModel
         NavigationStack {
             VStack(spacing: 0) {
-                topBar
+                topBar(vm: vm)
 
-                if isGenealogyUnlocked {
-                    genealogyContent
+                if vm.isGenealogyUnlocked {
+                    genealogyContent(vm: vm)
                 } else {
-                    lockedContent
+                    lockedContent(vm: vm)
                 }
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
-            .sheet(isPresented: $isShowingCreateReminder) {
+            .sheet(isPresented: $vm.isShowingCreateReminder) {
                 ReminderFormView(onSave: { newEvent in
-                    saveMember(newEvent)
+                    vm.saveMember(newEvent)
                 })
                 .presentationDetents([.fraction(0.92), .large])
                 .presentationDragIndicator(.visible)
             }
-            .sheet(item: $selectedReminder) { item in
+            .sheet(item: $vm.selectedReminder) { item in
                 ReminderFormView(existingReminder: item, onSave: { updated in
-                    saveMember(updated)
+                    vm.saveMember(updated)
                 })
                 .presentationDetents([.fraction(0.92), .large])
                 .presentationDragIndicator(.visible)
             }
-            .sheet(isPresented: $isShowingPaywall) {
+            .sheet(isPresented: $vm.isShowingPaywall) {
                 PaywallView()
             }
             .task {
-                await loadMembers()
+                if viewModel == nil {
+                    viewModel = activeViewModel
+                }
+                await viewModel?.load()
             }
         }
     }
 
-    // MARK: - Top Bar (canonical translucent bar)
+    // MARK: - Top Bar
     @ViewBuilder
-    private var topBar: some View {
+    private func topBar(vm: FamilyHierarchyViewModel) -> some View {
         HStack(spacing: VNSpacing.sm) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("Gia Phả")
@@ -134,7 +83,7 @@ public struct FamilyHierarchyView: View {
             Spacer()
 
             Button {
-                checkAndAddMember()
+                vm.checkAndCreate()
             } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 15, weight: .bold))
@@ -155,24 +104,25 @@ public struct FamilyHierarchyView: View {
     }
 
     // MARK: - Genealogy Content (Pro)
-    private var genealogyContent: some View {
+    private func genealogyContent(vm: FamilyHierarchyViewModel) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: VNSpacing.xl) {
-                headerSection
+                headerSection(vm: vm)
 
-                if reminders.isEmpty {
-                    emptyStateSection
+                if vm.reminders.isEmpty {
+                    emptyStateSection(vm: vm)
                 } else {
-                    genealogyTreeSection
+                    genealogyTreeSection(vm: vm)
                 }
             }
             .padding(.bottom, VNSpacing.xl)
         }
     }
 
-    // MARK: - Locked State (free tier) — same lock pattern as LunarWidgetEntryView.lockedWidgetView
-    private var lockedContent: some View {
-        VStack(spacing: VNSpacing.md) {
+    // MARK: - Locked State (free tier)
+    private func lockedContent(vm: FamilyHierarchyViewModel) -> some View {
+        @Bindable var boundVM = vm
+        return VStack(spacing: VNSpacing.md) {
             Image(systemName: "lock.fill")
                 .font(.system(size: 44, weight: .semibold))
                 .foregroundColor(.vnAccentImperialGold)
@@ -190,7 +140,7 @@ public struct FamilyHierarchyView: View {
                 .padding(.horizontal, VNSpacing.xl)
 
             VNButton("Nâng Cấp Pro", icon: "crown.fill", variant: .primary, size: .medium) {
-                isShowingPaywall = true
+                boundVM.isShowingPaywall = true
             }
             .padding(.top, VNSpacing.xs)
         }
@@ -201,7 +151,7 @@ public struct FamilyHierarchyView: View {
 
     // MARK: - Header Section
     @ViewBuilder
-    private var headerSection: some View {
+    private func headerSection(vm: FamilyHierarchyViewModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
                 Text("KÍNH TỔ PHỤNG GIA")
@@ -211,8 +161,8 @@ public struct FamilyHierarchyView: View {
 
                 Spacer()
 
-                if !reminders.isEmpty {
-                    Text("\(reminders.count) tiền nhân")
+                if !vm.reminders.isEmpty {
+                    Text("\(vm.reminders.count) tiền nhân")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.vnOnGoldContainer)
                         .padding(.horizontal, VNSpacing.sm)
@@ -228,7 +178,7 @@ public struct FamilyHierarchyView: View {
 
     // MARK: - Empty State
     @ViewBuilder
-    private var emptyStateSection: some View {
+    private func emptyStateSection(vm: FamilyHierarchyViewModel) -> some View {
         VStack(spacing: VNSpacing.md) {
             Image(systemName: "person.3.sequence.fill")
                 .font(.system(size: 48))
@@ -246,8 +196,10 @@ public struct FamilyHierarchyView: View {
                 .lineSpacing(4)
                 .padding(.horizontal, VNSpacing.xl)
 
-            VNButton("Thêm Tiền Nhân Gia Tộc", icon: "plus", variant: .primary, size: .medium, action: checkAndAddMember)
-                .padding(.top, VNSpacing.xs)
+            VNButton("Thêm Tiền Nhân Gia Tộc", icon: "plus", variant: .primary, size: .medium) {
+                vm.checkAndCreate()
+            }
+            .padding(.top, VNSpacing.xs)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, VNSpacing.xl)
@@ -262,19 +214,19 @@ public struct FamilyHierarchyView: View {
         .padding(.horizontal, VNSpacing.xl)
     }
 
-    // MARK: - Genealogy Tree Section (artwork rail — DESIGN.md §6)
+    // MARK: - Genealogy Tree Section
     @ViewBuilder
-    private var genealogyTreeSection: some View {
+    private func genealogyTreeSection(vm: FamilyHierarchyViewModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xl) {
-            ForEach(groupedGenerations) { group in
-                generationBand(group)
+            ForEach(vm.groupedGenerations) { group in
+                generationBand(group, vm: vm)
             }
         }
     }
 
-    // MARK: - Generation Band (rank seal + gold connector rail + member branches)
+    // MARK: - Generation Band
     @ViewBuilder
-    private func generationBand(_ group: FamilyMemberGroup) -> some View {
+    private func generationBand(_ group: FamilyMemberGroup, vm: FamilyHierarchyViewModel) -> some View {
         HStack(alignment: .top, spacing: VNSpacing.md) {
             generationRail(rank: group.generationRank)
 
@@ -297,14 +249,13 @@ public struct FamilyHierarchyView: View {
                 }
 
                 ForEach(group.members) { member in
-                    memberBranch(member)
+                    memberBranch(member, vm: vm)
                 }
             }
         }
         .padding(.horizontal, VNSpacing.xl)
     }
 
-    // Left rail: ấn triện rank marker + gold connector line (DESIGN §6.3)
     private func generationRail(rank: String) -> some View {
         VStack(spacing: VNSpacing.sm) {
             Text(rankLetter(from: rank))
@@ -328,9 +279,8 @@ public struct FamilyHierarchyView: View {
         .frame(width: 32)
     }
 
-    // Branch tick from rail to card + pressed vermilion ring (DESIGN §6.2)
     @ViewBuilder
-    private func memberBranch(_ member: ReminderEvent) -> some View {
+    private func memberBranch(_ member: ReminderEvent, vm: FamilyHierarchyViewModel) -> some View {
         HStack(alignment: .top, spacing: VNSpacing.sm) {
             Rectangle()
                 .fill(Color.vnAccentImperialGold.opacity(0.45))
@@ -349,14 +299,13 @@ public struct FamilyHierarchyView: View {
                 .contentShape(Rectangle())
                 .onTapGesture {
                     pressedMemberID = member.id
-                    selectedReminder = member
+                    vm.selectedReminder = member
                 }
                 .accessibilityAddTraits(.isButton)
                 .accessibilityHint("Chỉnh sửa chi tiết tiền nhân")
         }
     }
 
-    // "ĐỜI I" → "I", "HẬU DUỆ" → "D"
     private func rankLetter(from rank: String) -> String {
         let last = rank.split(separator: " ").last.map(String.init) ?? String(rank.prefix(1))
         return String(last.prefix(1))
@@ -365,8 +314,6 @@ public struct FamilyHierarchyView: View {
     // MARK: - Member Card
     private func memberCard(member: ReminderEvent) -> some View {
         let isDeath = member.category == .deathAnniversary || member.category == .ancestral
-        let accentColor = isDeath ? Color.vnAccentDeepPrimary : Color.vnAccentImperialGold
-
         return HStack(spacing: VNSpacing.md) {
             if member.category == .deathAnniversary {
                 VNSealBadge.gio(size: .small)
@@ -427,47 +374,5 @@ public struct FamilyHierarchyView: View {
                 .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
         )
         .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
-    }
-
-    private func loadMembers() async {
-        if let items = try? await container.reminderRepository.fetchAllReminders() {
-            self.reminders = items
-        }
-    }
-
-    private func checkAndAddMember() {
-        Task {
-            // Genealogy mode is Pro-only; the quota check below alone lets free users in.
-            let unlocked = await container.evaluateFeatureGateUseCase.isFeatureAvailable(.genealogyMode)
-            guard unlocked else {
-                isShowingPaywall = true
-                return
-            }
-            do {
-                let canAdd = try await container.evaluateFeatureGateUseCase.canAddReminder()
-                if canAdd {
-                    isShowingCreateReminder = true
-                } else {
-                    isShowingPaywall = true
-                }
-            } catch {
-                // Fail closed: a gate error must not open the create form.
-                isShowingPaywall = true
-            }
-        }
-    }
-
-    private func saveMember(_ member: ReminderEvent) {
-        Task {
-            do {
-                try await container.scheduleReminderUseCase.execute(save: member)
-            } catch {
-                // Surface save failures instead of silently dropping the reminder.
-            }
-            await loadMembers()
-            if let items = try? await container.reminderRepository.fetchAllReminders() {
-                try? await container.notificationEngine.pruneAndSchedule(reminders: items)
-            }
-        }
     }
 }
