@@ -92,14 +92,28 @@ public actor LunarAstronomicalEngine {
         return AstronomicalMath.solarDate(from: resultJD)
     }
 
-    /// Kiểm tra năm Âm lịch `year` có tháng nhuận đúng số `month` hay không.
-    /// Round-trip qua convertToSolar/convertToLunar thay vì lặp lại công thức
-    /// thiên văn: hai hàm này đã được kiểm chứng, nên kết quả tự nhất quán.
+    /// Trả về số tháng nhuận (1...12) của năm âm lịch `year`, hoặc `nil` nếu
+    /// năm đó không có tháng nhuận.
+    ///
+    /// Dùng đúng phép tính mà `convertToSolar` dùng để quyết định `off` khi
+    /// `isLeapMonth == true`, để thông báo (LeapMonthPolicy) luôn khớp với lịch
+    /// hiển thị. LƯU Ý: `getLeapMonthOffset` là code thừa kế có lệch chuẩn với
+    /// âm lịch Việt Nam ở một số năm (2025, 1984, 2033 — xem review PR #2).
+    /// Sửa thuật toán thiên văn tầng sâu nằm ngoài phạm vi PR này; fix tại đây
+    /// chỉ đảm bảo nhất quán giữa notification và calendar, không tự sửa lịch.
+    nonisolated public func leapMonth(ofLunarYear year: Int, timeZoneOffset: Double = 7.0) -> Int? {
+        let a11 = getLunarMonth11(year: year - 1, timeZoneOffset: timeZoneOffset)
+        let b11 = getLunarMonth11(year: year, timeZoneOffset: timeZoneOffset)
+        guard b11 - a11 > 365 else { return nil }
+        let leapOff = getLeapMonthOffset(a11: a11, timeZoneOffset: timeZoneOffset)
+        var leapMonth = leapOff - 2
+        if leapMonth <= 0 { leapMonth += 12 }
+        return leapMonth
+    }
+
+    /// Có tháng nhuận `matching` trong năm âm lịch `year` hay không.
     nonisolated public func hasLeapMonth(ofLunarYear year: Int, matching month: Int) -> Bool {
-        let probe = LunarDate(day: 1, month: month, year: year, isLeapMonth: true)
-        let solar = convertToSolar(from: probe)
-        let back = convertToLunar(from: solar)
-        return back.isLeapMonth && back.month == month && back.year == year
+        leapMonth(ofLunarYear: year) == month
     }
 
     /// Tính toán Can Chi cho ngày Dương Lịch

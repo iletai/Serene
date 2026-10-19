@@ -198,7 +198,24 @@ public actor SmartNotificationEngine {
                 let subtitleText: String
                 let bundle = Self.activeBundle
                 func copy(_ key: String, _ args: CVarArg...) -> String {
-                    String(format: bundle.localizedString(forKey: key, value: nil, table: nil), arguments: args)
+                    let raw = bundle.localizedString(forKey: key, value: nil, table: nil)
+                    let fmt: String
+                    if raw == key {
+                        // Missing key fallback preserves spec format arguments
+                        switch key {
+                        case "notif.today_title": fmt = "Hôm nay là %@"
+                        case "notif.today_body_lunar": fmt = "Ngày %lld/%lld Âm lịch - %@"
+                        case "notif.today_body_lunar_clamped": fmt = "Ngày %lld/%lld ÂL (Tháng thiếu 29 ngày) - %@"
+                        case "notif.today_body_solar": fmt = "Ngày %lld/%lld Dương lịch - %@"
+                        case "notif.upcoming_title": fmt = "Sắp đến %@ (Còn %lld ngày)"
+                        case "notif.upcoming_body_lunar": fmt = "Sự kiện vào ngày %lld/%lld ÂL - %@"
+                        case "notif.upcoming_body_solar": fmt = "Sự kiện vào ngày %lld/%lld Dương lịch - %@"
+                        default: fmt = key
+                        }
+                    } else {
+                        fmt = raw
+                    }
+                    return String(format: fmt, arguments: args)
                 }
                 if offset == 0 {
                     titleText = copy("notif.today_title", event.title)
