@@ -9,6 +9,10 @@ Tài liệu đặc tả toàn diện ngôn ngữ thiết kế, Design Tokens, c�
 ### 1.0. Stitch Design Prototype
 - **Màn hình Stitch Prototype**: `An Niên - Lịch Việt & Ngày Nhớ` (Project: `projects/9156707561340621727`)
 - **Visual Artifacts**: Lưới 42 ô lịch Âm Dương, Thẻ Thông tin Hôm Nay, Can Chi & Tiết khí, Danh sách Giỗ gia đình, Bottom Navigation.
+- **Screens mới (2026-10-19)**:
+  - `An Niên - Cây Gia Phả & Gia Tiên` (`bd623b48fc394bb6a3e3c508610fcc84`) — artwork tree; **status: NEED-ITERATION** theo review QA (`DESIGN.md` §6.5). Artifacts: `.stitch/designs/family-tree-bd623b48.*`
+  - `An Niên - Lịch Ngày (Bản Tinh Hoa)` (`a55f5cf282bf454688e66ce5d4af4927`) — lịch ngày polish; **status: NEED-ITERATION** (nav offset, radius ladder, touch target). Artifacts: `.stitch/designs/daily-polish-a55f5cf282bf454688e66ce5d4af4927.*`
+  - Spec gia phả đã chuẩn hoá: `DESIGN.md` (repo root) §6 "Family Tree — Cây Gia Phả".
 
 ### 1.1. Tôn Chỉ Nghệ Thuật
 An Niên kết hợp giữa **Thẩm mỹ Cổ điển Việt Nam** (sự mộc mạc của giấy điệp, màu sơn son thếp vàng cung đình Huế, nét mực nho thư pháp) với **Apple Human Interface Guidelines (iOS 17/18)** (tối giản, chiều sâu phân lớp, kiểu chữ sắc nét, chuyển động vật lý tự nhiên).

@@ -190,3 +190,58 @@ Chọn Corner Radius cho Component?
     *   Detailed daily timeline with auspicious hours and memorial reminders.
 4.  **Năm (Year Overview — `VNYearCalendarView.swift`):**
     *   12-month mini-grid overview for rapid navigation across the lunar-solar year.
+
+---
+
+## 6. Family Tree — Cây Gia Phả (Artwork Diagram Spec)
+
+Stitch reference screens:
+*   `An Niên - Cây Gia Phả & Gia Tiên` — `screens/bd623b48fc394bb6a3e3c508610fcc84` (`.stitch/designs/family-tree-bd623b48.*`)
+*   `An Niên - Lịch Ngày (Bản Tinh Hoa)` — `screens/a55f5cf282bf454688e66ce5d4af4927` (`.stitch/designs/daily-polish-a55f5cf282bf454688e66ce5d4af4927.*`)
+
+Cây gia phả là **artwork biểu đồ**, không phải danh sách: thế hệ xếp dọc, connector vàng nối nhánh, ấn triện đánh dấu cặp vợ chồng.
+
+### 6.1 Generation Bands
+*   Nhãn đời dọc bên trái: `ĐỜI I`, `ĐỜI II`, `ĐỜI III`, `HẬU DUỆ` — 11pt/700, tracking +0.66, màu `vnAccentImperialGold`.
+*   Tiêu đề đời bên cạnh: serif 17pt/700 `vnTextPrimary`; đếm số vị 12pt/500 `vnTextSecondary`.
+*   Nguồn dữ liệu duy nhất: `ReminderEvent` hiện có (`title`, `relationship`, `day`, `month`, `year`, `category`, `note`). Group theo `relationship` (Cụ → Ông/Bà → Cha/Mẹ/Bác/Chú/Cô/Dì → còn lại) như `FamilyHierarchyView.groupedGenerations`.
+
+### 6.2 Member Node (rice-paper card)
+*   Nền `vnBackgroundSecondary`, radius `VNCornerRadius.card` (12pt), viền hairline `vnAccentImperialGold.opacity(0.28)` 1pt, shadow `VNShadow.folio`.
+*   Tên: serif 17–20pt/600 `vnTextPrimary`.
+*   Ngày giỗ: lunar style `dd/m Âm lịch`, sans 12pt `vnTextSecondary`, icon nhỏ cùng hàng.
+*   Tag quan hệ: capsule `vnBackgroundTertiary`, 11pt/600 `vnTextSecondary`.
+*   **Chỉ render field có thật trong `ReminderEvent`.** Không render tuổi thọ, số con, quê quán, chi/nhánh nếu chưa mở rộng domain.
+*   Tap target toàn card ≥ 44pt; pressed state = viền `vnAccentHeritageRed.opacity(0.5)` 1.5pt.
+
+### 6.3 Connectors & Couples
+*   Connector orthogonal 1pt `vnAccentImperialGold` (opacity 0.45–0.7). **Không dùng `vnBorderSubtle`** cho connector — phải phân biệt được với viền card.
+*   Cặp vợ chồng: 2 node cạnh nhau + Ấn Triện 40×40 vermilion ở giữa (viền 2pt, inset ring 1pt `vnAccentHeritageRed.opacity(0.4)`).
+*   Nhánh xuống thế hệ sau: đường dọc từ tâm cặp → đường ngang → nhánh dọc vào từng node con.
+
+### 6.4 Navigation & CTA
+*   Bottom nav dùng chung floating pill (offset 14pt, `vnSurfaceElevated.opacity(0.85)` + blur, icon 22pt + label 11pt). Label khớp `MainTabView`: **Lịch Ngày / Ngày Giỗ / Văn Khấn / Gia Tộc**.
+*   Tab active: icon + label `vnAccentHeritageRed`; inactive: `vnTextSecondary`.
+*   CTA chính: floating pill "Thêm thành viên" fill `vnAccentHeritageRed`, chữ trắng, minHeight 52pt (`.large`).
+*   Không thêm tab/ghost-link điều hướng thứ 5.
+
+### 6.5 Known gaps of Stitch v1 export (không copy nguyên vào code)
+| # | Gap | Quyết định |
+|---|---|---|
+| 1 | Export render "Thọ 89 tuổi", "2 Trai 3 Gái", "Từ Sơn, Bắc Ninh", "Ngành trưởng/Nội trợ" | **Bỏ** — domain chưa có field; chỉ dùng `ReminderEvent` hiện tại |
+| 2 | Export nav bar đặc dính `bottom-0`, tab active là khối đỏ | **Sửa** — dùng floating pill + icon đỏ như §6.4 |
+| 3 | Nav offset 0 / 24px | **Sửa** — 14pt trên safe area |
+| 4 | Label nav khác nhau giữa 2 export | **Sửa** — theo `MainTabView` |
+| 5 | Section gap 16px, `space-xl`=32px | **Sửa** — `VNSpacing.xl` = 20pt |
+| 6 | Touch target "Chi tiết"/FAB/top icons < 44pt | **Sửa** — min 44pt (top bar visual 36, hit frame 44) |
+| 7 | Radius ladder thấp 4px (card 8, button 2, seal 4) | **Sửa** — card 12 / small 8 / micro 4 / pill |
+| 8 | Tree phẳng, connector chỉ dọc tuần tự | **Sửa** — thêm nhánh ngang theo §6.3; giữ fallback list khi dữ liệu < 2 thế hệ |
+| 9 | Ghost link "Xem lịch tháng" thành tab thứ 5 | **Bỏ** — tap hero card để mở tháng |
+| 10 | Hero numeral dùng sans | **Sửa** — serif 56pt/300 (`vnHeroNumeral`) |
+| 11 | `secondary` map #775A19 thay vì gold | **Sửa** — `vnAccentImperialGold` #C5A059 |
+| 12 | Seal viền 1.5px | **Sửa** — 2pt (`VNBorderWidth.focus`) |
+| 13 | Nav active dùng fill khác nhau | **Sửa** — uniform theo §6.4 |
+| 14 | Ornament pulse/glow chồng lớp | **Bỏ** — tĩnh tại, không animation nhấp nháy |
+| 15 | "Bình minh/Hoàng hôn" ngoài spec hero; "CHÁNH THẤẤP"/"Đích Tôn" không map model | **Bỏ** — YAGNI, chưa có data source |
+| 16 | Seal hiển thị "安年" + "Cát Nhật" | **Sửa** — seal là Can Chi (vd "Đinh Dậu") theo STYLE_BRIEF |
+| 17 | Shadow nav 0.12 alpha ≠ `VNShadow.floating` (red 0.08) | **Sửa** — dùng đúng token |

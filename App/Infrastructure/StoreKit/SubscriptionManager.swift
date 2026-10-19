@@ -66,6 +66,10 @@ public final class SubscriptionManager {
     private var transactionListener: Task<Void, Never>?
     private var statusObservers: [UUID: AsyncStream<Bool>.Continuation] = [:]
 
+    /// Fired once on a free -> pro transition. Lets the app layer reopen the
+    /// SwiftData store so CloudKit sync turns on without a relaunch.
+    public var onProUpgrade: (@MainActor () -> Void)?
+
     public init() {
         // Last-known entitlement from App Group cache so cold launch is not "free"
         // while the StoreKit refresh Task runs. Refreshed online; cache is advisory.
@@ -157,6 +161,7 @@ public final class SubscriptionManager {
     }
 
     public func updatePurchasedProducts() async {
+        let wasPro = entitlement.isPro
         var activeTier: EntitlementStatus = .free
 
         for await result in Transaction.currentEntitlements {
@@ -182,6 +187,10 @@ public final class SubscriptionManager {
         self.entitlement = activeTier
         persistEntitlementCache(activeTier)
         broadcastStatus(activeTier.isPro)
+
+        if !wasPro && activeTier.isPro {
+            onProUpgrade?()
+        }
     }
 
     private func persistEntitlementCache(_ status: EntitlementStatus) {

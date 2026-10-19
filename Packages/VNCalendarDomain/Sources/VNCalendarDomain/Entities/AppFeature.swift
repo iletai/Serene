@@ -9,17 +9,6 @@ public enum AppFeature: String, Sendable, Codable, CaseIterable {
     case batchExportICS
 }
 
-public enum EntitlementTier: String, Sendable, Codable {
-    case free
-    case proMonthly
-    case proYearly
-    case proLifetime
-
-    public var isPro: Bool {
-        self != .free
-    }
-}
-
 public struct FeatureGateRule: Sendable {
     public static let freeMaxReminders = 5
 
