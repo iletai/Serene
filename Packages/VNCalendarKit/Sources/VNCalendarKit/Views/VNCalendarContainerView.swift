@@ -1,12 +1,13 @@
 import SwiftUI
 import CalendarView
 import VNCalendarDomain
+import VNCalendarLunar
 import VNCalendarDesignSystem
 
 public struct VNCalendarContainerView: View {
     private static var vietnamCalendar: Calendar = {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         return cal
     }()
 

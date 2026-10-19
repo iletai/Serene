@@ -79,7 +79,7 @@ public struct LunarTimelineProvider: TimelineProvider {
     public func getTimeline(in context: Context, completion: @escaping (Timeline<LunarWidgetEntry>) -> Void) {
         var entries: [LunarWidgetEntry] = []
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
 
         let now = Date()
         for hourOffset in 0..<24 {
@@ -95,7 +95,7 @@ public struct LunarTimelineProvider: TimelineProvider {
 
     private func makeEntry(for date: Date) -> LunarWidgetEntry {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
 
         let solar = SolarDate(from: date, calendar: cal)
         let jd = AstronomicalMath.julianDay(from: solar)

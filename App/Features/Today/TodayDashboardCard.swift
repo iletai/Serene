@@ -75,7 +75,7 @@ public struct TodayDashboardCard: View {
 
     private var gmt7Date: Date? {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? .current
+        calendar.timeZone = VNTime.vietnam
         var comps = DateComponents()
         comps.day = currentSolarDate.day
         comps.month = currentSolarDate.month
@@ -87,7 +87,7 @@ public struct TodayDashboardCard: View {
         guard let date = gmt7Date else { return nil }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "vi_VN")
-        formatter.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? .current
+        formatter.timeZone = VNTime.vietnam
         formatter.dateFormat = "EEEE, d 'Tháng' MM"
         return formatter.string(from: date).capitalized
     }
@@ -95,7 +95,7 @@ public struct TodayDashboardCard: View {
     private var weekOfYearText: String? {
         guard let date = gmt7Date else { return nil }
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? .current
+        calendar.timeZone = VNTime.vietnam
         return "Tuần thứ \(calendar.component(.weekOfYear, from: date))"
     }
 

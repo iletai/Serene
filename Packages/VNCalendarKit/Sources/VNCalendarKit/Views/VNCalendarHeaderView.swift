@@ -99,7 +99,7 @@ public struct VNCalendarHeaderView: View {
 
     private var headerTitle: String {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let month = cal.component(.month, from: monthDate)
         let year = cal.component(.year, from: monthDate)
 
@@ -119,7 +119,7 @@ public struct VNCalendarHeaderView: View {
 
     private var headerSubtitle: String? {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let solar = SolarDate(from: monthDate, calendar: cal)
         let fullCanChi = LunarAstronomicalEngine.shared.computeCanChi(for: solar)
 

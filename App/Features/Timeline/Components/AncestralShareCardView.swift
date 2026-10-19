@@ -15,7 +15,7 @@ public struct AncestralShareCardView: View {
 
     private var nextDateString: String {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let today = cal.startOfDay(for: Date())
         let solarNow = SolarDate(from: today, calendar: cal)
 

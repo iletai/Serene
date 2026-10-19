@@ -12,7 +12,7 @@ public final class VNMonthLunarCache: @unchecked Sendable {
 
     public init() {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         self.calendar = cal
     }
 

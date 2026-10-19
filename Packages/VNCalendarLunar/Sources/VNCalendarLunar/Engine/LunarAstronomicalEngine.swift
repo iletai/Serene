@@ -92,6 +92,16 @@ public actor LunarAstronomicalEngine {
         return AstronomicalMath.solarDate(from: resultJD)
     }
 
+    /// Kiểm tra năm Âm lịch `year` có tháng nhuận đúng số `month` hay không.
+    /// Round-trip qua convertToSolar/convertToLunar thay vì lặp lại công thức
+    /// thiên văn: hai hàm này đã được kiểm chứng, nên kết quả tự nhất quán.
+    nonisolated public func hasLeapMonth(ofLunarYear year: Int, matching month: Int) -> Bool {
+        let probe = LunarDate(day: 1, month: month, year: year, isLeapMonth: true)
+        let solar = convertToSolar(from: probe)
+        let back = convertToLunar(from: solar)
+        return back.isLeapMonth && back.month == month && back.year == year
+    }
+
     /// Tính toán Can Chi cho ngày Dương Lịch
     nonisolated public func computeCanChi(for solar: SolarDate, hourIndex: Int = 0) -> FullCanChi {
         let jd = AstronomicalMath.julianDay(from: solar)

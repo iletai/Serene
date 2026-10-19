@@ -72,9 +72,11 @@ public struct MemorialEvent: Identifiable, Equatable, Sendable, Codable {
         self.isLeapMonth = reminder.isLeapMonth
         self.leapPolicy = reminder.leapPolicy
         switch reminder.category {
-        case .deathAnniversary, .ancestral:
+        case .deathAnniversary:
+            // Spec 05 §2.2: critical only for Tứ Thân Phụ Mẫu / ruột thịt.
             self.priority = .critical
-        case .worship:
+        case .ancestral, .worship:
+            // Giỗ Họ / Chạp Họ is `high` per spec 05 §2.2.
             self.priority = .high
         case .birthday, .wedding:
             self.priority = .medium

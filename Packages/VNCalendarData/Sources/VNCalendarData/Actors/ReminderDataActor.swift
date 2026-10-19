@@ -6,6 +6,7 @@ import VNCalendarDomain
 public actor ReminderDataActor {
     public func fetchAllReminders() throws -> [ReminderEvent] {
         let descriptor = FetchDescriptor<ReminderItemEntity>(
+            predicate: #Predicate<ReminderItemEntity> { !$0.isDeleted },
             sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
         )
         return try modelContext.fetch(descriptor).map { $0.toDomain() }
@@ -15,7 +16,7 @@ public actor ReminderDataActor {
         let dateType = isLunar ? "lunar" : "solar"
         let descriptor = FetchDescriptor<ReminderItemEntity>(
             predicate: #Predicate<ReminderItemEntity> {
-                $0.month == month && $0.dateTypeRawValue == dateType
+                !$0.isDeleted && $0.month == month && $0.dateTypeRawValue == dateType
             },
             sortBy: [SortDescriptor(\.day)]
         )
@@ -24,7 +25,7 @@ public actor ReminderDataActor {
 
     public func getReminder(by id: UUID) throws -> ReminderEvent? {
         let descriptor = FetchDescriptor<ReminderItemEntity>(
-            predicate: #Predicate<ReminderItemEntity> { $0.id == id }
+            predicate: #Predicate<ReminderItemEntity> { !$0.isDeleted && $0.id == id }
         )
         return try modelContext.fetch(descriptor).first?.toDomain()
     }
@@ -37,6 +38,8 @@ public actor ReminderDataActor {
 
         if let existing = try modelContext.fetch(descriptor).first {
             existing.update(from: reminder)
+            // Re-saving a previously soft-deleted record revives it.
+            existing.isDeleted = false
         } else {
             let newEntity = ReminderItemEntity(from: reminder)
             modelContext.insert(newEntity)
@@ -44,13 +47,16 @@ public actor ReminderDataActor {
         try modelContext.save()
     }
 
+    // Soft delete (CloudKit tombstone spec 04-data-layer): flag the record so
+    // the deletion propagates to other devices instead of resurrecting.
     public func deleteReminder(by id: UUID) throws {
         let targetId = id
         let descriptor = FetchDescriptor<ReminderItemEntity>(
             predicate: #Predicate<ReminderItemEntity> { $0.id == targetId }
         )
         if let existing = try modelContext.fetch(descriptor).first {
-            modelContext.delete(existing)
+            existing.isDeleted = true
+            existing.updatedAt = Date()
             try modelContext.save()
         }
     }

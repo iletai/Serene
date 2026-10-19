@@ -20,3 +20,7 @@ INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPort
 // Inject microCMS read-only key into generated Info.plist (read by AppConfiguration).
 // Define MICROCMS_API_KEY in Config/Secrets.xcconfig (gitignored); see Secrets.xcconfig.example.
 INFOPLIST_KEY_MICROCMS_API_KEY = $(MICROCMS_API_KEY)
+// Single microCMS tenant (annien.microcms.io); override per env only when a
+// separate dev tenant exists. Parsed by AppConfiguration.
+MICROCMS_SERVICE_DOMAIN = annien
+INFOPLIST_KEY_MICROCMS_SERVICE_DOMAIN = $(MICROCMS_SERVICE_DOMAIN)

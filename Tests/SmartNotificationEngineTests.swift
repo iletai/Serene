@@ -4,9 +4,21 @@ import VNCalendarDomain
 import VNCalendarLunar
 
 final class SmartNotificationEngineTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        // Notification copy follows the app language setting; pin to vi so the
+        // Vietnamese assertions below are independent of the host locale.
+        UserDefaults.standard.set("vi", forKey: "appLanguage")
+    }
+
+    override func tearDown() {
+        UserDefaults.standard.removeObject(forKey: "appLanguage")
+        super.tearDown()
+    }
+
     private func makeCalendar() -> Calendar {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         return cal
     }
 

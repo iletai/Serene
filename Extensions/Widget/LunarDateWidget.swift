@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import VNCalendarDomain
 import VNCalendarDesignSystem
 
 public struct LunarWidgetEntryView: View {
@@ -162,6 +163,26 @@ public struct LunarWidgetEntryView: View {
 public struct LunarDateWidget: Widget {
     public let kind: String = "LunarDateWidget"
 
+    // Contract shared with SubscriptionManager (App target):
+    //   suite = AppConfiguration.current.appGroupIdentifier
+    //   key   = "subscription_entitlement" (ProTierType rawValue; absent = free)
+    // Spec 06-storekit §FeatureGatePolicy: free tier gets systemSmall only.
+    private static let proFamilies: [WidgetFamily] = [
+        .systemSmall,
+        .systemMedium,
+        .accessoryInline,
+        .accessoryCircular,
+        .accessoryRectangular
+    ]
+    private static let freeFamilies: [WidgetFamily] = [.systemSmall]
+
+    private static var isPro: Bool {
+        guard let defaults = UserDefaults(suiteName: AppConfiguration.current.appGroupIdentifier) else {
+            return false
+        }
+        return defaults.string(forKey: "subscription_entitlement") != nil
+    }
+
     public init() {}
 
     public var body: some WidgetConfiguration {
@@ -171,12 +192,6 @@ public struct LunarDateWidget: Widget {
         }
         .configurationDisplayName("Lịch Âm An Niên")
         .description("Xem ngày Âm lịch, Can Chi, Tiết khí và ngày giỗ gia đình.")
-        .supportedFamilies([
-            .systemSmall,
-            .systemMedium,
-            .accessoryInline,
-            .accessoryCircular,
-            .accessoryRectangular
-        ])
+        .supportedFamilies(Self.isPro ? Self.proFamilies : Self.freeFamilies)
     }
 }
