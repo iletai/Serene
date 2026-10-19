@@ -89,11 +89,30 @@ External SPM:
 ### Module Dependency Rules
 - `VNCalendarLunar`: No internal or external dependencies.
 - `VNCalendarDomain`: Depends only on `VNCalendarLunar`. Must not import SwiftUI, SwiftData, or UIKit.
-- `VNCalendarData`: Depends on `VNCalendarDomain` and `VNCalendarLunar`. Implements domain repository protocols with SwiftData/CloudKit.
+- `VNCalendarData`: Depends on `VNCalendarDomain` and `VNCalendarLunar`. Implements domain repository protocols with SwiftData/CloudKit, and houses `SubscriptionManager` (StoreKit 2 infrastructure).
 - `VNCalendarDesignSystem`: Depends on `VNCalendarDomain`.
 - `VNCalendarKit`: Depends on `VNCalendarDomain`, `VNCalendarDesignSystem`, `VNCalendarLunar`, and external `iletai/SwiftUICalendarView` (v3.1.0+).
 - `AnNien (App)`: Imports all local packages and targets, plus external `iletai/AppUpdateKit` (v1.1.0+) for update gating.
 - `AnNienWidget`: Depends on `VNCalendarLunar`, `VNCalendarDomain`, `VNCalendarData`, `VNCalendarDesignSystem`.
+
+---
+
+## MVVM & Clean Architecture Guidelines
+
+The application strictly implements **MVVM with Clean Architecture**:
+- **ViewModel Convention**:
+  - Every feature screen under `App/Features/<Feature>/` MUST have its own `@Observable @MainActor final class <Feature>ViewModel`.
+  - ViewModels hold UI state, filter/search/sort queries, and async intent methods (`load()`, `save()`, `delete()`).
+  - ViewModels are constructor-injected with UseCases and Repositories; they do NOT access `AppContainer.shared` directly.
+  - ViewModels do NOT import `SwiftData` or raw database actors.
+- **View Layer**:
+  - Views are thin presentation containers using `@Environment(AppContainer.self) private var container`.
+  - Views do NOT hold business state or execute business math (e.g. lunar recurrence, countdown diffing).
+  - Business math belongs to Domain entities (`ReminderEvent.nextOccurrence`, `ReminderEvent.countdownText`) or UseCases.
+  - Subviews and cards receive immutable models or bindings from the ViewModel.
+- **Dependency Injection**:
+  - `AppContainer` serves as the composition root and is injected into the root environment (`MainTabView().environment(container)`).
+  - View access is via `@Environment(AppContainer.self)`, enabling clean mock injection for SwiftUI Previews and UI Tests. Direct calls to `AppContainer.shared` inside `App/Features/` are prohibited.
 
 ---
 
