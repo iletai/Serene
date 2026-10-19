@@ -8,98 +8,56 @@ public struct ReminderFormView: View {
     public var onSave: (ReminderEvent) -> Void
 
     @FocusState private var isTitleFocused: Bool
-
-    @State private var title: String = ""
-    @State private var category: ReminderCategory = .deathAnniversary
-    @State private var dateType: CalendarDateType = .lunar
-    @State private var day: Int = 1
-    @State private var month: Int = 1
-    @State private var year: String = ""
-    @State private var isLeapMonth = false
-    @State private var recurrence: RecurrenceRule = .yearly
-    @State private var relationship: String = "Ông"
-    @State private var note: String = ""
-
-    // Advance Offsets
-    @State private var notifyOnDay = true
-    @State private var notify1DayBefore = true
-    @State private var notify3DaysBefore = true
-    @State private var notify7DaysBefore = true
-    @State private var notify14DaysBefore = false
-    @State private var notify30DaysBefore = false
-
-    private let existingReminder: ReminderEvent?
+    @State private var viewModel: ReminderFormViewModel
 
     public init(
         existingReminder: ReminderEvent? = nil,
         initialDate: Date? = nil,
         onSave: @escaping (ReminderEvent) -> Void
     ) {
-        self.existingReminder = existingReminder
         self.onSave = onSave
-
-        if let existing = existingReminder {
-            _title = State(initialValue: existing.title)
-            _category = State(initialValue: existing.category)
-            _dateType = State(initialValue: existing.dateType)
-            _day = State(initialValue: existing.day)
-            _month = State(initialValue: existing.month)
-            _year = State(initialValue: existing.year.map(String.init) ?? "")
-            _isLeapMonth = State(initialValue: existing.isLeapMonth)
-            _recurrence = State(initialValue: existing.recurrence)
-            _relationship = State(initialValue: existing.relationship ?? "Ông")
-            _note = State(initialValue: existing.note ?? "")
-
-            let offsets = Set(existing.alertOffsets)
-            _notifyOnDay = State(initialValue: offsets.contains(0))
-            _notify1DayBefore = State(initialValue: offsets.contains(-1))
-            _notify3DaysBefore = State(initialValue: offsets.contains(-3))
-            _notify7DaysBefore = State(initialValue: offsets.contains(-7))
-            _notify14DaysBefore = State(initialValue: offsets.contains(-14))
-            _notify30DaysBefore = State(initialValue: offsets.contains(-30))
-        } else if let date = initialDate {
-            var cal = Calendar(identifier: .gregorian)
-            cal.timeZone = VNTime.vietnam
-            _day = State(initialValue: cal.component(.day, from: date))
-            _month = State(initialValue: cal.component(.month, from: date))
-        }
+        _viewModel = State(initialValue: ReminderFormViewModel(
+            existingReminder: existingReminder,
+            initialDate: initialDate
+        ))
     }
 
     public var body: some View {
+        @Bindable var vm = viewModel
         NavigationStack {
             ScrollView {
                 VStack(spacing: VNSpacing.xl) {
                     ReminderHeaderView(
-                        isEditing: existingReminder != nil,
-                        day: day,
-                        month: month,
-                        year: year,
-                        dateType: dateType,
-                        isLeapMonth: isLeapMonth
+                        isEditing: vm.existingReminder != nil,
+                        day: vm.day,
+                        month: vm.month,
+                        year: vm.year,
+                        dateType: vm.dateType,
+                        isLeapMonth: vm.isLeapMonth
                     )
-                    ReminderCategoryGrid(selectedCategory: $category)
+                    ReminderCategoryGrid(selectedCategory: $vm.category)
                     ReminderTitleSection(
-                        title: $title,
-                        relationship: $relationship,
+                        title: $vm.title,
+                        relationship: $vm.relationship,
                         isFocused: $isTitleFocused
                     )
                     ReminderDatePickerCard(
-                        dateType: $dateType,
-                        day: $day,
-                        month: $month,
-                        year: $year,
-                        isLeapMonth: $isLeapMonth
+                        dateType: $vm.dateType,
+                        day: $vm.day,
+                        month: $vm.month,
+                        year: $vm.year,
+                        isLeapMonth: $vm.isLeapMonth
                     )
                     ReminderOffsetsCard(
-                        notifyOnDay: $notifyOnDay,
-                        notify1DayBefore: $notify1DayBefore,
-                        notify3DaysBefore: $notify3DaysBefore,
-                        notify7DaysBefore: $notify7DaysBefore,
-                        notify14DaysBefore: $notify14DaysBefore,
-                        notify30DaysBefore: $notify30DaysBefore
+                        notifyOnDay: $vm.notifyOnDay,
+                        notify1DayBefore: $vm.notify1DayBefore,
+                        notify3DaysBefore: $vm.notify3DaysBefore,
+                        notify7DaysBefore: $vm.notify7DaysBefore,
+                        notify14DaysBefore: $vm.notify14DaysBefore,
+                        notify30DaysBefore: $vm.notify30DaysBefore
                     )
-                    notesSection
-                    saveActionButton
+                    notesSection(vm: vm)
+                    saveActionButton(vm: vm)
                 }
                 .padding(.horizontal, VNSpacing.xl)
                 .padding(.vertical, VNSpacing.md)
@@ -120,33 +78,33 @@ public struct ReminderFormView: View {
                     Button("Xong") {
                         isTitleFocused = false
                     }
-                    .foregroundColor(.vnAccentHeritageRed)
-                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.vnAccentDeepPrimary)
                 }
             }
         }
     }
 
     @ViewBuilder
-    private var notesSection: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("GHI CHÚ / PHÂN CÔNG CÚNG GIỖ")
-                .font(.vnCaption2)
-                .fontWeight(.medium)
-                .tracking(0.66)
-                .foregroundColor(.vnAccentImperialGold)
+    private func notesSection(vm: ReminderFormViewModel) -> some View {
+        @Bindable var boundVM = vm
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
+            Text("GHI CHÚ THÊM")
+                .font(.system(size: 11, weight: .bold))
+                .tracking(0.5)
+                .foregroundColor(.vnTextTertiary)
 
-            VNCard(
-                allPadding: VNSpacing.xl,
-                cornerRadius: VNCornerRadius.card,
-                backgroundColor: Color.vnBackgroundSecondary,
-                borderColor: Color.vnAccentImperialGold.opacity(0.28),
-                shadow: nil
-            ) {
-                TextEditor(text: $note)
-                    .font(.vnCallout)
+            VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                TextField("Ví dụ: Cúng gà luộc, xôi gấc, mời họ hàng nội tộc...", text: $boundVM.note, axis: .vertical)
+                    .font(.system(size: 14))
                     .foregroundColor(.vnTextPrimary)
-                    .scrollContentBackground(.hidden)
+                    .lineLimit(3...5)
+                    .padding(VNSpacing.md)
+                    .background(Color.vnBackgroundSecondary)
+                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                            .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
+                    )
                     .frame(minHeight: 70)
                     .accessibilityLabel("Ghi chú / phân công cúng giỗ")
             }
@@ -154,49 +112,18 @@ public struct ReminderFormView: View {
     }
 
     @ViewBuilder
-    private var saveActionButton: some View {
+    private func saveActionButton(vm: ReminderFormViewModel) -> some View {
         VNButton(
-            existingReminder != nil ? "Lưu Thay Đổi" : "Lưu Ngày Lễ",
+            vm.existingReminder != nil ? "Lưu Thay Đổi" : "Lưu Ngày Lễ",
             icon: "checkmark.seal.fill",
-            variant: title.trimmingCharacters(in: .whitespaces).isEmpty ? .secondary : .primary,
+            variant: vm.isValid ? .primary : .secondary,
             size: .large,
             isFullWidth: true
         ) {
-            saveAndDismiss()
+            onSave(vm.buildReminder())
+            dismiss()
         }
-        .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
+        .disabled(!vm.isValid)
         .padding(.top, VNSpacing.md)
-    }
-
-    private func saveAndDismiss() {
-        var offsets: [Int] = []
-        if notifyOnDay { offsets.append(0) }
-        if notify1DayBefore { offsets.append(-1) }
-        if notify3DaysBefore { offsets.append(-3) }
-        if notify7DaysBefore { offsets.append(-7) }
-        if notify14DaysBefore { offsets.append(-14) }
-        if notify30DaysBefore { offsets.append(-30) }
-        if offsets.isEmpty { offsets.append(0) }
-
-        let parsedYear = Int(year.trimmingCharacters(in: .whitespaces))
-        let newOrUpdated = ReminderEvent(
-            id: existingReminder?.id ?? UUID(),
-            title: title.trimmingCharacters(in: .whitespaces),
-            category: category,
-            dateType: dateType,
-            day: day,
-            month: month,
-            year: parsedYear,
-            isLeapMonth: isLeapMonth,
-            recurrence: recurrence,
-            alertOffsets: offsets,
-            note: note.isEmpty ? nil : note,
-            relationship: relationship,
-            createdAt: existingReminder?.createdAt ?? Date(),
-            updatedAt: Date()
-        )
-
-        onSave(newOrUpdated)
-        dismiss()
     }
 }
