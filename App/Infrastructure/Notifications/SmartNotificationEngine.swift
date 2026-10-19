@@ -405,3 +405,6 @@ public actor SmartNotificationEngine {
         return occurrences
     }
 }
+
+// MARK: - NotificationScheduling Conformance
+extension SmartNotificationEngine: NotificationScheduling {}

@@ -138,7 +138,8 @@ public final class AppContainer {
             ),
             scheduleReminderUseCase: ScheduleReminderUseCase(
                 reminderRepository: reminderRepository,
-                subscriptionRepository: subscriptionManager
+                subscriptionRepository: subscriptionManager,
+                notificationScheduler: SmartNotificationEngine.shared
             ),
             naturalSearchUseCase: NaturalSearchUseCase(
                 reminderRepository: reminderRepository,

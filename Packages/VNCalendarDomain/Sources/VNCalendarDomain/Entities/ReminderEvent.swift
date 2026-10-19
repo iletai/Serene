@@ -124,3 +124,57 @@ public struct ReminderEvent: Identifiable, Equatable, Sendable, Codable {
         leapPolicy = try c.decodeIfPresent(LeapMonthPolicy.self, forKey: .leapPolicy) ?? .adaptiveFallback
     }
 }
+
+// MARK: - Occurrence & Countdown Math
+import VNCalendarLunar
+
+extension ReminderEvent {
+    public func nextOccurrence(after anchorDate: Date, calendar: Calendar) -> Date {
+        let solarNow = SolarDate(from: anchorDate, calendar: calendar)
+        if dateType == .lunar {
+            let engine = LunarAstronomicalEngine.shared
+            let currentLunar = engine.convertToLunar(from: solarNow)
+            var targetLunarYear = currentLunar.year
+            if currentLunar.month > month || (currentLunar.month == month && currentLunar.day > day) {
+                targetLunarYear += 1
+            }
+            let targetLunar = LunarDate(day: day, month: month, year: targetLunarYear, isLeapMonth: isLeapMonth)
+            let targetSolar = engine.convertToSolar(from: targetLunar)
+            return targetSolar.date ?? anchorDate
+        } else {
+            var comps = DateComponents(year: solarNow.year, month: month, day: day)
+            if let date = calendar.date(from: comps) {
+                if date < anchorDate {
+                    comps.year = solarNow.year + 1
+                    return calendar.date(from: comps) ?? date
+                }
+                return date
+            }
+            // Clamp invalid solar day (e.g. 30/2) to the month's last day.
+            let monthDate = calendar.date(from: DateComponents(year: solarNow.year, month: month, day: 1)) ?? anchorDate
+            if let clampedDay = calendar.range(of: .day, in: .month, for: monthDate)?.count {
+                comps.day = min(day, clampedDay)
+                if let date = calendar.date(from: comps), date >= anchorDate {
+                    return date
+                }
+            }
+            return anchorDate
+        }
+    }
+
+    public func countdownText(relativeTo anchorDate: Date, calendar: Calendar) -> String {
+        let today = calendar.startOfDay(for: anchorDate)
+        let target = nextOccurrence(after: today, calendar: calendar)
+        let diff = calendar.dateComponents([.day], from: today, to: target).day ?? 0
+
+        if diff == 0 {
+            return "Hôm nay"
+        } else if diff == 1 {
+            return "Ngày mai"
+        } else if diff > 1 {
+            return "Còn \(diff) ngày"
+        } else {
+            return "Đã qua"
+        }
+    }
+}

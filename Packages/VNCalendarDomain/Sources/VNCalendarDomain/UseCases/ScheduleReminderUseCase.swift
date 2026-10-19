@@ -7,13 +7,16 @@ public enum ScheduleReminderError: Error, Sendable, Equatable {
 public final class ScheduleReminderUseCase: Sendable {
     private let reminderRepository: ReminderRepositoryProtocol
     private let subscriptionRepository: SubscriptionRepositoryProtocol
+    private let notificationScheduler: NotificationScheduling?
 
     public init(
         reminderRepository: ReminderRepositoryProtocol,
-        subscriptionRepository: SubscriptionRepositoryProtocol
+        subscriptionRepository: SubscriptionRepositoryProtocol,
+        notificationScheduler: NotificationScheduling? = nil
     ) {
         self.reminderRepository = reminderRepository
         self.subscriptionRepository = subscriptionRepository
+        self.notificationScheduler = notificationScheduler
     }
 
     public func execute(save reminder: ReminderEvent) async throws {
@@ -28,9 +31,17 @@ public final class ScheduleReminderUseCase: Sendable {
             }
         }
         try await reminderRepository.saveReminder(reminder)
+        await pruneNotifications()
     }
 
     public func execute(delete id: UUID) async throws {
         try await reminderRepository.deleteReminder(by: id)
+        await pruneNotifications()
+    }
+
+    private func pruneNotifications() async {
+        guard let scheduler = notificationScheduler,
+              let all = try? await reminderRepository.fetchAllReminders() else { return }
+        try? await scheduler.pruneAndSchedule(reminders: all)
     }
 }
