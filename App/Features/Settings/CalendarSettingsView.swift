@@ -400,6 +400,7 @@ public struct CalendarSettingsView: View {
 
         Task {
             do {
+                await container.syncProverbs()
                 try await container.holidayRepository.synchronizeRemoteContent()
 
                 let formatter = DateFormatter()

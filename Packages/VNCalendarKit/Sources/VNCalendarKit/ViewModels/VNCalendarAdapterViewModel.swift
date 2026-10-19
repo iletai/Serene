@@ -19,6 +19,8 @@ public final class VNCalendarAdapterViewModel {
     public var isDetailSheetPresented = false
 
     private var prefetchTask: Task<Void, Never>?
+    // nonisolated(unsafe): needed so deinit can remove the observer; @Observation rejects plain nonisolated.
+    nonisolated(unsafe) private var folkQuoteObserver: NSObjectProtocol?
     private let cache = VNMonthLunarCache.shared
     private var allReminders: [ReminderEvent] = []
     private var calendar: Calendar
@@ -38,6 +40,19 @@ public final class VNCalendarAdapterViewModel {
         self.allReminders = reminders
         cache.precomputeMonthWindow(around: initialDate, reminders: reminders)
         self.selectedDayModel = cache.dayModel(for: selectedDateKey)
+        folkQuoteObserver = NotificationCenter.default.addObserver(
+            forName: .annienFolkQuotesDidChange, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.refreshAfterFolkQuoteChange()
+            }
+        }
+    }
+
+    deinit {
+        if let folkQuoteObserver {
+            NotificationCenter.default.removeObserver(folkQuoteObserver)
+        }
     }
 
     public func updateReminders(_ reminders: [ReminderEvent]) {
@@ -208,5 +223,10 @@ public final class VNCalendarAdapterViewModel {
                 self.selectedDayModel = self.cache.dayModel(for: self.selectedDateKey)
             }
         }
+    }
+
+    private func refreshAfterFolkQuoteChange() {
+        cache.precomputeMonthWindow(around: displayMonthDate, reminders: allReminders)
+        selectedDayModel = cache.dayModel(for: selectedDateKey)
     }
 }

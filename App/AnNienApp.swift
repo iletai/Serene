@@ -47,6 +47,7 @@ struct AnNienApp: App {
                     // Initial permissions & background synchronization
                     _ = try? await container.notificationEngine.requestAuthorization()
                     try? await container.holidayRepository.synchronizeRemoteContent()
+                    await container.syncProverbs()
                     if let reminders = try? await container.reminderRepository.fetchAllReminders() {
                         try? await container.notificationEngine.pruneAndSchedule(reminders: reminders)
                     }

@@ -1,8 +1,10 @@
 import SwiftUI
 import SwiftData
 import Observation
+import OSLog
 import VNCalendarDomain
 import VNCalendarData
+import VNCalendarKit
 import VNCalendarLunar
 
 @Observable
@@ -10,10 +12,13 @@ import VNCalendarLunar
 public final class AppContainer {
     public static let shared = AppContainer()
 
+    private let logger = Logger(subsystem: "com.iletai.annien", category: "AppContainer")
+
     public let modelContainer: ModelContainer
     public let reminderRepository: ReminderRepositoryProtocol
     public let holidayRepository: HolidayRepositoryProtocol
     public let prayerRepository: PrayerRepositoryProtocol
+    public let proverbRepository: ProverbRepositoryProtocol
     public let subscriptionManager: SubscriptionManager
     public let notificationEngine: SmartNotificationEngine
 
@@ -59,6 +64,7 @@ public final class AppContainer {
         self.reminderRepository = SwiftDataReminderRepository(modelContainer: self.modelContainer)
         self.holidayRepository = HybridHolidayRepository(modelContainer: self.modelContainer, client: microClient)
         self.prayerRepository = LocalPrayerRepository()
+        self.proverbRepository = HybridProverbRepository(client: microClient)
         self.subscriptionManager = SubscriptionManager.shared
         self.notificationEngine = SmartNotificationEngine.shared
 
@@ -78,5 +84,22 @@ public final class AppContainer {
             subscriptionRepository: self.subscriptionManager,
             reminderRepository: self.reminderRepository
         )
+    }
+
+    /// Refreshes proverbs from microCMS and pushes them into the calendar's quote source.
+    /// Never throws: offline/failed sync must not break callers' status messaging.
+    public func syncProverbs() async {
+        do {
+            try await proverbRepository.synchronizeRemoteContent()
+        } catch {
+            logger.error("Proverb sync failed: \(error.localizedDescription)")
+        }
+        guard let proverbs = try? await proverbRepository.fetchProverbs() else {
+            logger.error("Proverb fetch failed (cache and bundle both unavailable).")
+            return
+        }
+        let quotes = proverbs.map { VNFolkQuote(quote: $0.text, authorOrOrigin: $0.origin) }
+        guard quotes != VNFolkQuotes.source else { return }  // skip redundant cache invalidation
+        VNFolkQuotes.source = quotes
     }
 }

@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 public struct VNFolkQuote: Sendable, Equatable, Hashable {
     public let quote: String
@@ -8,6 +9,11 @@ public struct VNFolkQuote: Sendable, Equatable, Hashable {
         self.quote = quote
         self.authorOrOrigin = authorOrOrigin
     }
+}
+
+extension Notification.Name {
+    /// Posted when `VNFolkQuotes.source` changes so cached calendar models refresh.
+    public static let annienFolkQuotesDidChange = Notification.Name("annienFolkQuotesDidChange")
 }
 
 public enum VNFolkQuotes {
@@ -47,8 +53,31 @@ public enum VNFolkQuotes {
         VNFolkQuote(quote: "Nhất nghệ tinh, nhất thân vinh.", authorOrOrigin: "Tục ngữ Việt Nam")
     ]
 
+    // ponytail: lock guards source against off-main readers; static kept for single
+    // injection point — move to a store type if a second source ever appears.
+    // nonisolated(unsafe): lock-protected shared state; compiler cannot see the os_unfair_lock.
+    private nonisolated(unsafe) static var sourceLock = os_unfair_lock_s()
+    private nonisolated(unsafe) static var _source: [VNFolkQuote] = allQuotes
+
+    public static var source: [VNFolkQuote] {
+        get {
+            os_unfair_lock_lock(&sourceLock)
+            defer { os_unfair_lock_unlock(&sourceLock) }
+            return _source
+        }
+        set {
+            os_unfair_lock_lock(&sourceLock)
+            _source = newValue
+            os_unfair_lock_unlock(&sourceLock)
+            VNMonthLunarCache.shared.removeAll()
+            NotificationCenter.default.post(name: .annienFolkQuotesDidChange, object: nil)
+        }
+    }
+
     public static func quote(for dateKey: DateKey) -> VNFolkQuote {
-        let index = abs(dateKey.rawValue) % allQuotes.count
-        return allQuotes[index]
+        let current = source
+        let list = current.isEmpty ? allQuotes : current
+        let index = abs(dateKey.rawValue) % list.count
+        return list[index]
     }
 }

@@ -172,6 +172,32 @@ final class CalendarKitTests: XCTestCase {
         XCTAssertFalse(model.folkQuote.authorOrOrigin.isEmpty)
     }
 
+    func testQuoteFallsBackWhenSourceEmpty() {
+        addTeardownBlock { VNFolkQuotes.source = VNFolkQuotes.allQuotes }
+        VNFolkQuotes.source = []
+        let quote = VNFolkQuotes.quote(for: DateKey(year: 2026, month: 10, day: 18))
+        XCTAssertFalse(quote.quote.isEmpty)
+        XCTAssertTrue(VNFolkQuotes.allQuotes.contains(quote),
+                      "fallback must come from allQuotes")
+    }
+
+    func testSourceChangeInvalidatesCache() throws {
+        addTeardownBlock { VNFolkQuotes.source = VNFolkQuotes.allQuotes }
+        let cache = VNMonthLunarCache.shared
+        let key = DateKey(year: 2026, month: 10, day: 18)
+        let fixedDate = try XCTUnwrap(key.toDate)
+        cache.precomputeMonthWindow(around: fixedDate)
+        XCTAssertNotNil(cache.dayModel(for: key))
+
+        let notificationExpectation = expectation(
+            forNotification: NSNotification.Name("annienFolkQuotesDidChange"), object: nil
+        )
+        VNFolkQuotes.source = [VNFolkQuote(quote: "Test quote one line.", authorOrOrigin: "Test")]
+        wait(for: [notificationExpectation], timeout: 1.0)
+        XCTAssertNil(cache.dayModel(for: key),
+                     "cache must be invalidated when source changes")
+    }
+
     func test42CellMatrixGeneration() {
         let cache = VNMonthLunarCache()
         var cal = Calendar(identifier: .gregorian)
