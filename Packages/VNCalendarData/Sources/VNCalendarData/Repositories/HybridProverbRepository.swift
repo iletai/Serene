@@ -5,8 +5,10 @@ import VNCalendarDomain
 private let logger = Logger(subsystem: "com.iletai.annien", category: "ProverbRepository")
 
 public final class HybridProverbRepository: ProverbRepositoryProtocol, Sendable {
-    public static let cacheKey = "proverbs_cache_json"
+    private static let cacheKey = "proverbs_cache_json"
     private static let endpoint = "proverbs"
+    /// Must match the key format MicroCMSClient uses to persist the ETag.
+    private static let eTagKey = "microcms_etag_\(endpoint)"
 
     private let client: MicroCMSClient
     /// `UserDefaults` is documented thread-safe but not marked `Sendable`.
@@ -36,7 +38,8 @@ public final class HybridProverbRepository: ProverbRepositoryProtocol, Sendable 
             endpoint: Self.endpoint,
             limit: 100
         )
-        if case .success(let payload, _) = response {
+        switch response {
+        case .success(let payload, _):
             let proverbs = payload.contents.map {
                 Proverb(text: $0.text, origin: $0.origin, category: $0.category)
             }
@@ -47,7 +50,17 @@ public final class HybridProverbRepository: ProverbRepositoryProtocol, Sendable 
             do {
                 defaults.set(try JSONEncoder().encode(proverbs), forKey: Self.cacheKey)
             } catch {
+                // ETag already stored by the client; drop it so the next sync
+                // re-fetches the full payload instead of getting a permanent 304.
                 logger.error("Failed to encode proverbs cache: \(error.localizedDescription)")
+                defaults.removeObject(forKey: Self.eTagKey)
+            }
+        case .notModified:
+            // Cache lost but ETag still present (partial defaults wipe):
+            // clear the ETag so the next sync does a full GET, not a 304 loop.
+            if defaults.data(forKey: Self.cacheKey) == nil {
+                logger.debug("304 received but cache is missing; clearing proverbs ETag.")
+                defaults.removeObject(forKey: Self.eTagKey)
             }
         }
     }

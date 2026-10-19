@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 public struct VNFolkQuote: Sendable, Equatable, Hashable {
     public let quote: String
@@ -52,19 +53,30 @@ public enum VNFolkQuotes {
         VNFolkQuote(quote: "Nhất nghệ tinh, nhất thân vinh.", authorOrOrigin: "Tục ngữ Việt Nam")
     ]
 
-    // ponytail: single static injection point (app composition root sets it once per sync);
-    // move to a DI'd store if a second source or per-scene state ever appears.
-    // nonisolated(unsafe) because StrictConcurrency forbids mutable global state;
-    // writes happen on @MainActor (AppContainer), reads are index reads (safe in practice).
-    public nonisolated(unsafe) static var source: [VNFolkQuote] = allQuotes {
-        didSet {
+    // ponytail: lock guards source against off-main readers; static kept for single
+    // injection point — move to a store type if a second source ever appears.
+    // nonisolated(unsafe): lock-protected shared state; compiler cannot see the os_unfair_lock.
+    private nonisolated(unsafe) static var sourceLock = os_unfair_lock_s()
+    private nonisolated(unsafe) static var _source: [VNFolkQuote] = allQuotes
+
+    public static var source: [VNFolkQuote] {
+        get {
+            os_unfair_lock_lock(&sourceLock)
+            defer { os_unfair_lock_unlock(&sourceLock) }
+            return _source
+        }
+        set {
+            os_unfair_lock_lock(&sourceLock)
+            _source = newValue
+            os_unfair_lock_unlock(&sourceLock)
             VNMonthLunarCache.shared.removeAll()
             NotificationCenter.default.post(name: .annienFolkQuotesDidChange, object: nil)
         }
     }
 
     public static func quote(for dateKey: DateKey) -> VNFolkQuote {
-        let list = source.isEmpty ? allQuotes : source
+        let current = source
+        let list = current.isEmpty ? allQuotes : current
         let index = abs(dateKey.rawValue) % list.count
         return list[index]
     }

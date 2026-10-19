@@ -18,6 +18,10 @@ final class ProverbDataTests: XCTestCase {
         let many = #"{"text":"Lời nói chẳng mất tiền mua.","origin":"Tục ngữ Việt Nam","category":["tuc_ngu"]}"#
         let manyDTO = try JSONDecoder().decode(MicroCMSProverbDTO.self, from: Data(many.utf8))
         XCTAssertEqual(manyDTO.category, "tuc_ngu")
+
+        let empty = #"{"text":"X","origin":"Y","category":[]}"#
+        let emptyDTO = try JSONDecoder().decode(MicroCMSProverbDTO.self, from: Data(empty.utf8))
+        XCTAssertEqual(emptyDTO.category, "cham_ngon")
     }
 
     func testListResponseDecodesContents() throws {
@@ -65,5 +69,24 @@ final class ProverbDataTests: XCTestCase {
         XCTAssertEqual(proverbs.count, 30, "corrupt cache must be discarded for bundled fallback")
         XCTAssertNil(defaults.data(forKey: "proverbs_cache_json"),
                      "corrupt cache key must be deleted so next sync rewrites it")
+    }
+
+    func testSyncFailureKeepsExistingCache() async throws {
+        let defaults = try makeDefaults()
+        let cached = [Proverb(text: "Keep me", origin: "Test", category: "cham_ngon")]
+        defaults.set(try JSONEncoder().encode(cached), forKey: "proverbs_cache_json")
+        // empty serviceDomain/apiKey → MicroCMSError.configurationMissing
+        let repo = HybridProverbRepository(
+            client: MicroCMSClient(serviceDomain: "", apiKey: ""),
+            defaults: defaults
+        )
+        do {
+            try await repo.synchronizeRemoteContent()
+            XCTFail("Expected configurationMissing")
+        } catch {
+            // expected
+        }
+        let proverbs = try await repo.fetchProverbs()
+        XCTAssertEqual(proverbs.first?.text, "Keep me", "failed sync must not wipe cache")
     }
 }

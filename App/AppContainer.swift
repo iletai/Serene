@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import Observation
+import OSLog
 import VNCalendarDomain
 import VNCalendarData
 import VNCalendarKit
@@ -10,6 +11,8 @@ import VNCalendarLunar
 @MainActor
 public final class AppContainer {
     public static let shared = AppContainer()
+
+    private let logger = Logger(subsystem: "com.iletai.annien", category: "AppContainer")
 
     public let modelContainer: ModelContainer
     public let reminderRepository: ReminderRepositoryProtocol
@@ -86,10 +89,17 @@ public final class AppContainer {
     /// Refreshes proverbs from microCMS and pushes them into the calendar's quote source.
     /// Never throws: offline/failed sync must not break callers' status messaging.
     public func syncProverbs() async {
-        try? await proverbRepository.synchronizeRemoteContent()
-        guard let proverbs = try? await proverbRepository.fetchProverbs() else { return }
-        VNFolkQuotes.source = proverbs.map {
-            VNFolkQuote(quote: $0.text, authorOrOrigin: $0.origin)
+        do {
+            try await proverbRepository.synchronizeRemoteContent()
+        } catch {
+            logger.error("Proverb sync failed: \(error.localizedDescription)")
         }
+        guard let proverbs = try? await proverbRepository.fetchProverbs() else {
+            logger.error("Proverb fetch failed (cache and bundle both unavailable).")
+            return
+        }
+        let quotes = proverbs.map { VNFolkQuote(quote: $0.text, authorOrOrigin: $0.origin) }
+        guard quotes != VNFolkQuotes.source else { return }  // skip redundant cache invalidation
+        VNFolkQuotes.source = quotes
     }
 }
