@@ -254,7 +254,7 @@ public struct UpcomingTimelineView: View {
 
     private func calculateCountdown(for reminder: ReminderEvent) -> String {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let today = cal.startOfDay(for: Date())
         let target = nextOccurrenceDate(for: reminder, today: today, calendar: cal)
         let diff = cal.dateComponents([.day], from: today, to: target).day ?? 0
@@ -273,7 +273,7 @@ public struct UpcomingTimelineView: View {
     private func loadReminders() async {
         if let items = try? await container.reminderRepository.fetchAllReminders() {
             var cal = Calendar(identifier: .gregorian)
-            cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+            cal.timeZone = VNTime.vietnam
             let today = cal.startOfDay(for: Date())
             self.reminders = items.sorted {
                 nextOccurrenceDate(for: $0, today: today, calendar: cal) < nextOccurrenceDate(for: $1, today: today, calendar: cal)

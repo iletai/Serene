@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import VNCalendarDomain
 import VNCalendarDesignSystem
 
 public struct LunarWidgetEntryView: View {
@@ -7,20 +8,43 @@ public struct LunarWidgetEntryView: View {
     @Environment(\.widgetFamily) var family
 
     public var body: some View {
-        switch family {
-        case .systemSmall:
-            smallWidgetView
-        case .systemMedium:
-            mediumWidgetView
-        case .accessoryInline:
-            inlineLockScreenView
-        case .accessoryCircular:
-            circularLockScreenView
-        case .accessoryRectangular:
-            rectangularLockScreenView
-        default:
-            smallWidgetView
+        // Spec 06-storekit §FeatureGatePolicy: free tier is small-only. Gate at
+        // the view level, NOT via supportedFamilies — that descriptor is cached
+        // by SpringBoard, so shrinking it on expiry strands/loses the widget.
+        if !LunarDateWidget.isPro && family != .systemSmall {
+            lockedWidgetView
+        } else {
+            switch family {
+            case .systemSmall:
+                smallWidgetView
+            case .systemMedium:
+                mediumWidgetView
+            case .accessoryInline:
+                inlineLockScreenView
+            case .accessoryCircular:
+                circularLockScreenView
+            case .accessoryRectangular:
+                rectangularLockScreenView
+            default:
+                smallWidgetView
+            }
         }
+    }
+
+    private var lockedWidgetView: some View {
+        VStack(spacing: VNSpacing.sm) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundColor(Color.vnAccentImperialGold)
+            Text("Nâng cấp Pro")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color.vnTextPrimary)
+            Text("Mở khoá widget Vừa & Màn hình khoá")
+                .font(.system(size: 10))
+                .multilineTextAlignment(.center)
+                .foregroundColor(Color.vnTextSecondary)
+        }
+        .padding(VNSpacing.sm)
     }
 
     private var smallWidgetView: some View {
@@ -162,6 +186,16 @@ public struct LunarWidgetEntryView: View {
 public struct LunarDateWidget: Widget {
     public let kind: String = "LunarDateWidget"
 
+    // Contract shared with SubscriptionManager (App target):
+    //   suite = AppConfiguration.current.appGroupIdentifier
+    //   key   = "subscription_entitlement" (ProTierType rawValue; absent = free)
+    static var isPro: Bool {
+        guard let defaults = UserDefaults(suiteName: AppConfiguration.current.appGroupIdentifier) else {
+            return false
+        }
+        return defaults.string(forKey: "subscription_entitlement") != nil
+    }
+
     public init() {}
 
     public var body: some WidgetConfiguration {
@@ -171,6 +205,8 @@ public struct LunarDateWidget: Widget {
         }
         .configurationDisplayName("Lịch Âm An Niên")
         .description("Xem ngày Âm lịch, Can Chi, Tiết khí và ngày giỗ gia đình.")
+        // Every family is declared so an expiring subscription never leaves a
+        // widget the OS can no longer render. Pro gating happens in the view.
         .supportedFamilies([
             .systemSmall,
             .systemMedium,

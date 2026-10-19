@@ -4,9 +4,21 @@ import VNCalendarDomain
 import VNCalendarLunar
 
 final class SmartNotificationEngineTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        // Notification copy follows the app language setting; pin to vi so the
+        // Vietnamese assertions below are independent of the host locale.
+        UserDefaults.standard.set("vi", forKey: "appLanguage")
+    }
+
+    override func tearDown() {
+        UserDefaults.standard.removeObject(forKey: "appLanguage")
+        super.tearDown()
+    }
+
     private func makeCalendar() -> Calendar {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         return cal
     }
 
@@ -237,4 +249,45 @@ final class SmartNotificationEngineTests: XCTestCase {
             )
         }
     }
+
+    // 5. LeapMonthPolicy branches: .both, .leapOnly, .regularOnly
+    func testLeapMonthPolicyCandidateGeneration() async throws {
+        let engine = makeEngine()
+        let calendar = makeCalendar()
+
+        // 2023 has leap month 2 (Quý Mão)
+        let leapReminder = ReminderEvent(
+            title: "Giỗ Tháng 2 Nhuận",
+            category: .deathAnniversary,
+            dateType: .lunar,
+            day: 15,
+            month: 2,
+            isLeapMonth: false,
+            leapPolicy: .both,
+            alertOffsets: [0]
+        )
+
+        let memorial = MemorialEvent(from: leapReminder)
+        let occBoth = await engine.resolveTriggerDates(event: memorial, targetYear: 2023, calendar: calendar)
+        XCTAssertEqual(occBoth.count, 2, ".both in a leap year should return 2 occurrences (regular + leap)")
+        XCTAssertTrue(occBoth.contains(where: { !$0.lunarDate.isLeapMonth }), "Must include regular month")
+        XCTAssertTrue(occBoth.contains(where: { $0.lunarDate.isLeapMonth }), "Must include leap month")
+
+        var leapOnlyMemorial = memorial
+        leapOnlyMemorial.leapPolicy = .leapOnly
+        let occLeapOnly = await engine.resolveTriggerDates(event: leapOnlyMemorial, targetYear: 2023, calendar: calendar)
+        XCTAssertEqual(occLeapOnly.count, 1, ".leapOnly in a leap year returns 1 occurrence")
+        XCTAssertTrue(occLeapOnly.first?.lunarDate.isLeapMonth == true)
+
+        // 2024 has no leap month 2
+        let occNonLeapYear = await engine.resolveTriggerDates(event: leapOnlyMemorial, targetYear: 2024, calendar: calendar)
+        XCTAssertTrue(occNonLeapYear.isEmpty, ".leapOnly in a non-leap year returns 0 occurrences")
+
+        var regOnlyMemorial = memorial
+        regOnlyMemorial.leapPolicy = .regularOnly
+        let occRegOnly = await engine.resolveTriggerDates(event: regOnlyMemorial, targetYear: 2023, calendar: calendar)
+        XCTAssertEqual(occRegOnly.count, 1, ".regularOnly in a leap year returns only the regular occurrence")
+        XCTAssertFalse(occRegOnly.first?.lunarDate.isLeapMonth == true)
+    }
 }
+

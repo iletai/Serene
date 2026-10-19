@@ -3,6 +3,10 @@ import SwiftData
 import VNCalendarDomain
 
 /// Schema version 1. Freeze the entity list here so future versions can diff against it.
+/// Note: two VersionedSchema enums cannot share the same @Model classes —
+/// SwiftData computes a checksum per class set and rejects duplicates.
+/// `ReminderItemEntity.isDeleted` (added with a default) migrates via
+/// automatic lightweight migration; bump a real V2 only for non-lightweight changes.
 public enum AppSchemaV1: VersionedSchema {
     public static var versionIdentifier: Schema.Version { .init(1, 0, 0) }
 
@@ -18,8 +22,6 @@ public enum AppSchemaV1: VersionedSchema {
     }
 }
 
-/// Single-version plan: add `AppSchemaV2` + a `MigrationStage.lightweight` entry in `stages`
-/// when the schema first changes.
 public enum AppSchemaMigrationPlan: SchemaMigrationPlan {
     public static var schemas: [any VersionedSchema.Type] {
         [AppSchemaV1.self]
@@ -31,9 +33,11 @@ public enum AppSchemaMigrationPlan: SchemaMigrationPlan {
 }
 
 public enum ModelContainerFactory {
+    // cloudKitContainerIdentifier is required (no default): a silent prod
+    // container default lets a forgotten argument write DEV data into prod.
     public static func createContainer(
         inMemoryOnly: Bool = false,
-        cloudKitContainerIdentifier: String = "iCloud.com.iletai.annien",
+        cloudKitContainerIdentifier: String,
         appGroupIdentifier: String? = nil,
         cloudKitEnabled: Bool = true
     ) throws -> ModelContainer {

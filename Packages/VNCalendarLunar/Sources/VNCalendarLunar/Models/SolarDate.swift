@@ -13,7 +13,7 @@ public struct SolarDate: Hashable, Sendable, Codable, CustomStringConvertible {
 
     public init(from date: Date, calendar: Calendar = Calendar(identifier: .gregorian)) {
         var cal = calendar
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let components = cal.dateComponents([.day, .month, .year], from: date)
         self.day = components.day ?? 1
         self.month = components.month ?? 1
@@ -26,7 +26,7 @@ public struct SolarDate: Hashable, Sendable, Codable, CustomStringConvertible {
 
     public var date: Date? {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         var comps = DateComponents()
         comps.year = year
         comps.month = month

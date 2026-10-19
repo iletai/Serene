@@ -164,13 +164,13 @@ public struct CalendarMainView: View {
 
     private var displaySolarYear: Int {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         return cal.component(.year, from: adapterViewModel.displayMonthDate)
     }
 
     private var displaySolarMonth: Int {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         return cal.component(.month, from: adapterViewModel.displayMonthDate)
     }
 
@@ -251,7 +251,7 @@ public struct CalendarMainView: View {
 
     private var monthCalloutTitle: String {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let month = cal.component(.month, from: adapterViewModel.displayMonthDate)
         let year = cal.component(.year, from: adapterViewModel.displayMonthDate)
         return "\(solarMonthNames[month - 1]) · \(year)"
@@ -259,14 +259,14 @@ public struct CalendarMainView: View {
 
     private var displayYearCanChi: CanChiPair {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let year = cal.component(.year, from: adapterViewModel.displayMonthDate)
         return CanChiPair.year(for: year)
     }
 
     private var solarTermAnchorDate: SolarDate {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         return SolarDate(from: adapterViewModel.displayMonthDate, calendar: cal)
     }
 
@@ -280,7 +280,7 @@ public struct CalendarMainView: View {
 
     private var lunarSubtitle: String {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let year = cal.component(.year, from: adapterViewModel.displayMonthDate)
         let yearPair = CanChiPair.year(for: year)
         return "Năm \(yearPair.description) • Âm Dương Hợp Lịch"

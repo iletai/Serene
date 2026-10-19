@@ -49,7 +49,7 @@ public enum DataBackupEngine {
     ) async -> String {
         let engine = LunarAstronomicalEngine.shared
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
 
         let currentYear = cal.component(.year, from: Date())
         let exportYears = years ?? [currentYear, currentYear + 1, currentYear + 2]

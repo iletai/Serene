@@ -118,7 +118,7 @@ struct ReminderDatePickerCard: View {
 
     private var astronomicalPreviewText: String {
         let engine = LunarAstronomicalEngine()
-        let currentYear = Calendar.current.component(.year, from: Date())
+        let currentYear = VNTime.vietnamCalendar.component(.year, from: Date())
         let selectedYear = Int(year.trimmingCharacters(in: .whitespaces)) ?? currentYear
 
         if dateType == .lunar {

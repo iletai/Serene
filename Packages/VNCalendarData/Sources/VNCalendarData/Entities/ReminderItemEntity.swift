@@ -18,6 +18,10 @@ public final class ReminderItemEntity {
     public var relationship: String?
     public var createdAt = Date()
     public var updatedAt = Date()
+    // Spec 04-data-layer: soft delete for CloudKit tombstone propagation.
+    // Hard delete loses the deletion on offline devices; they resurrect the
+    // record on next sync.
+    public var isDeleted = false
 
     public init(
         id: UUID = UUID(),

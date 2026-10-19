@@ -7,7 +7,7 @@ final class DataTests: XCTestCase {
     var container: ModelContainer!
 
     override func setUp() async throws {
-        container = try ModelContainerFactory.createContainer(inMemoryOnly: true)
+        container = try ModelContainerFactory.createContainer(inMemoryOnly: true, cloudKitContainerIdentifier: "iCloud.com.iletai.annien.test")
     }
 
     func testReminderCRUD() async throws {

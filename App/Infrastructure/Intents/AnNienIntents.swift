@@ -12,7 +12,7 @@ public struct CheckLunarDateIntent: AppIntent {
     public func perform() async throws -> some ProvidesDialog & ReturnsValue<String> {
         let now = Date()
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
 
         let solar = SolarDate(from: now, calendar: cal)
         let engine = LunarAstronomicalEngine.shared
@@ -45,7 +45,7 @@ public struct CheckNextMemorialIntent: AppIntent {
         }
 
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let today = cal.startOfDay(for: Date())
         let solarNow = SolarDate(from: today, calendar: cal)
 

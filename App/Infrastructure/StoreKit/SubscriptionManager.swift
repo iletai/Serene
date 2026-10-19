@@ -1,5 +1,6 @@
 import Foundation
 import StoreKit
+import WidgetKit
 import Observation
 import OSLog
 import VNCalendarDomain
@@ -190,6 +191,9 @@ public final class SubscriptionManager {
         } else {
             defaults.removeObject(forKey: entitlementCacheKey)
         }
+        // Widget gates content by this cache; without a reload it would keep
+        // showing stale free/pro UI until the next scheduled refresh (up to 24h).
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     private func broadcastStatus(_ isPro: Bool) {

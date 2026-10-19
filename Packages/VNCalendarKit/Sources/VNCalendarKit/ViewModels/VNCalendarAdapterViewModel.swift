@@ -29,7 +29,7 @@ public final class VNCalendarAdapterViewModel {
         initialMode: VNCalendarDisplayMode = .month
     ) {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         self.calendar = cal
         self.displayMode = initialMode
         self.displayMonthDate = initialDate

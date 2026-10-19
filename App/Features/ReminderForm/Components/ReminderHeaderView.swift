@@ -92,7 +92,7 @@ struct ReminderHeaderView: View {
 
     private var selectedYear: Int {
         let typed = Int(year.trimmingCharacters(in: .whitespaces))
-        return typed ?? Calendar.current.component(.year, from: Date())
+        return typed ?? VNTime.vietnamCalendar.component(.year, from: Date())
     }
 
     private var solarDate: SolarDate {

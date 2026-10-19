@@ -23,21 +23,26 @@ public struct AppConfiguration: Sendable {
 
     public static var current: AppConfiguration {
         let infoDict = Bundle.main.infoDictionary ?? [:]
+        // Service domain is single-source in Config/*.xcconfig
+        // (MICROCMS_SERVICE_DOMAIN -> Info.plist) so envs can diverge
+        // without touching Swift. Fallback matches the live tenant.
+        let serviceDomain = infoDict["MICROCMS_SERVICE_DOMAIN"] as? String ?? "annien"
+        let apiKey = infoDict["MICROCMS_API_KEY"] as? String ?? ""
         #if DEV
         return AppConfiguration(
             bundleIdentifier: "com.iletai.annien.dev",
             appGroupIdentifier: "group.com.iletai.annien.dev",
             cloudKitContainerIdentifier: "iCloud.com.iletai.annien.dev",
-            microCMSServiceDomain: "annien",
-            microCMSApiKey: infoDict["MICROCMS_API_KEY"] as? String ?? ""
+            microCMSServiceDomain: serviceDomain,
+            microCMSApiKey: apiKey
         )
         #else
         return AppConfiguration(
             bundleIdentifier: "com.iletai.annien",
             appGroupIdentifier: "group.com.iletai.annien",
             cloudKitContainerIdentifier: "iCloud.com.iletai.annien",
-            microCMSServiceDomain: "annien",
-            microCMSApiKey: infoDict["MICROCMS_API_KEY"] as? String ?? ""
+            microCMSServiceDomain: serviceDomain,
+            microCMSApiKey: apiKey
         )
         #endif
     }

@@ -59,7 +59,7 @@ public struct ReminderFormView: View {
             _notify30DaysBefore = State(initialValue: offsets.contains(-30))
         } else if let date = initialDate {
             var cal = Calendar(identifier: .gregorian)
-            cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+            cal.timeZone = VNTime.vietnam
             _day = State(initialValue: cal.component(.day, from: date))
             _month = State(initialValue: cal.component(.month, from: date))
         }

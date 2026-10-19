@@ -14,7 +14,7 @@ public struct DateKey: Hashable, Sendable, Comparable, CustomStringConvertible {
 
     public init(date: Date, calendar: Calendar = Calendar(identifier: .gregorian)) {
         var cal = calendar
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         let c = cal.dateComponents([.year, .month, .day], from: date)
         self.init(year: c.year ?? 2026, month: c.month ?? 1, day: c.day ?? 1)
     }
@@ -45,7 +45,7 @@ public struct DateKey: Hashable, Sendable, Comparable, CustomStringConvertible {
         components.month = month
         components.day = day
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        cal.timeZone = VNTime.vietnam
         return cal.date(from: components)
     }
 

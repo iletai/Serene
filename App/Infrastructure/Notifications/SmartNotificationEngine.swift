@@ -66,6 +66,26 @@ public actor SmartNotificationEngine {
     public static let maxNotificationLimit = 64
     public static let reservedSlots = 4
     public static let usableSlotLimit = maxNotificationLimit - reservedSlots // 60 slots
+    /// Hyperbolic time-decay coefficient α (spec 05 §2.1).
+    public static let decayAlpha = 0.05
+
+    /// Bundle whose .lproj matches the in-app language setting
+    /// (`appLanguage`: "vi", "en", or "system").
+    private static var activeBundle: Bundle {
+        let setting = UserDefaults.standard.string(forKey: "appLanguage") ?? "system"
+        let code: String?
+        switch setting {
+        case "vi": code = "vi"
+        case "en": code = "en"
+        default: code = nil // follow device preference
+        }
+        guard let code,
+              let path = Bundle.main.path(forResource: code, ofType: "lproj"),
+              let bundle = Bundle(path: path) else {
+            return .main
+        }
+        return bundle
+    }
 
     public static let categoryIdentifier = "AN_LUNAR_REMINDER"
     public static let actionViewDetail = "ACTION_VIEW_DETAIL"
@@ -141,7 +161,7 @@ public actor SmartNotificationEngine {
 
         let now = Date()
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh") ?? TimeZone(secondsFromGMT: 7 * 3600) ?? .current
+        calendar.timeZone = VNTime.vietnam
 
         let selectedCandidates = await generateCandidates(for: reminders, now: now, calendar: calendar)
 
@@ -168,51 +188,89 @@ public actor SmartNotificationEngine {
 
                 let daysUntil = max(0.1, fireDate.timeIntervalSince(now) / 86400.0)
                 let offsetWeight = (offset == 0) ? 1.0 : (1.0 / Double(abs(offset) + 1))
-                let decayFactor = 1.0 / (1.0 + 0.05 * daysUntil)
+                let decayFactor = 1.0 / (1.0 + Self.decayAlpha * daysUntil)
                 let score = Double(event.priority.rawValue) * offsetWeight * decayFactor
 
-                    let notifID = "\(Self.notificationPrefix)\(event.id.uuidString)_\(year)_\(offset)"
-                    let titleText: String
-                    let subtitleText: String
-                    if offset == 0 {
-                        titleText = "🔔 Hôm nay là \(event.title)"
-                        if event.isLunar {
-                            subtitleText = occ.isClamped
-                                ? "Ngày \(occ.lunarDate.day)/\(occ.lunarDate.month) ÂL (Tháng thiếu 29 ngày) - \(event.body)"
-                                : "Ngày \(occ.lunarDate.day)/\(occ.lunarDate.month) Âm lịch - \(event.body)"
-                        } else {
-                            subtitleText = "Ngày \(event.day)/\(event.month) Dương lịch - \(event.body)"
+                // Leap-month occurrences need a distinct ID or `.both` collapses into one.
+                let leapTag = occ.lunarDate.isLeapMonth ? "_leap" : ""
+                let notifID = "\(Self.notificationPrefix)\(event.id.uuidString)_\(year)\(leapTag)_\(offset)"
+                let titleText: String
+                let subtitleText: String
+                let bundle = Self.activeBundle
+                func copy(_ key: String, _ args: CVarArg...) -> String {
+                    let raw = bundle.localizedString(forKey: key, value: nil, table: nil)
+                    let fmt: String
+                    if raw == key {
+                        // Missing key fallback preserves spec format arguments
+                        switch key {
+                        case "notif.today_title": fmt = "Hôm nay là %@"
+                        case "notif.today_body_lunar": fmt = "Ngày %lld/%lld Âm lịch - %@"
+                        case "notif.today_body_lunar_clamped": fmt = "Ngày %lld/%lld ÂL (Tháng thiếu 29 ngày) - %@"
+                        case "notif.today_body_solar": fmt = "Ngày %lld/%lld Dương lịch - %@"
+                        case "notif.upcoming_title": fmt = "Sắp đến %@ (Còn %lld ngày)"
+                        case "notif.upcoming_body_lunar": fmt = "Sự kiện vào ngày %lld/%lld ÂL - %@"
+                        case "notif.upcoming_body_solar": fmt = "Sự kiện vào ngày %lld/%lld Dương lịch - %@"
+                        default: fmt = key
                         }
                     } else {
-                        let positiveOffset = abs(offset)
-                        titleText = "⏳ Sắp đến \(event.title) (Còn \(positiveOffset) ngày)"
-                        if event.isLunar {
-                            subtitleText = "Sự kiện vào ngày \(occ.lunarDate.day)/\(occ.lunarDate.month) ÂL - \(event.body)"
-                        } else {
-                            subtitleText = "Sự kiện vào ngày \(event.day)/\(event.month) Dương lịch - \(event.body)"
-                        }
+                        fmt = raw
                     }
-
-                    let payload: [String: String] = [
-                        "reminder_id": event.id.uuidString,
-                        "offset": "\(offset)",
-                        "deep_link": "annien://reminder/\(event.id.uuidString)"
-                    ]
-
-                    result.append(
-                        NotificationCandidate(
-                            identifier: notifID,
-                            eventId: event.id,
-                            triggerDate: fireDate,
-                            priority: event.priority,
-                            score: score,
-                            title: titleText,
-                            body: subtitleText,
-                            userInfo: payload
-                        )
-                    )
+                    return String(format: fmt, arguments: args)
                 }
+                if offset == 0 {
+                    titleText = copy("notif.today_title", event.title)
+                    if event.isLunar {
+                        subtitleText = occ.isClamped
+                            ? copy(
+                                "notif.today_body_lunar_clamped",
+                                Int64(occ.lunarDate.day), Int64(occ.lunarDate.month), event.body
+                            )
+                            : copy(
+                                "notif.today_body_lunar",
+                                Int64(occ.lunarDate.day), Int64(occ.lunarDate.month), event.body
+                            )
+                    } else {
+                        subtitleText = copy(
+                            "notif.today_body_solar",
+                            Int64(event.day), Int64(event.month), event.body
+                        )
+                    }
+                } else {
+                    let positiveOffset = abs(offset)
+                    titleText = copy("notif.upcoming_title", event.title, Int64(positiveOffset))
+                    if event.isLunar {
+                        subtitleText = copy(
+                            "notif.upcoming_body_lunar",
+                            Int64(occ.lunarDate.day), Int64(occ.lunarDate.month), event.body
+                        )
+                    } else {
+                        subtitleText = copy(
+                            "notif.upcoming_body_solar",
+                            Int64(event.day), Int64(event.month), event.body
+                        )
+                    }
+                }
+
+                let payload: [String: String] = [
+                    "reminder_id": event.id.uuidString,
+                    "offset": "\(offset)",
+                    "deep_link": "annien://reminder/\(event.id.uuidString)"
+                ]
+
+                result.append(
+                    NotificationCandidate(
+                        identifier: notifID,
+                        eventId: event.id,
+                        triggerDate: fireDate,
+                        priority: event.priority,
+                        score: score,
+                        title: titleText,
+                        body: subtitleText,
+                        userInfo: payload
+                    )
+                )
             }
+        }
         return result
     }
 
@@ -230,7 +288,10 @@ public actor SmartNotificationEngine {
     }
 
     private func scheduleRequests(candidates: [NotificationCandidate], calendar: Calendar) async {
-        for item in candidates {
+        // Spec 05 §7.2: skip identifiers already pending to avoid re-add churn
+        // on every scenePhase .active / app launch.
+        let existingIDs = Set(await center.pendingNotificationRequests().map(\.identifier))
+        for item in candidates where !existingIDs.contains(item.identifier) {
             let content = UNMutableNotificationContent()
             content.title = item.title
             content.body = item.body
@@ -273,20 +334,53 @@ public actor SmartNotificationEngine {
             return [occ]
         }
 
-        let reqLunar = LunarDate(day: event.day, month: event.month, year: targetYear, isLeapMonth: event.isLeapMonth)
-        let solar = await lunarEngine.convertToSolar(from: reqLunar)
-        let verifiedLunar = await lunarEngine.convertToLunar(from: solar)
-        let isClamped = (event.day == 30 && verifiedLunar.day == 29)
+        // Spec 05 §3.2: apply LeapMonthPolicy when the target lunar year may
+        // contain a leap month matching the event's month.
+        let hasLeapThisYear = lunarEngine.hasLeapMonth(
+            ofLunarYear: targetYear,
+            matching: event.month
+        )
 
-        var comp = DateComponents()
-        comp.year = solar.year
-        comp.month = solar.month
-        comp.day = solar.day
-        comp.hour = event.hour
-        comp.minute = event.minute
-        comp.second = 0
+        let requestedMonths: [(day: Int, month: Int, isLeap: Bool)]
+        switch event.leapPolicy {
+        case .regularOnly:
+            requestedMonths = [(event.day, event.month, false)]
+        case .leapOnly:
+            requestedMonths = hasLeapThisYear ? [(event.day, event.month, true)] : []
+        case .adaptiveFallback:
+            // Prefer the actual leap month in leap years; fall back to regular.
+            requestedMonths = hasLeapThisYear
+                ? [(event.day, event.month, true)]
+                : [(event.day, event.month, false)]
+        case .both:
+            requestedMonths = hasLeapThisYear
+                ? [(event.day, event.month, false), (event.day, event.month, true)]
+                : [(event.day, event.month, false)]
+        }
 
-        guard let d = calendar.date(from: comp) else { return [] }
-        return [TriggerOccurrence(date: d, isClamped: isClamped, lunarDate: verifiedLunar)]
+        var occurrences: [TriggerOccurrence] = []
+        for request in requestedMonths {
+            let reqLunar = LunarDate(
+                day: request.day,
+                month: request.month,
+                year: targetYear,
+                isLeapMonth: request.isLeap
+            )
+            let solar = await lunarEngine.convertToSolar(from: reqLunar)
+            let verifiedLunar = await lunarEngine.convertToLunar(from: solar)
+            let isClamped = (request.day == 30 && verifiedLunar.day == 29)
+
+            var comp = DateComponents()
+            comp.year = solar.year
+            comp.month = solar.month
+            comp.day = solar.day
+            comp.hour = event.hour
+            comp.minute = event.minute
+            comp.second = 0
+
+            guard let d = calendar.date(from: comp) else { continue }
+            occurrences.append(TriggerOccurrence(date: d, isClamped: isClamped, lunarDate: verifiedLunar))
+        }
+        return occurrences
     }
 }
