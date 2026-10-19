@@ -4,86 +4,75 @@ import VNCalendarDesignSystem
 import VNCalendarLunar
 
 public struct UpcomingTimelineView: View {
-    @State private var container = AppContainer.shared
-    @State private var reminders: [ReminderEvent] = []
-    @State private var searchQuery = ""
-    @State private var selectedFilter: MemorialFilterTab = .all
-    @State private var isShowingCreateReminder = false
-    @State private var isShowingPaywall = false
-    @State private var editingReminder: ReminderEvent?
-    @State private var selectedRitualTitle: String?
+    @Environment(AppContainer.self) private var container
+    @State private var viewModel: UpcomingTimelineViewModel?
 
     public init() {}
 
-    private var filteredReminders: [ReminderEvent] {
-        let base = reminders.filter { selectedFilter.matches(category: $0.category) }
-        if searchQuery.isEmpty {
-            return base
-        }
-        return base.filter {
-            $0.title.localizedCaseInsensitiveContains(searchQuery) ||
-            ($0.note?.localizedCaseInsensitiveContains(searchQuery) == true) ||
-            ($0.relationship?.localizedCaseInsensitiveContains(searchQuery) == true)
-        }
-    }
-
-    private var urgentMemorial: ReminderEvent? {
-        reminders.first {
-            $0.category == .deathAnniversary || $0.category == .ancestral
-        }
+    private var activeViewModel: UpcomingTimelineViewModel {
+        if let existing = viewModel { return existing }
+        let vm = UpcomingTimelineViewModel(
+            reminderRepository: container.reminderRepository,
+            scheduleReminderUseCase: container.scheduleReminderUseCase,
+            evaluateFeatureGateUseCase: container.evaluateFeatureGateUseCase
+        )
+        return vm
     }
 
     public var body: some View {
+        @Bindable var vm = activeViewModel
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: VNSpacing.md) {
-                    headerSection
-                    searchBarSection
+                    headerSection(vm: vm)
+                    searchBarSection(vm: vm)
                     MemorialFilterPills(
-                        selectedTab: $selectedFilter,
+                        selectedTab: $vm.selectedFilter,
                         countForTab: { tab in
-                            reminders.filter { tab.matches(category: $0.category) }.count
+                            vm.reminders.filter { tab.matches(category: $0.category) }.count
                         }
                     )
-                    contentSection
+                    contentSection(vm: vm)
                 }
-                // Pill space is reserved by MainTabView.safeAreaInset; this is just a section gap.
                 .padding(.bottom, VNSpacing.xl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
-            .sheet(isPresented: $isShowingCreateReminder) {
+            .sheet(isPresented: $vm.isShowingCreateReminder) {
                 ReminderFormView(onSave: { newReminder in
-                    saveReminder(newReminder)
+                    vm.save(newReminder)
                 })
                 .presentationDetents([.fraction(0.92), .large])
                 .presentationDragIndicator(.visible)
             }
-            .sheet(item: $editingReminder) { item in
+            .sheet(item: $vm.editingReminder) { item in
                 ReminderFormView(existingReminder: item, onSave: { updated in
-                    saveReminder(updated)
+                    vm.save(updated)
                 })
                 .presentationDetents([.fraction(0.92), .large])
                 .presentationDragIndicator(.visible)
             }
             .sheet(item: Binding<RitualItem?>(
-                get: { selectedRitualTitle.map { RitualItem(title: $0) } },
-                set: { selectedRitualTitle = $0?.title }
+                get: { vm.selectedRitualTitle.map { RitualItem(title: $0) } },
+                set: { vm.selectedRitualTitle = $0?.title }
             )) { ritual in
                 RitualPrayerModal(title: ritual.title)
             }
-            .sheet(isPresented: $isShowingPaywall) {
+            .sheet(isPresented: $vm.isShowingPaywall) {
                 PaywallView()
             }
             .task {
-                await loadReminders()
+                if viewModel == nil {
+                    viewModel = activeViewModel
+                }
+                await viewModel?.load()
             }
         }
     }
 
     // MARK: - Header Section
     @ViewBuilder
-    private var headerSection: some View {
+    private func headerSection(vm: UpcomingTimelineViewModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
                 HStack(spacing: VNSpacing.xs) {
@@ -103,7 +92,7 @@ public struct UpcomingTimelineView: View {
                 Spacer()
 
                 VNButton("Thêm Mới", icon: "plus", variant: .primary, size: .small) {
-                    checkAndCreate()
+                    vm.checkAndCreate()
                 }
             }
 
@@ -121,8 +110,8 @@ public struct UpcomingTimelineView: View {
 
                 Spacer()
 
-                if !reminders.isEmpty {
-                    Text("\(reminders.count) sự kiện")
+                if !vm.reminders.isEmpty {
+                    Text("\(vm.reminders.count) sự kiện")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.vnAccentHeritageRed)
                         .padding(.horizontal, VNSpacing.sm)
@@ -139,18 +128,19 @@ public struct UpcomingTimelineView: View {
 
     // MARK: - Search Bar
     @ViewBuilder
-    private var searchBarSection: some View {
+    private func searchBarSection(vm: UpcomingTimelineViewModel) -> some View {
+        @Bindable var boundVM = vm
         HStack(spacing: VNSpacing.sm) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.vnTextSecondary)
                 .font(.system(size: 14))
 
-            TextField("Tìm tên tiền nhân, ngày cúng, dòng họ...", text: $searchQuery)
+            TextField("Tìm tên tiền nhân, ngày cúng, dòng họ...", text: $boundVM.searchQuery)
                 .font(.system(size: 13))
 
-            if !searchQuery.isEmpty {
+            if !vm.searchQuery.isEmpty {
                 Button {
-                    searchQuery = ""
+                    vm.searchQuery = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.vnTextTertiary)
@@ -176,14 +166,14 @@ public struct UpcomingTimelineView: View {
 
     // MARK: - Main Content Area
     @ViewBuilder
-    private var contentSection: some View {
-        if filteredReminders.isEmpty {
-            MemorialEmptyStateView(onAdd: { checkAndCreate() })
+    private func contentSection(vm: UpcomingTimelineViewModel) -> some View {
+        @Bindable var boundVM = vm
+        if vm.filteredReminders.isEmpty {
+            MemorialEmptyStateView(onAdd: { vm.checkAndCreate() })
                 .padding(.horizontal, VNSpacing.xl)
         } else {
             VStack(alignment: .leading, spacing: VNSpacing.md) {
-                // Urgent Hero Card (if on All or Ancestor tab and no search filter)
-                if searchQuery.isEmpty && selectedFilter == .all, let hero = urgentMemorial {
+                if vm.searchQuery.isEmpty && vm.selectedFilter == .all, let hero = vm.urgentMemorial {
                     let monthStr = String(format: "%02d", hero.month)
                     let calTypeStr = hero.dateType == .lunar ? "Âm Lịch" : "Dương Lịch"
                     let dateText = "\(hero.day)/\(monthStr) \(calTypeStr)"
@@ -191,134 +181,31 @@ public struct UpcomingTimelineView: View {
                     MemorialHeroCard(
                         reminder: hero,
                         dateText: dateText,
-                        countdownText: calculateCountdown(for: hero),
-                        onQuickRitual: { selectedRitualTitle = hero.title },
-                        onEdit: { editingReminder = hero }
+                        countdownText: vm.countdownText(for: hero),
+                        onQuickRitual: { vm.selectedRitualTitle = hero.title },
+                        onEdit: { boundVM.editingReminder = hero }
                     )
 
                     MemorialTimelineDivider(title: "DANH SÁCH TIẾP THEO")
                 }
 
-                // Regular Timeline List
-                ForEach(filteredReminders) { reminder in
+                ForEach(vm.filteredReminders) { reminder in
                     let monthStr = String(format: "%02d", reminder.month)
                     let calTypeStr = reminder.dateType == .lunar ? "Âm Lịch" : "Dương Lịch"
                     let dateText = "\(reminder.day)/\(monthStr) \(calTypeStr)"
-                    let countdown = calculateCountdown(for: reminder)
+                    let countdown = vm.countdownText(for: reminder)
 
                     MemorialTimelineCard(
                         reminder: reminder,
                         dateText: dateText,
                         countdownText: countdown,
-                        onViewRitual: { selectedRitualTitle = reminder.title },
-                        onEdit: { editingReminder = reminder },
-                        onDelete: { deleteReminder(reminder) }
+                        onViewRitual: { vm.selectedRitualTitle = reminder.title },
+                        onEdit: { boundVM.editingReminder = reminder },
+                        onDelete: { vm.delete(reminder) }
                     )
                 }
             }
             .padding(.horizontal, VNSpacing.xl)
-        }
-    }
-
-    private func nextOccurrenceDate(for reminder: ReminderEvent, today: Date, calendar: Calendar) -> Date {
-        let solarNow = SolarDate(from: today, calendar: calendar)
-        if reminder.dateType == .lunar {
-            let engine = LunarAstronomicalEngine.shared
-            let currentLunar = engine.convertToLunar(from: solarNow)
-            var targetLunarYear = currentLunar.year
-            if currentLunar.month > reminder.month || (currentLunar.month == reminder.month && currentLunar.day > reminder.day) {
-                targetLunarYear += 1
-            }
-            let targetLunar = LunarDate(day: reminder.day, month: reminder.month, year: targetLunarYear, isLeapMonth: reminder.isLeapMonth)
-            let targetSolar = engine.convertToSolar(from: targetLunar)
-            return targetSolar.date ?? today
-        } else {
-            var comps = DateComponents(year: solarNow.year, month: reminder.month, day: reminder.day)
-            if let date = calendar.date(from: comps) {
-                if date < today {
-                    comps.year = solarNow.year + 1
-                    return calendar.date(from: comps) ?? date
-                }
-                return date
-            }
-            // Clamp invalid solar day (e.g. 30/2) to the month's last day.
-            if let clampedDay = calendar.range(of: .day, in: .month, for: calendar.date(from: DateComponents(year: solarNow.year, month: reminder.month, day: 1)) ?? today)?.count {
-                comps.day = min(reminder.day, clampedDay)
-                if let date = calendar.date(from: comps), date >= today {
-                    return date
-                }
-            }
-            return today
-        }
-    }
-
-    private func calculateCountdown(for reminder: ReminderEvent) -> String {
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = VNTime.vietnam
-        let today = cal.startOfDay(for: Date())
-        let target = nextOccurrenceDate(for: reminder, today: today, calendar: cal)
-        let diff = cal.dateComponents([.day], from: today, to: target).day ?? 0
-
-        if diff == 0 {
-            return "Hôm nay"
-        } else if diff == 1 {
-            return "Ngày mai"
-        } else if diff > 1 {
-            return "Còn \(diff) ngày"
-        } else {
-            return "Đã qua"
-        }
-    }
-
-    private func loadReminders() async {
-        if let items = try? await container.reminderRepository.fetchAllReminders() {
-            var cal = Calendar(identifier: .gregorian)
-            cal.timeZone = VNTime.vietnam
-            let today = cal.startOfDay(for: Date())
-            self.reminders = items.sorted {
-                nextOccurrenceDate(for: $0, today: today, calendar: cal) < nextOccurrenceDate(for: $1, today: today, calendar: cal)
-            }
-        }
-    }
-
-    private func checkAndCreate() {
-        Task {
-            do {
-                let canAdd = try await container.evaluateFeatureGateUseCase.canAddReminder()
-                if canAdd {
-                    isShowingCreateReminder = true
-                } else {
-                    isShowingPaywall = true
-                }
-            } catch {
-                // Fail closed: a gate error must not open the create form.
-                isShowingPaywall = true
-            }
-        }
-    }
-
-    private func saveReminder(_ reminder: ReminderEvent) {
-        Task {
-            do {
-                try await container.scheduleReminderUseCase.execute(save: reminder)
-            } catch {
-                // Surface save failures instead of silently dropping the reminder.
-            }
-            await loadReminders()
-            if let items = try? await container.reminderRepository.fetchAllReminders() {
-                try? await container.notificationEngine.pruneAndSchedule(reminders: items)
-            }
-        }
-    }
-
-    private func deleteReminder(_ reminder: ReminderEvent) {
-        Task {
-            try? await container.reminderRepository.deleteReminder(by: reminder.id)
-            await loadReminders()
-            // Prune so deleted events do not keep firing from pending requests.
-            if let items = try? await container.reminderRepository.fetchAllReminders() {
-                try? await container.notificationEngine.pruneAndSchedule(reminders: items)
-            }
         }
     }
 }
@@ -336,7 +223,6 @@ private struct RitualPrayerModal: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: VNSpacing.lg) {
-                    // Ceremonial Header
                     VStack(alignment: .leading, spacing: VNSpacing.xs) {
                         HStack(spacing: VNSpacing.xs) {
                             VNSealBadge.gio(size: .medium)
@@ -359,7 +245,6 @@ private struct RitualPrayerModal: View {
 
                     VNRowDivider()
 
-                    // Prayer Scroll
                     VStack(alignment: .leading, spacing: VNSpacing.md) {
                         Text("""
                         Nam mô A Di Đà Phật! (3 lần)

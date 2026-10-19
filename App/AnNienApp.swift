@@ -41,6 +41,7 @@ struct AnNienApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
+                .environment(container)
                 .preferredColorScheme(preferredScheme)
                 .environment(\.locale, selectedLocale)
                 .task {
