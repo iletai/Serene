@@ -172,7 +172,7 @@ public struct PaywallView: View {
     }
 
     private func restoreButton(vm: PaywallViewModel) -> some View {
-        Button("Khôi phục gói mua") {
+        Button("paywall.restore") {
             vm.restorePurchases { dismiss() }
         }
         .font(.vnFootnote)
@@ -184,13 +184,13 @@ public struct PaywallView: View {
 
     private var legalLinks: some View {
         HStack(spacing: VNSpacing.lg) {
-            legalLink(title: "Điều khoản sử dụng", url: legalLinksService.termsOfUseURL)
-            legalLink(title: "Chính sách bảo mật", url: legalLinksService.privacyPolicyURL)
+            legalLink(title: "paywall.terms", url: legalLinksService.termsOfUseURL)
+            legalLink(title: "paywall.privacy", url: legalLinksService.privacyPolicyURL)
         }
         .padding(.bottom, VNSpacing.xxl)
     }
 
-    private func legalLink(title: String, url: URL?) -> some View {
+    private func legalLink(title: LocalizedStringKey, url: URL?) -> some View {
         Button(title) {
             guard let url else { return }
             openURL(url)
@@ -269,7 +269,7 @@ public struct PaywallView: View {
            hasFreeTrial(product) {
             return "paywall.cta_start_trial"
         }
-        return "paywall.title"
+        return "paywall.cta_subscribe"
     }
 
     private func hasFreeTrial(_ product: Product) -> Bool {

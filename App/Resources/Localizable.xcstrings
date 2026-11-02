@@ -409,6 +409,125 @@
         }
       }
     },
+    "paywall.cta_subscribe": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Pro Now"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nâng Cấp Pro Bây Giờ"
+          }
+        }
+      }
+    },
+    "paywall.feature.cloudkit_sync": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Family Heritage Sync across devices"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đồng bộ phả hệ & gia tộc qua iCloud"
+          }
+        }
+      }
+    },
+    "paywall.feature.heritage_mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compact Family Heritage mode"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chế Độ Gia Phả Thu Nhỏ"
+          }
+        }
+      }
+    },
+    "paywall.feature.ics_export": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export dates as ICS calendar files"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xuất ngày quan trọng ra lịch (ICS)"
+          }
+        }
+      }
+    },
+    "paywall.feature.pro_widgets": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medium & Lock Screen widgets with lunar Can Chi"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget Màn hình khóa & Can Chi chuyên sâu"
+          }
+        }
+      }
+    },
+    "paywall.feature.unlimited_reminders": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlimited memorial dates & smart alerts"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không giới hạn ngày giỗ & thông báo thông minh"
+          }
+        }
+      }
+    },
+    "paywall.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preserve your ancestors' memories and your family's Vietnamese heritage"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lưu giữ trọn vẹn ký ức tổ tiên & bản sắc gia đình Việt"
+          }
+        }
+      }
+    },
     "paywall.loading": {
       "extractionState": "manual",
       "localizations": {
