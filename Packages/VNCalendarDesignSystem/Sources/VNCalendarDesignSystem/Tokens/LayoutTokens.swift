@@ -12,6 +12,22 @@ public enum VNSpacing {
     /// Golden-ratio hero gap ≈ 20 × 1.618 = 32.36, rounded to 32pt (DESIGN §4 intentional golden-ratio proportions).
     public static let golden: CGFloat = 32
     public static let hero: CGFloat = 48
+    public static let screenMargin: CGFloat = 20
+    public static let cardPadding: CGFloat = 16
+    public static let sectionGap: CGFloat = 24
+}
+
+public enum VNSize {
+    /// HIG minimum tap target.
+    public static let minTapTarget: CGFloat = 44
+    public static let iconButton: CGFloat = 40
+    public static let iconBadge: CGFloat = 24
+}
+
+public enum VNLayout {
+    public static let tabBarMaxWidth: CGFloat = 520
+    public static let tabBarBottomInset: CGFloat = 12
+    public static let tabBarItemHeight: CGFloat = 48
 }
 
 public enum VNCornerRadius {

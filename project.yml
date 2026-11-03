@@ -26,6 +26,9 @@ packages:
   AppUpdateKit:
     url: https://github.com/iletai/AppUpdateKit.git
     from: 1.1.0
+  BaseNavigationStack:
+    url: https://github.com/iletai/BaseNavigationStack.git
+    from: 2.0.0
   VNCalendarLunar:
     path: Packages/VNCalendarLunar
   VNCalendarDomain:
@@ -53,6 +56,7 @@ targets:
     dependencies:
       - package: CalendarView
       - package: AppUpdateKit
+      - package: BaseNavigationStack
       - package: VNCalendarLunar
       - package: VNCalendarDomain
       - package: VNCalendarData
