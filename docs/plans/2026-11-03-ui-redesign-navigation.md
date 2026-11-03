@@ -399,6 +399,21 @@ Delete the now-unused `isShowing*` properties and `checkAndShowReminderForm`. Up
 
 ---
 
+### Task 11A: UI gallery (local + GitHub CI) — added after Phase 2 started
+**Why:** screenshots taken by agents live only on the author's simulator; the owner cannot see UI results without running the simulator, and the app has no way to seed data / unlock Pro, so the Pro-only Family tree and filled lists were never captured. Goal: one command locally and one GitHub Actions job that build the app, drive it through every screen in light / dark / accessibility-XXXL, and publish a browsable gallery.
+
+**Files:**
+- Create: `App/Infrastructure/UITestSupport.swift` — compiled only for `DEV`/`DEBUG` (`#if DEV || DEBUG`, never in PROD). Reads launch argument `-UITestSeed` (installs deterministic sample reminders, an in-memory store and Pro unlocked) and `-UITestRoute <tab|settings|paywall|search|reminderForm|holiday|ritual>` (routes through the existing `DeepLinkCenter`/`DeepLinkHandler`). Wire it from `AppContainer`/`AnNienApp` with the smallest hook; read both files first.
+- Create: `Tests/UITests/UIGalleryTests.swift` — XCUITest class `UIGalleryTests`; a table of screens × variants {light, dark, xxxl}; variants applied through launch arguments (`-AppleInterfaceStyle Dark`, `-UIPreferredContentSizeCategoryName UICTContentSizeCategoryAccessibilityXXXL`, `-AppleLanguages (vi)`); each shot is an `XCTAttachment(screenshot:)` named `<screen>--<variant>` with `lifetime = .keepAlways`; scroll-to-bottom shot for XXXL on list screens. Screens: calendar, today-card, timeline (seeded), family tree (seeded, Pro), articles, holiday sheet, ritual sheet, reminder form (empty-title error state), settings, calendar settings, paywall, search.
+- Create: `scripts/ui-gallery/build-gallery.sh` — takes an `.xcresult` path and an output dir; exports attachments (`xcrun xcresulttool export attachments --path … --output-path …`), renames to `<screen>--<variant>.png`, writes a self-contained `index.html` (one row per screen, columns light / dark / XXXL, lazy images, relative links, no CDN).
+- Create: `scripts/ui-gallery/run-local.sh` — boots simulator `iPhone 16 Pro` (or `$SIM_ID`), runs `xcodebuild test -only-testing:AnNienUITests/UIGalleryTests -resultBundlePath /tmp/ui-gallery.xcresult`, calls `build-gallery.sh`, then `open <out>/index.html`.
+- Create: `.github/workflows/ui-gallery.yml` — triggers `pull_request` (paths `App/**`, `Packages/**`, `project.yml`, `Tests/UITests/**`) and `workflow_dispatch`; `macos-15`; reuse the Xcode/xcodegen/SPM-cache steps of `ci.yml`; run the same xcodebuild command; run `build-gallery.sh`; `actions/upload-artifact@v4` name `ui-gallery` (index.html + PNGs) and `ui-gallery-xcresult`; write the screen list and the artifact link to `$GITHUB_STEP_SUMMARY`; on pull requests post/update ONE sticky PR comment (via `actions/github-script`, `GITHUB_TOKEN`, `pull-requests: write`) with the run link and the number of screens captured. No GitHub Pages / external hosting (outward-facing; owner decides later).
+- Modify: `project.yml` only if `AnNienUITests` needs the new file included (it already globs `Tests/UITests`) — verify, do not change unless required.
+
+**Rules:** no secrets in files; the seed hook must not exist in PROD builds (verify with `xcodebuild -scheme AnNien-Prod build` compile + `grep` that symbols are absent, or `#if` proof in the report); tests must not use `sleep` beyond `waitForExistence`; the workflow must be validated with `actionlint` if installed (else `python3 -c "import yaml…"` parse) because it cannot run on GitHub until the owner pushes; do NOT push.
+
+**Verify:** (1) `scripts/ui-gallery/run-local.sh` produces ≥ 12 screens × 3 variants and opens a gallery whose images are non-blank (check file sizes > 20 KB and spot-check 3 images by viewing them); (2) the Family tree, Timeline list and Today card show seeded data; (3) PROD scheme still builds; (4) `swiftlint --strict --quiet` exit 0; (5) full `AnNienTests` unaffected. Commit as `test(ui): add UI gallery tests and scripts`, `ci: add ui-gallery workflow`.
+
 ## PHASE 3 — Verification
 
 ### Task 11: Verify and review
