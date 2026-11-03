@@ -55,10 +55,11 @@ final class ReminderFormViewModel {
             notify14DaysBefore = offsets.contains(-14)
             notify30DaysBefore = offsets.contains(-30)
         } else if let date = initialDate {
-            var cal = Calendar(identifier: .gregorian)
-            cal.timeZone = VNTime.vietnam
-            day = cal.component(.day, from: date)
-            month = cal.component(.month, from: date)
+            // The form defaults to lunar, so seed it with the lunar equivalent of the solar date.
+            let lunar = LunarAstronomicalEngine.shared.convertToLunar(from: SolarDate(from: date))
+            day = lunar.day
+            month = lunar.month
+            isLeapMonth = lunar.isLeapMonth
         }
         baseline = fingerprint
     }

@@ -60,7 +60,7 @@ public struct PaywallView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    VNDismissButton { router.dismiss() }
+                    VNDismissButton { router.dismissModals() }
                 }
             }
         }
@@ -139,7 +139,7 @@ public struct PaywallView: View {
     private func purchaseCTA(vm: PaywallViewModel) -> some View {
         Button(
             action: {
-                vm.purchase { router.dismiss() }
+                vm.purchase { router.dismissModals() }
             },
             label: {
                 HStack {
@@ -166,7 +166,7 @@ public struct PaywallView: View {
 
     private func restoreButton(vm: PaywallViewModel) -> some View {
         Button("paywall.restore") {
-            vm.restorePurchases { router.dismiss() }
+            vm.restorePurchases { router.dismissModals() }
         }
         .font(.vnFootnote)
         .foregroundColor(.vnTextSecondary)

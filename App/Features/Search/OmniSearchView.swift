@@ -46,7 +46,7 @@ public struct OmniSearchView: View {
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .vnNavBar(title: "Tra Cứu Thông Minh") {
-                VNDismissButton { router.dismiss() }
+                VNDismissButton { router.dismissModals() }
             }
             .task {
                 if viewModel == nil {
@@ -153,7 +153,7 @@ public struct OmniSearchView: View {
         Button {
             guard !vm.isCheckingGate else { return }
             let initialDate = vm.resolvedSolarDate
-            router.dismiss()
+            router.dismissModals()
             Task {
                 await Task.yield()
                 switch await vm.createReminderGate() {

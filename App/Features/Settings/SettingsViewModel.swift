@@ -40,7 +40,10 @@ final class SettingsViewModel {
         do {
             let reminders = try await container.reminderRepository.fetchAllReminders()
             let data = try DataBackupEngine.exportJSON(reminders: reminders)
-            guard let str = String(data: data, encoding: .utf8) else { return nil }
+            guard let str = String(data: data, encoding: .utf8) else {
+                backupStatusMessage = String(format: String(localized: "settings.data.export_error"), "UTF-8")
+                return nil
+            }
             backupStatusMessage = String(format: String(localized: "settings.data.export_done"), reminders.count)
             return .share(str)
         } catch {
@@ -49,11 +52,17 @@ final class SettingsViewModel {
         }
     }
 
-    func exportICS() async -> ExportOutcome {
+    func exportICS() async -> ExportOutcome? {
         guard await container.evaluateFeatureGateUseCase.isFeatureAvailable(.batchExportICS) else {
             return .requiresPro
         }
-        let reminders = (try? await container.reminderRepository.fetchAllReminders()) ?? []
+        let reminders: [ReminderEvent]
+        do {
+            reminders = try await container.reminderRepository.fetchAllReminders()
+        } catch {
+            backupStatusMessage = String(format: String(localized: "settings.data.export_error"), error.localizedDescription)
+            return nil
+        }
         let ics = await DataBackupEngine.generateICS(reminders: reminders)
         backupStatusMessage = String(localized: "settings.data.ics_done")
         return .share(ics)

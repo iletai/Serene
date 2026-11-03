@@ -13,6 +13,8 @@ public struct ReminderFormView: View {
     @FocusState private var focusedField: Field?
     @State private var viewModel: ReminderFormViewModel
     @State private var isConfirmingDiscard = false
+    /// Set once the form has saved, so a double tap on Save persists only once.
+    @State private var didFinish = false
     @ScaledMetric(relativeTo: .caption2) private var bottomInset: CGFloat = VNSpacing.hero + VNSpacing.sectionGap
 
     static let titleRequiredMessage = "Nhập tên người được tưởng nhớ trước"
@@ -93,7 +95,7 @@ public struct ReminderFormView: View {
         }
         .interactiveDismissDisabled(vm.isDirty)
         .confirmationDialog("Bỏ thay đổi?", isPresented: $isConfirmingDiscard, titleVisibility: .visible) {
-            Button("Bỏ thay đổi", role: .destructive) { router.dismiss() }
+            Button("Bỏ thay đổi", role: .destructive) { router.dismissModals() }
             Button("Tiếp tục chỉnh sửa", role: .cancel) {}
         }
     }
@@ -102,7 +104,7 @@ public struct ReminderFormView: View {
         if viewModel.isDirty {
             isConfirmingDiscard = true
         } else {
-            router.dismiss()
+            router.dismissModals()
         }
     }
 
@@ -141,13 +143,15 @@ public struct ReminderFormView: View {
             size: .large,
             isFullWidth: true
         ) {
+            guard !didFinish else { return }
             guard let reminder = vm.save() else {
                 focusedField = .title
                 return
             }
+            didFinish = true
             VNHaptics.impact(.success, enabled: hapticFeedbackEnabled)
             onSave(reminder)
-            router.dismiss()
+            router.dismissModals()
         }
         .accessibilityHint(vm.isValid ? "" : Self.titleRequiredMessage)
         .padding(.top, VNSpacing.md)
