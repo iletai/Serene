@@ -70,6 +70,9 @@ public final class SubscriptionManager {
     /// SwiftData store so CloudKit sync turns on without a relaunch.
     public var onProUpgrade: (@MainActor () -> Void)?
 
+    /// Set only by the Debug-only `pinProForUITests()`; stops StoreKit refreshes from reverting it.
+    @ObservationIgnored private var isEntitlementPinned = false
+
     public init() {
         // Last-known entitlement from App Group cache so cold launch is not "free"
         // while the StoreKit refresh Task runs. Refreshed online; cache is advisory.
@@ -161,7 +164,20 @@ public final class SubscriptionManager {
     }
 
     public func updatePurchasedProducts() async {
+        guard !isEntitlementPinned else { return }
         let wasPro = entitlement.isPro
+        let activeTier = await currentEntitlementTier()
+
+        self.entitlement = activeTier
+        persistEntitlementCache(activeTier)
+        broadcastStatus(activeTier.isPro)
+
+        if !wasPro && activeTier.isPro {
+            onProUpgrade?()
+        }
+    }
+
+    private func currentEntitlementTier() async -> EntitlementStatus {
         var activeTier: EntitlementStatus = .free
 
         for await result in Transaction.currentEntitlements {
@@ -183,14 +199,7 @@ public final class SubscriptionManager {
                 }
             }
         }
-
-        self.entitlement = activeTier
-        persistEntitlementCache(activeTier)
-        broadcastStatus(activeTier.isPro)
-
-        if !wasPro && activeTier.isPro {
-            onProUpgrade?()
-        }
+        return activeTier
     }
 
     private func persistEntitlementCache(_ status: EntitlementStatus) {
@@ -236,6 +245,17 @@ public final class SubscriptionManager {
         }
     }
 }
+
+#if DEBUG
+extension SubscriptionManager {
+    /// UI-test seam (Debug builds only; caller is the app's `#if DEV` UITestSupport): pins Pro
+    /// without StoreKit and without touching the App Group entitlement cache.
+    public func pinProForUITests() {
+        isEntitlementPinned = true
+        entitlement = .pro(.lifetime)
+    }
+}
+#endif
 
 extension SubscriptionManager: @preconcurrency SubscriptionRepositoryProtocol {
     public func isFeatureUnlocked(_ feature: AppFeature) async -> Bool {

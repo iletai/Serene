@@ -36,6 +36,8 @@ public struct CalendarMainView: View {
                     onQuickSearch: { router.present(sheet: .search) }
                 )
                 .padding(.horizontal, VNSpacing.screenMargin)
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("today.card")
 
                 // Multi-Mode Calendar Container (Nhật Lịch • Tháng • Tuần • Năm).
                 // The package fires this only after its own day sheet has finished dismissing.
