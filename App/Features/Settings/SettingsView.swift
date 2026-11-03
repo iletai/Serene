@@ -87,6 +87,7 @@ public struct SettingsView: View {
                         VNSettingsRow(icon: "calendar.badge.clock", title: String(localized: "settings.calendar.title"), subtitle: String(localized: "settings.calendar.subtitle_desc"), tint: .vnAccentHeritageRed)
                     }
                     .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+                    .accessibilityIdentifier("settings.calendarSettings")
                 }
             }
 

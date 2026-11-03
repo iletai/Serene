@@ -95,6 +95,8 @@ platform :ios do
       code_coverage: true,
       output_directory: "fastlane/test_output",
       output_types: "html,junit",
+      # Screenshot gallery runs in its own workflow (.github/workflows/ui-gallery.yml).
+      skip_testing: "AnNienUITests/UIGalleryTests",
       fail_build: true
     )
   end
