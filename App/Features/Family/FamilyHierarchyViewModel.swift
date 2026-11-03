@@ -7,25 +7,18 @@ import VNCalendarData
 @MainActor
 final class FamilyHierarchyViewModel {
     var reminders: [ReminderEvent] = []
-    var pressedMemberID: UUID?
-    var isShowingCreateReminder = false
-    var isShowingPaywall = false
-    var selectedReminder: ReminderEvent?
 
     private let reminderRepository: ReminderRepositoryProtocol
     private let subscriptionManager: SubscriptionManager
-    private let scheduleReminderUseCase: ScheduleReminderUseCase
     private let evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase
 
     init(
         reminderRepository: ReminderRepositoryProtocol,
         subscriptionManager: SubscriptionManager,
-        scheduleReminderUseCase: ScheduleReminderUseCase,
         evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase
     ) {
         self.reminderRepository = reminderRepository
         self.subscriptionManager = subscriptionManager
-        self.scheduleReminderUseCase = scheduleReminderUseCase
         self.evaluateFeatureGateUseCase = evaluateFeatureGateUseCase
     }
 
@@ -95,24 +88,18 @@ final class FamilyHierarchyViewModel {
         }
     }
 
-    func checkAndCreate() {
-        Task {
-            do {
-                if try await evaluateFeatureGateUseCase.canAddReminder() {
-                    isShowingCreateReminder = true
-                } else {
-                    isShowingPaywall = true
-                }
-            } catch {
-                isShowingPaywall = true
-            }
+    /// Keeps the tree in sync with saves made from the router-presented reminder form.
+    func observe() async {
+        for await items in reminderRepository.observeReminders() {
+            reminders = items
         }
     }
 
-    func saveMember(_ event: ReminderEvent) {
-        Task {
-            try? await scheduleReminderUseCase.execute(save: event)
-            await load()
+    func createReminderGate() async -> CreateReminderGate {
+        do {
+            return try await evaluateFeatureGateUseCase.canAddReminder() ? .allowed : .requiresPro
+        } catch {
+            return .requiresPro
         }
     }
 }
