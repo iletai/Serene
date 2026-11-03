@@ -426,7 +426,7 @@ public struct HolidayDetailSheet: View {
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    VNDismissButton(style: .text("Đóng")) { router.dismiss() }
+                    VNDismissButton(style: .text("Đóng")) { router.dismissModals() }
                 }
             }
         }

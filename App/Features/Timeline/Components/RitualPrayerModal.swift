@@ -71,7 +71,7 @@ struct RitualPrayerModal: View {
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .vnNavBar(title: "Văn Khấn Gia Tiên") {
-                VNDismissButton(style: .text("Đóng")) { router.dismiss() }
+                VNDismissButton(style: .text("Đóng")) { router.dismissModals() }
             }
         }
     }
