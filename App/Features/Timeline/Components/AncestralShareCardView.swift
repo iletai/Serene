@@ -56,7 +56,7 @@ public struct AncestralShareCardView: View {
             VStack(spacing: VNSpacing.lg) {
                 // The Visual Shareable Card Canvas
                 shareCardCanvas
-                    .padding(.horizontal, VNSpacing.xl)
+                    .padding(.horizontal, VNSpacing.screenMargin)
                     .padding(.top, VNSpacing.md)
 
                 Spacer()
@@ -76,12 +76,12 @@ public struct AncestralShareCardView: View {
                     Button("Đóng") {
                         dismiss()
                     }
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.subheadline.weight(.medium))
                     .foregroundColor(.vnTextSecondary)
-                    .frame(minHeight: 44)
+                    .frame(minHeight: VNSize.minTapTarget)
                     .contentShape(Rectangle())
                 }
-                .padding(.horizontal, VNSpacing.xl)
+                .padding(.horizontal, VNSpacing.screenMargin)
                 .padding(.bottom, VNSpacing.xl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
@@ -109,26 +109,26 @@ public struct AncestralShareCardView: View {
             // Header Title
             VStack(spacing: VNSpacing.xs) {
                 Text("THÔNG BÁO NGÀY GIỖ GIA TIÊN")
-                    .font(.system(size: 13, weight: .bold, design: .serif))
+                    .font(.system(.footnote, design: .serif, weight: .bold))
                     .foregroundColor(.vnAccentHeritageRed)
                     .tracking(2.0)
 
                 Text("Kính cáo toàn thể dòng họ & con cháu nội ngoại")
-                    .font(.system(size: 11, design: .serif).italic())
+                    .font(.system(.caption2, design: .serif).italic())
                     .foregroundColor(.vnTextSecondary)
             }
 
             Rectangle()
-                .fill(Color.vnOldRiceBorder)
-                .frame(height: 1)
+                .fill(Color.vnBorderSubtle)
+                .frame(height: VNBorderWidth.hairline)
                 .padding(.horizontal, VNSpacing.md)
 
             // Member Info
             VStack(spacing: VNSpacing.xs) {
                 if let rel = reminder.relationship, !rel.isEmpty {
                     Text(rel.uppercased())
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.vnAccentImperialGold)
+                        .font(.caption.weight(.bold))
+                        .foregroundColor(.vnAccentGoldText)
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.space2)
                         .background(Color.vnAccentGoldSurface)
@@ -136,7 +136,7 @@ public struct AncestralShareCardView: View {
                 }
 
                 Text(reminder.title)
-                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .font(.system(.title2, design: .serif, weight: .bold))
                     .foregroundColor(.vnTextPrimary)
                     .multilineTextAlignment(.center)
             }
@@ -147,10 +147,10 @@ public struct AncestralShareCardView: View {
                 HStack(spacing: VNSpacing.md) {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         Text("NGÀY ÂM LỊCH")
-                            .font(.system(size: 9, weight: .bold))
+                            .font(.caption2.weight(.bold))
                             .foregroundColor(.vnTextSecondary)
                         Text(lunarDateString)
-                            .font(.system(size: 14, weight: .bold, design: .serif))
+                            .font(.system(.subheadline, design: .serif, weight: .bold))
                             .foregroundColor(.vnAccentHeritageRed)
                     }
 
@@ -158,10 +158,10 @@ public struct AncestralShareCardView: View {
 
                     VStack(alignment: .trailing, spacing: VNSpacing.space2) {
                         Text("DƯƠNG LỊCH NĂM NAY")
-                            .font(.system(size: 9, weight: .bold))
+                            .font(.caption2.weight(.bold))
                             .foregroundColor(.vnTextSecondary)
                         Text(nextDateString)
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.footnote.weight(.semibold))
                             .foregroundColor(.vnTextPrimary)
                     }
                 }
@@ -177,7 +177,7 @@ public struct AncestralShareCardView: View {
 
             if let note = reminder.note, !note.isEmpty {
                 Text("Địa điểm / Lời dặn: \(note)")
-                    .font(.system(size: 12, weight: .medium, design: .serif))
+                    .font(.system(.caption, design: .serif, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, VNSpacing.md)
@@ -186,7 +186,7 @@ public struct AncestralShareCardView: View {
             // Footer Stamp
             HStack {
                 Text("AN NIÊN • LỊCH VIỆT & NGÀY NHỚ")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
                     .foregroundColor(.vnTextTertiary)
                     .tracking(1.0)
 

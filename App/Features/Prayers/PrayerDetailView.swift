@@ -9,6 +9,7 @@ public struct PrayerDetailView: View {
     @State private var fontSize: CGFloat = 16
     @State private var isZenMode = false
     @State private var showCopiedAlert = false
+    @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
 
     public init(prayer: Prayer) {
         self.prayer = prayer
@@ -68,7 +69,7 @@ public struct PrayerDetailView: View {
                         dismiss()
                     }
                     .foregroundColor(.vnTextSecondary)
-                    .frame(minHeight: 44)
+                    .frame(minHeight: VNSize.minTapTarget)
                     .contentShape(Rectangle())
                 }
 
@@ -87,7 +88,7 @@ public struct PrayerDetailView: View {
                         .foregroundColor(.vnAccentDeepPrimary)
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.xs)
-                        .frame(minHeight: 44)
+                        .frame(minHeight: VNSize.minTapTarget)
                         .background(Color.vnBackgroundPrimary)
                         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
                         .overlay(
@@ -100,11 +101,11 @@ public struct PrayerDetailView: View {
             .overlay(alignment: .bottom) {
                 if showCopiedAlert {
                     Text("Đã sao chép bài văn khấn")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.footnote.weight(.semibold))
                         .foregroundColor(.vnOnAccent)
                         .padding(.horizontal, VNSpacing.lg)
                         .padding(.vertical, VNSpacing.sm)
-                        .background(Color.vnVermilionDark.opacity(0.95))
+                        .background(Color.vnAccentDeepPrimary.opacity(0.95))
                         .clipShape(Capsule())
                         .shadow(color: VNShadow.card.color, radius: VNShadow.card.radius,
                                 x: VNShadow.card.x, y: VNShadow.card.y)
@@ -149,10 +150,10 @@ public struct PrayerDetailView: View {
             HStack(spacing: VNSpacing.xs) {
                 Image(systemName: "calendar")
                     .font(.vnCaption1)
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
                     .accessibilityHidden(true)
                 Text(prayer.occasion)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.footnote.weight(.medium))
                     .foregroundColor(.vnTextSecondary)
             }
         }
@@ -163,10 +164,10 @@ public struct PrayerDetailView: View {
     private var offeringsCard: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("Lễ vật cần chuẩn bị")
-                .font(.system(size: 18, weight: .semibold, design: .serif))
+                .font(.system(.headline, design: .serif, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
             Text("Mâm cúng dâng trước án tọa")
-                .font(.system(size: 11))
+                .font(.caption2)
                 .foregroundColor(.vnTextSecondary)
 
             VNRowDivider()
@@ -210,14 +211,14 @@ public struct PrayerDetailView: View {
                     Image(systemName: "bell.fill")
                         .font(.vnCaption1)
                         .fontWeight(.bold)
-                        .foregroundColor(.vnAccentImperialGold)
+                        .foregroundColor(.vnAccentGoldText)
                         .accessibilityHidden(true)
                     Text("Chuông Khánh")
                         .font(.vnCaption1)
                         .fontWeight(.semibold)
                         .foregroundColor(.vnTextPrimary)
                 }
-                .frame(minHeight: 44)
+                .frame(minHeight: VNSize.minTapTarget)
                 .padding(.horizontal, VNSpacing.md)
                 .background(Color.vnAccentGoldSurface)
                 .clipShape(Capsule())
@@ -272,7 +273,7 @@ public struct PrayerDetailView: View {
     private var prayerTextCard: some View {
         VStack(alignment: .leading, spacing: VNSpacing.md) {
             Text("Bài văn khấn")
-                .font(.system(size: 18, weight: .semibold, design: .serif))
+                .font(.system(.headline, design: .serif, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
 
             VNRowDivider()
@@ -302,11 +303,11 @@ public struct PrayerDetailView: View {
     private func notesCard(_ notes: String) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text("Lưu ý văn hóa & nghi lễ")
-                .font(.system(size: 18, weight: .semibold, design: .serif))
+                .font(.system(.headline, design: .serif, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
 
             Text(notes)
-                .font(.system(size: 12, weight: .regular))
+                .font(.caption)
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(3)
         }
@@ -321,9 +322,8 @@ public struct PrayerDetailView: View {
     private func copyToClipboard() {
         #if canImport(UIKit)
         UIPasteboard.general.string = interpolatedPrayerText
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
         #endif
+        VNHaptics.impact(.success, enabled: hapticFeedbackEnabled)
 
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             showCopiedAlert = true
@@ -337,9 +337,6 @@ public struct PrayerDetailView: View {
     }
 
     private func triggerBellChime() {
-        #if canImport(UIKit)
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
-        #endif
+        VNHaptics.impact(.medium, enabled: hapticFeedbackEnabled)
     }
 }
