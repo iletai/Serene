@@ -11,6 +11,14 @@ struct ReminderDatePickerCard: View {
     @Binding var isLeapMonth: Bool
 
     @FocusState private var isYearFocused: Bool
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// Columns stack vertically at accessibility sizes so the pickers stay readable.
+    private var columnsLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: VNSpacing.md))
+            : AnyLayout(HStackLayout(spacing: VNSpacing.md))
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
@@ -37,7 +45,7 @@ struct ReminderDatePickerCard: View {
                     .pickerStyle(.segmented)
                     .tint(Color.vnAccentHeritageRed)
 
-                    HStack(spacing: VNSpacing.md) {
+                    columnsLayout {
                         pickerColumn(title: "Ngày") {
                             Picker("Ngày", selection: $day) {
                                 ForEach(1...31, id: \.self) { d in

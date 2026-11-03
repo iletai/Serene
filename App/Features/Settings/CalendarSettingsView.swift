@@ -30,7 +30,16 @@ public struct CalendarSettingsView: View {
     public init() {}
 
     /// Row icon tile; scales with Dynamic Type so the glyph never overflows it.
-    @ScaledMetric(relativeTo: .callout) private var iconBox: CGFloat = VNSize.iconButton
+    @ScaledMetric(relativeTo: .callout) private var scaledIconBox: CGFloat = VNSize.iconButton
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// Capped so accessibility sizes leave room for the label.
+    private var iconBox: CGFloat { min(scaledIconBox, VNSize.iconButton * 1.4) }
+    /// Stacks label above control at accessibility sizes so neither gets crushed.
+    private var rowLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: VNSpacing.sm))
+            : AnyLayout(HStackLayout())
+    }
 
     /// Leading inset aligning row subtitles under the icon tile plus its gap (rowLabel).
     private var settingsSubtitleLeadingInset: CGFloat { iconBox + VNSpacing.md }
@@ -110,9 +119,9 @@ public struct CalendarSettingsView: View {
 
                 rowDivider
 
-                HStack {
+                rowLayout {
                     rowLabel(icon: "calendar", tint: .vnAccentGoldText, title: String(localized: "settings.calendar.week_start"))
-                    Spacer()
+                    Spacer(minLength: 0)
                     Picker(String(localized: "settings.calendar.week_start"), selection: $startOfWeek) {
                         Text(String(localized: "settings.calendar.week_start_monday")).tag(2)
                         Text(String(localized: "settings.calendar.week_start_sunday")).tag(1)
@@ -395,7 +404,6 @@ public struct CalendarSettingsView: View {
             Text(title)
                 .font(.callout)
                 .foregroundColor(.vnTextPrimary)
-                .lineLimit(2)
                 .minimumScaleFactor(0.8)
         }
     }

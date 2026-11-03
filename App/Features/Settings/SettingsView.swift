@@ -107,7 +107,7 @@ public struct SettingsView: View {
                 VNSectionLabel(String(localized: "settings.data.header"))
                 VNGroupCard {
                     Button { router.push(.dataBackup) } label: {
-                        VNSettingsRow(icon: "arrow.triangle.2.circlepath.cloud.fill", title: String(localized: "settings.data.header"), subtitle: String(localized: "settings.data.refresh"), tint: .vnStatusSuccess)
+                        VNSettingsRow(icon: "arrow.clockwise.icloud.fill", title: String(localized: "settings.data.header"), subtitle: String(localized: "settings.data.refresh"), tint: .vnStatusSuccess)
                     }
                     .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                 }
