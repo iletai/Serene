@@ -47,12 +47,12 @@ struct MemorialFilterPills: View {
                         label: {
                             HStack(spacing: VNSpacing.xs) {
                                 Text(tab.rawValue)
-                                    .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
-                                    .frame(minHeight: 44)
+                                    .font(.caption.weight(isSelected ? .semibold : .medium))
+                                    .frame(minHeight: VNSize.minTapTarget)
 
                                 if itemCount > 0 {
                                     Text("(\(itemCount))")
-                                        .font(.system(size: 11, weight: .regular))
+                                        .font(.caption2)
                                         .monospacedDigit()
                                 }
                             }
@@ -75,7 +75,7 @@ struct MemorialFilterPills: View {
                     .accessibilityAddTraits(isSelected ? [.isSelected, .isButton] : .isButton)
                 }
             }
-            .padding(.horizontal, VNSpacing.xl)
+            .padding(.horizontal, VNSpacing.screenMargin)
         }
     }
 }
