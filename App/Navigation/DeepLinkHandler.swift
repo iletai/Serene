@@ -12,7 +12,8 @@ struct DeepLinkHandler: Sendable {
     static let scheme = "annien"
 
     func action(for url: URL) -> Action? {
-        guard url.scheme == Self.scheme, let host = url.host() else { return nil }
+        // Schemes and hosts are case-insensitive (RFC 3986).
+        guard url.scheme?.lowercased() == Self.scheme, let host = url.host()?.lowercased() else { return nil }
         switch host {
         case "calendar": return .select(.calendar)
         // Notification payloads use `annien://reminder/<uuid>`; minimal routing is the memorial tab.

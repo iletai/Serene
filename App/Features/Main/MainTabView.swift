@@ -42,13 +42,14 @@ public enum MainTab: Int, CaseIterable, Identifiable, Sendable {
 public struct MainTabView: View {
     @Binding private var pendingDeepLink: DeepLinkHandler.Action?
     @State private var selectedTab: MainTab = .calendar
-    /// One router per tab, created once so each tab keeps its stack and sheet across switches.
-    @State private var routers: [MainTab: AppRouter]
+    /// One router per tab, indexed by `MainTab.rawValue` (0..<allCases.count), created once so each
+    /// tab keeps its stack and sheet across switches.
+    @State private var routers: [AppRouter]
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
 
     init(pendingDeepLink: Binding<DeepLinkHandler.Action?> = .constant(nil)) {
         _pendingDeepLink = pendingDeepLink
-        _routers = State(initialValue: Dictionary(uniqueKeysWithValues: MainTab.allCases.map { ($0, AppRouter()) }))
+        _routers = State(initialValue: MainTab.allCases.map { _ in AppRouter() })
     }
 
     public var body: some View {
@@ -73,19 +74,20 @@ public struct MainTabView: View {
     }
 
     private func handle(_ action: DeepLinkHandler.Action) {
+        // A sheet on the current tab would otherwise stay up over the newly selected tab.
+        routers[selectedTab.rawValue].dismissModals()
         switch action {
         case .select(let tab):
             selectedTab = tab
         case .present(let tab, let sheet):
             selectedTab = tab
-            routers[tab]?.present(sheet: sheet)
+            routers[tab.rawValue].present(sheet: sheet)
         }
     }
 
     private func tabContainer(for tab: MainTab) -> some View {
-        let router = routers[tab] ?? AppRouter()
-        return BaseNavigationContainer(
-            router: router,
+        BaseNavigationContainer(
+            router: routers[tab.rawValue],
             content: { tabRoot(for: tab) },
             destination: { AppRouteView(route: $0) },
             sheet: { AppSheetView(sheet: $0) },

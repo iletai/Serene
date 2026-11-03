@@ -31,6 +31,11 @@ final class DeepLinkHandlerTests: XCTestCase {
         XCTAssertEqual(action("annien://reminder/\(UUID().uuidString)"), .select(.memorial))
     }
 
+    func testSchemeAndHostAreCaseInsensitive() {
+        XCTAssertEqual(action("annien://Settings"), .present(tab: .calendar, sheet: .settings))
+        XCTAssertEqual(action("ANNIEN://calendar"), .select(.calendar))
+    }
+
     func testForeignSchemeIsIgnored() {
         XCTAssertNil(action("https://settings"))
     }
