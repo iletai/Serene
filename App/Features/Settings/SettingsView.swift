@@ -10,7 +10,7 @@ private let settingsLogger = Logger(subsystem: "com.iletai.annien", category: "S
 public struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppContainer.self) private var container
-    @State private var isShowingPaywall = false
+    @Environment(AppRouter.self) private var router
     @AppStorage("appThemeAppearance") private var appThemeAppearance: Int = 0 // 0: Auto, 1: Rice Paper Light, 2: Lacquer Charcoal Dark
     @AppStorage("appLanguage") private var appLanguage: String = "system"
 
@@ -21,23 +21,19 @@ public struct SettingsView: View {
     }
 
     public var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: VNSpacing.xl) {
-                    membershipCard
-                    navigationMenuList
-                }
-                .padding(.horizontal, VNSpacing.xl)
-                .padding(.top, VNSpacing.xl)
-                .padding(.bottom, VNSpacing.xxl)
+        ScrollView {
+            VStack(spacing: VNSpacing.sectionGap) {
+                membershipCard
+                navigationMenuList
             }
-            .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-            .vnNavBar(title: String(localized: "tab.settings")) {
-                VNDismissButton(style: .text(String(localized: "settings.action.done"))) { dismiss() }
-            }
-            .sheet(isPresented: $isShowingPaywall) {
-                PaywallView()
-            }
+            .padding(.horizontal, VNSpacing.screenMargin)
+            .padding(.top, VNSpacing.xl)
+            .padding(.bottom, VNSpacing.xxl)
+        }
+        .background(Color.vnBackgroundPrimary.ignoresSafeArea())
+        .vnNavBar(title: String(localized: "tab.settings")) {
+            // Settings is the root of its own sheet container, so the sheet-level dismiss closes it.
+            VNDismissButton(style: .text(String(localized: "settings.action.done"))) { dismiss() }
         }
     }
 
@@ -51,18 +47,22 @@ public struct SettingsView: View {
                         let proTitle = String(localized: "settings.membership.pro_title")
                         let freeTitle = String(localized: "settings.membership.free_title")
                         Text(isPro ? proTitle : freeTitle)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.callout.weight(.semibold))
                             .foregroundColor(.vnTextPrimary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
                         let proSubtitle = String(localized: "settings.membership.pro_subtitle")
                         let freeSubtitle = String(localized: "settings.membership.free_subtitle")
                         Text(isPro ? proSubtitle : freeSubtitle)
-                            .font(.system(size: 12))
+                            .font(.caption)
                             .foregroundColor(.vnTextSecondary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
                     }
                     Spacer()
                     if !isPro {
                         VNButton(String(localized: "settings.action.upgrade"), variant: .primary, size: .small) {
-                            isShowingPaywall = true
+                            router.present(sheet: .paywall)
                         }
                     } else {
                         Image(systemName: "checkmark.seal.fill")
@@ -70,7 +70,7 @@ public struct SettingsView: View {
                             .accessibilityHidden(true)
                     }
                 }
-                .padding(.horizontal, VNSpacing.lg)
+                .padding(.horizontal, VNSpacing.cardPadding)
                 .padding(.vertical, VNSpacing.md)
             }
         }
@@ -78,15 +78,15 @@ public struct SettingsView: View {
 
     // MARK: - Navigation Menu List
     private var navigationMenuList: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xl) {
+        VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
             // 1. Calendar & Astronomy Sub-menu
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 VNSectionLabel(String(localized: "settings.timezone.header"))
                 VNGroupCard {
-                    NavigationLink(destination: CalendarSettingsView()) {
+                    Button { router.push(.calendarSettings) } label: {
                         VNSettingsRow(icon: "calendar.badge.clock", title: String(localized: "settings.calendar.title"), subtitle: String(localized: "settings.calendar.subtitle_desc"), tint: .vnAccentHeritageRed)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                 }
             }
 
@@ -94,11 +94,11 @@ public struct SettingsView: View {
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 VNSectionLabel(String(localized: "settings.appearance.header"))
                 VNGroupCard {
-                    NavigationLink(destination: AppearanceLanguageSettingsView()) {
+                    Button { router.push(.appearanceLanguage) } label: {
                         let modeSubtitle = appThemeAppearance == 1 ? String(localized: "settings.appearance.light") : (appThemeAppearance == 2 ? String(localized: "settings.appearance.dark") : String(localized: "settings.appearance.auto"))
-                        VNSettingsRow(icon: "paintpalette.fill", title: String(localized: "settings.appearance.mode"), subtitle: modeSubtitle, tint: .vnAccentImperialGold)
+                        VNSettingsRow(icon: "paintpalette.fill", title: String(localized: "settings.appearance.mode"), subtitle: modeSubtitle, tint: .vnAccentGoldText)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                 }
             }
 
@@ -106,10 +106,10 @@ public struct SettingsView: View {
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 VNSectionLabel(String(localized: "settings.data.header"))
                 VNGroupCard {
-                    NavigationLink(destination: DataBackupSettingsView()) {
+                    Button { router.push(.dataBackup) } label: {
                         VNSettingsRow(icon: "arrow.triangle.2.circlepath.cloud.fill", title: String(localized: "settings.data.header"), subtitle: String(localized: "settings.data.refresh"), tint: .vnStatusSuccess)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                 }
             }
 
@@ -117,10 +117,10 @@ public struct SettingsView: View {
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 VNSectionLabel(String(localized: "settings.privacy.header"))
                 VNGroupCard {
-                    NavigationLink(destination: PrivacySecuritySettingsView()) {
+                    Button { router.push(.privacySecurity) } label: {
                         VNSettingsRow(icon: "lock.shield.fill", title: String(localized: "settings.privacy.zero_knowledge_title"), subtitle: "Zero-Knowledge Privacy", tint: .vnAccentDeepPrimary)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                 }
             }
 
@@ -128,10 +128,10 @@ public struct SettingsView: View {
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 VNSectionLabel(String(localized: "settings.about.header"))
                 VNGroupCard {
-                    NavigationLink(destination: AboutSettingsView()) {
-                        VNSettingsRow(icon: "info.circle.fill", title: String(localized: "settings.about.version"), subtitle: "1.0.0 (Build 1)", tint: .vnAccentImperialGold)
+                    Button { router.push(.about) } label: {
+                        VNSettingsRow(icon: "info.circle.fill", title: String(localized: "settings.about.version"), subtitle: "1.0.0 (Build 1)", tint: .vnAccentGoldText)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                 }
             }
         }
@@ -146,13 +146,10 @@ public struct AppearanceLanguageSettingsView: View {
 
     public var body: some View {
         ScrollView {
-            VStack(spacing: VNSpacing.xl) {
+            VStack(spacing: VNSpacing.sectionGap) {
                 // Theme Card
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    Text(String(localized: "settings.appearance.header").uppercased())
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, VNSpacing.xs)
+                    VNSectionLabel(String(localized: "settings.appearance.header"))
 
                     VStack(spacing: 0) {
                         Picker(String(localized: "settings.appearance.mode"), selection: $appThemeAppearance) {
@@ -161,7 +158,7 @@ public struct AppearanceLanguageSettingsView: View {
                             Text(String(localized: "settings.appearance.dark")).tag(2)
                         }
                         .pickerStyle(.inline)
-                        .padding(VNSpacing.lg)
+                        .padding(VNSpacing.cardPadding)
                     }
                     .background(Color.vnBackgroundSecondary)
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
@@ -169,10 +166,7 @@ public struct AppearanceLanguageSettingsView: View {
 
                 // Language Card
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    Text("NGÔN NGỮ ỨNG DỤNG / APP LANGUAGE".uppercased())
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, VNSpacing.xs)
+                    VNSectionLabel("NGÔN NGỮ ỨNG DỤNG / APP LANGUAGE")
 
                     VStack(spacing: 0) {
                         Picker("Ngôn ngữ", selection: $appLanguage) {
@@ -181,14 +175,15 @@ public struct AppearanceLanguageSettingsView: View {
                             Text("English").tag("en")
                         }
                         .pickerStyle(.inline)
-                        .padding(VNSpacing.lg)
+                        .padding(VNSpacing.cardPadding)
                     }
                     .background(Color.vnBackgroundSecondary)
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 }
             }
-            .padding(.horizontal, VNSpacing.xl)
+            .padding(.horizontal, VNSpacing.screenMargin)
             .padding(.top, VNSpacing.xl)
+            .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
         .vnNavBar(title: String(localized: "settings.appearance.header"))
@@ -197,6 +192,7 @@ public struct AppearanceLanguageSettingsView: View {
 
 public struct DataBackupSettingsView: View {
     @Environment(AppContainer.self) private var container
+    @Environment(AppRouter.self) private var router
     @State private var viewModel: SettingsViewModel?
 
     public init() {}
@@ -207,66 +203,43 @@ public struct DataBackupSettingsView: View {
     }
 
     public var body: some View {
-        @Bindable var vm = activeViewModel
+        let vm = activeViewModel
         ScrollView {
-            VStack(alignment: .leading, spacing: VNSpacing.xl) {
+            VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    Text(String(localized: "settings.data.header").uppercased())
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, VNSpacing.xs)
+                    VNSectionLabel(String(localized: "settings.data.header"))
 
                     VStack(spacing: 0) {
                         Button {
                             vm.syncContent()
                         } label: {
-                            HStack {
-                                Label(String(localized: "settings.data.refresh"), systemImage: "arrow.triangle.2.circlepath")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.vnTextPrimary)
-                                Spacer()
+                            actionRow(String(localized: "settings.data.refresh"), icon: "arrow.triangle.2.circlepath") {
                                 if vm.isSyncingContent { ProgressView().scaleEffect(0.8) }
                             }
-                            .padding(.horizontal, VNSpacing.lg)
-                            .padding(.vertical, VNSpacing.md)
                         }
 
-                        VNRowDivider(leadingInset: VNSpacing.lg)
+                        VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
                         Button {
-                            vm.exportJSON()
+                            Task { present(await vm.exportJSON()) }
                         } label: {
-                            HStack {
-                                Label(String(localized: "settings.data.export_json"), systemImage: "square.and.arrow.up")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.vnTextPrimary)
-                                Spacer()
-                            }
-                            .padding(.horizontal, VNSpacing.lg)
-                            .padding(.vertical, VNSpacing.md)
+                            actionRow(String(localized: "settings.data.export_json"), icon: "square.and.arrow.up") { EmptyView() }
                         }
 
-                        VNRowDivider(leadingInset: VNSpacing.lg)
+                        VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
                         Button {
-                            vm.exportICS()
+                            Task { present(await vm.exportICS()) }
                         } label: {
-                            HStack {
-                                Label(String(localized: "settings.data.export_ics"), systemImage: "calendar.badge.plus")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.vnTextPrimary)
-                                Spacer()
-                            }
-                            .padding(.horizontal, VNSpacing.lg)
-                            .padding(.vertical, VNSpacing.md)
+                            actionRow(String(localized: "settings.data.export_ics"), icon: "calendar.badge.plus") { EmptyView() }
                         }
 
                         if let msg = vm.backupStatusMessage {
                             VNRowDivider()
                             Text(msg)
-                                .font(.system(size: 12))
+                                .font(.caption)
                                 .foregroundColor(.vnStatusSuccess)
-                                .padding(.horizontal, VNSpacing.lg)
+                                .padding(.horizontal, VNSpacing.cardPadding)
                                 .padding(.vertical, VNSpacing.sm)
                         }
                     }
@@ -274,21 +247,42 @@ public struct DataBackupSettingsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 }
             }
-            .padding(.horizontal, VNSpacing.xl)
+            .padding(.horizontal, VNSpacing.screenMargin)
             .padding(.top, VNSpacing.xl)
+            .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
         .vnNavBar(title: String(localized: "settings.data.header"))
-        .sheet(isPresented: $vm.isShowingExportSheet) {
-            ShareSheet(activityItems: [vm.exportText])
-        }
-        .sheet(isPresented: $vm.isShowingPaywall) {
-            PaywallView()
-        }
         .task {
             if viewModel == nil {
                 viewModel = activeViewModel
             }
+        }
+    }
+
+    private func actionRow<Trailing: View>(
+        _ title: String,
+        icon: String,
+        @ViewBuilder trailing: () -> Trailing
+    ) -> some View {
+        HStack {
+            Label(title, systemImage: icon)
+                .font(.callout)
+                .foregroundColor(.vnTextPrimary)
+            Spacer()
+            trailing()
+        }
+        .padding(.horizontal, VNSpacing.cardPadding)
+        .padding(.vertical, VNSpacing.md)
+        .frame(minHeight: VNSize.minTapTarget)
+        .contentShape(Rectangle())
+    }
+
+    private func present(_ outcome: SettingsViewModel.ExportOutcome?) {
+        switch outcome {
+        case .share(let text): router.present(sheet: .share(text: text))
+        case .requiresPro: router.present(sheet: .paywall)
+        case nil: break
         }
     }
 }
@@ -296,30 +290,28 @@ public struct DataBackupSettingsView: View {
 public struct PrivacySecuritySettingsView: View {
     public var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: VNSpacing.xl) {
+            VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    Text(String(localized: "settings.privacy.header").uppercased())
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, VNSpacing.xs)
+                    VNSectionLabel(String(localized: "settings.privacy.header"))
 
                     VStack(alignment: .leading, spacing: VNSpacing.md) {
                         Text(String(localized: "settings.privacy.zero_knowledge_title"))
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.headline)
                             .foregroundColor(.vnTextPrimary)
 
                         Text(String(localized: "settings.privacy.zero_knowledge_body"))
-                            .font(.system(size: 14))
+                            .font(.subheadline)
                             .foregroundColor(.vnTextSecondary)
                             .lineSpacing(4)
                     }
-                    .padding(VNSpacing.lg)
+                    .padding(VNSpacing.cardPadding)
                     .background(Color.vnBackgroundSecondary)
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 }
             }
-            .padding(.horizontal, VNSpacing.xl)
+            .padding(.horizontal, VNSpacing.screenMargin)
             .padding(.top, VNSpacing.xl)
+            .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
         .vnNavBar(title: String(localized: "settings.privacy.header"))
@@ -329,49 +321,40 @@ public struct PrivacySecuritySettingsView: View {
 public struct AboutSettingsView: View {
     public var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: VNSpacing.xl) {
+            VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    Text(String(localized: "settings.about.header").uppercased())
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.vnOnGoldContainer)
-                        .padding(.horizontal, VNSpacing.xs)
+                    VNSectionLabel(String(localized: "settings.about.header"))
 
                     VStack(spacing: 0) {
-                        HStack {
-                            Text(String(localized: "settings.about.version"))
-                                .font(.system(size: 16))
-                                .foregroundColor(.vnTextPrimary)
-                            Spacer()
-                            Text("1.0.0 (Build 1)")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.vnTextSecondary)
-                        }
-                        .padding(.horizontal, VNSpacing.lg)
-                        .padding(.vertical, VNSpacing.md)
-
-                        VNRowDivider(leadingInset: VNSpacing.lg)
-
-                        HStack {
-                            Text(String(localized: "settings.about.copyright"))
-                                .font(.system(size: 16))
-                                .foregroundColor(.vnTextPrimary)
-                            Spacer()
-                            Text("An Niên • iletai")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.vnTextSecondary)
-                        }
-                        .padding(.horizontal, VNSpacing.lg)
-                        .padding(.vertical, VNSpacing.md)
+                        infoRow(String(localized: "settings.about.version"), value: "1.0.0 (Build 1)")
+                        VNRowDivider(leadingInset: VNSpacing.cardPadding)
+                        infoRow(String(localized: "settings.about.copyright"), value: "An Niên • iletai")
                     }
                     .background(Color.vnBackgroundSecondary)
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 }
             }
-            .padding(.horizontal, VNSpacing.xl)
+            .padding(.horizontal, VNSpacing.screenMargin)
             .padding(.top, VNSpacing.xl)
+            .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
         .vnNavBar(title: String(localized: "settings.about.header"))
+    }
+
+    private func infoRow(_ title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.callout)
+                .foregroundColor(.vnTextPrimary)
+            Spacer()
+            Text(value)
+                .font(.subheadline.weight(.medium))
+                .foregroundColor(.vnTextSecondary)
+        }
+        .padding(.horizontal, VNSpacing.cardPadding)
+        .padding(.vertical, VNSpacing.md)
+        .accessibilityElement(children: .combine)
     }
 }
 

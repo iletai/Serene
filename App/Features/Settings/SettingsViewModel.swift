@@ -6,9 +6,9 @@ import VNCalendarData
 @Observable
 @MainActor
 final class SettingsViewModel {
-    var isShowingPaywall = false
-    var exportText: String = ""
-    var isShowingExportSheet = false
+    /// What the View should present after an export; keeps the ViewModel router-free.
+    enum ExportOutcome: Equatable { case share(String), requiresPro }
+
     var backupStatusMessage: String?
     var isSyncingContent = false
 
@@ -36,34 +36,26 @@ final class SettingsViewModel {
         }
     }
 
-    func exportJSON() {
-        Task {
-            do {
-                let reminders = try await container.reminderRepository.fetchAllReminders()
-                let data = try DataBackupEngine.exportJSON(reminders: reminders)
-                if let str = String(data: data, encoding: .utf8) {
-                    exportText = str
-                    isShowingExportSheet = true
-                    backupStatusMessage = String(format: String(localized: "settings.data.export_done"), reminders.count)
-                }
-            } catch {
-                backupStatusMessage = String(format: String(localized: "settings.data.export_error"), error.localizedDescription)
-            }
+    func exportJSON() async -> ExportOutcome? {
+        do {
+            let reminders = try await container.reminderRepository.fetchAllReminders()
+            let data = try DataBackupEngine.exportJSON(reminders: reminders)
+            guard let str = String(data: data, encoding: .utf8) else { return nil }
+            backupStatusMessage = String(format: String(localized: "settings.data.export_done"), reminders.count)
+            return .share(str)
+        } catch {
+            backupStatusMessage = String(format: String(localized: "settings.data.export_error"), error.localizedDescription)
+            return nil
         }
     }
 
-    func exportICS() {
-        Task {
-            let unlocked = await container.evaluateFeatureGateUseCase.isFeatureAvailable(.batchExportICS)
-            guard unlocked else {
-                isShowingPaywall = true
-                return
-            }
-            let reminders = (try? await container.reminderRepository.fetchAllReminders()) ?? []
-            let ics = await DataBackupEngine.generateICS(reminders: reminders)
-            exportText = ics
-            isShowingExportSheet = true
-            backupStatusMessage = String(localized: "settings.data.ics_done")
+    func exportICS() async -> ExportOutcome {
+        guard await container.evaluateFeatureGateUseCase.isFeatureAvailable(.batchExportICS) else {
+            return .requiresPro
         }
+        let reminders = (try? await container.reminderRepository.fetchAllReminders()) ?? []
+        let ics = await DataBackupEngine.generateICS(reminders: reminders)
+        backupStatusMessage = String(localized: "settings.data.ics_done")
+        return .share(ics)
     }
 }
