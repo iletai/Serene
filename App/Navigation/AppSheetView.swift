@@ -27,10 +27,8 @@ struct AppSheetView: View {
             SettingsSheet()
         case .holiday(let holiday):
             HolidayDetailSheet(holiday: holiday)
-        case .ritual:
-            // ponytail: RitualPrayerModal is `private` in UpcomingTimelineView.swift; the Timeline
-            // Phase 2 task makes it internal and maps it here. Nothing presents `.ritual` yet.
-            EmptyView()
+        case .ritual(let title):
+            RitualPrayerModal(title: title)
         case .share(let text):
             ShareSheet(activityItems: [text])
         }
