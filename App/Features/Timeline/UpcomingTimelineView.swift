@@ -7,6 +7,9 @@ public struct UpcomingTimelineView: View {
     @Environment(AppContainer.self) private var container
     @Environment(AppRouter.self) private var router
     @State private var viewModel: UpcomingTimelineViewModel?
+    @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
+    // The floating tab pill overlays the scroll view without a safe-area inset; it grows with Dynamic Type.
+    @ScaledMetric(relativeTo: .caption2) private var tabBarClearance: CGFloat = VNSpacing.hero + VNSpacing.sectionGap
 
     public init() {}
 
@@ -32,9 +35,10 @@ public struct UpcomingTimelineView: View {
                         vm.reminders.filter { tab.matches(category: $0.category) }.count
                     }
                 )
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 contentSection(vm: vm)
             }
-            .padding(.bottom, VNSpacing.xl)
+            .padding(.bottom, tabBarClearance)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
         .task {
@@ -47,6 +51,7 @@ public struct UpcomingTimelineView: View {
     }
 
     private func createReminder(vm: UpcomingTimelineViewModel) {
+        VNHaptics.impact(.light, enabled: hapticFeedbackEnabled)
         Task {
             switch await vm.createReminderGate() {
             case .allowed: router.present(sheet: .reminderForm(editing: nil, initialDate: nil))
@@ -56,10 +61,12 @@ public struct UpcomingTimelineView: View {
     }
 
     private func edit(_ reminder: ReminderEvent) {
+        VNHaptics.impact(.light, enabled: hapticFeedbackEnabled)
         router.present(sheet: .reminderForm(editing: reminder, initialDate: nil))
     }
 
     private func showRitual(_ reminder: ReminderEvent) {
+        VNHaptics.impact(.light, enabled: hapticFeedbackEnabled)
         router.present(sheet: .ritual(title: reminder.title))
     }
 
@@ -161,6 +168,7 @@ public struct UpcomingTimelineView: View {
                 .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
         )
         .padding(.horizontal, VNSpacing.screenMargin)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 
     // MARK: - Main Content Area

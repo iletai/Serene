@@ -72,9 +72,9 @@ struct MemorialTimelineCard: View {
         }
         .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
         .accessibilityElement(children: .combine)
-        .accessibilityAction(named: "Chỉnh sửa") { onEdit() }
         .accessibilityActions {
             if isMemorial { Button("Xem Văn Khấn", action: onViewRitual) }
+            Button("Xóa ngày nhớ", role: .destructive, action: onDelete)
         }
         .contextMenu { cardMenu }
     }

@@ -18,8 +18,12 @@ final class UpcomingTimelineViewModelTests: XCTestCase {
             items.append(reminder)
         }
         func deleteReminder(by id: UUID) async throws { items.removeAll { $0.id == id } }
+        var continuation: AsyncStream<[ReminderEvent]>.Continuation?
         func observeReminders() -> AsyncStream<[ReminderEvent]> {
-            AsyncStream { continuation in continuation.yield(self.items) }
+            AsyncStream { continuation in
+                self.continuation = continuation
+                continuation.yield(self.items)
+            }
         }
     }
 
@@ -110,8 +114,16 @@ final class UpcomingTimelineViewModelTests: XCTestCase {
         repo.items = [ReminderEvent(title: "Giỗ Ông", category: .deathAnniversary, day: 3, month: 3)]
         let vm = makeViewModel(repo: repo, unlocked: true)
         let task = Task { await vm.observe() }
+        defer { task.cancel() }
         for _ in 0..<50 where vm.reminders.isEmpty { await Task.yield() }
-        task.cancel()
         XCTAssertEqual(vm.reminders.map(\.title), ["Giỗ Ông"])
+
+        // A later emission (e.g. after the reminder form saves) must replace the list.
+        repo.continuation?.yield([
+            ReminderEvent(title: "Giỗ Bà", category: .deathAnniversary, day: 4, month: 4),
+            ReminderEvent(title: "Giỗ Cụ", category: .ancestral, day: 5, month: 5)
+        ])
+        for _ in 0..<50 where vm.reminders.count != 2 { await Task.yield() }
+        XCTAssertEqual(Set(vm.reminders.map(\.title)), ["Giỗ Bà", "Giỗ Cụ"])
     }
 }
