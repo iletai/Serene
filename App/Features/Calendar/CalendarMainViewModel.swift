@@ -9,27 +9,20 @@ import VNCalendarLunar
 final class CalendarMainViewModel {
     let adapterViewModel: VNCalendarAdapterViewModel
     var todayDetails: DayCalendarDetails?
-    var isShowingCreateReminder = false
-    var isShowingPaywall = false
-    var isShowingSearch = false
-    var isShowingSettings = false
 
     private let getMonthCalendarUseCase: GetMonthCalendarUseCase
     private let reminderRepository: ReminderRepositoryProtocol
-    private let scheduleReminderUseCase: ScheduleReminderUseCase
     private let evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase
 
     init(
         adapterViewModel: VNCalendarAdapterViewModel = VNCalendarAdapterViewModel(),
         getMonthCalendarUseCase: GetMonthCalendarUseCase,
         reminderRepository: ReminderRepositoryProtocol,
-        scheduleReminderUseCase: ScheduleReminderUseCase,
         evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase
     ) {
         self.adapterViewModel = adapterViewModel
         self.getMonthCalendarUseCase = getMonthCalendarUseCase
         self.reminderRepository = reminderRepository
-        self.scheduleReminderUseCase = scheduleReminderUseCase
         self.evaluateFeatureGateUseCase = evaluateFeatureGateUseCase
     }
 
@@ -43,28 +36,18 @@ final class CalendarMainViewModel {
         }
     }
 
-    func checkAndShowReminderForm() {
-        Task {
-            do {
-                if try await evaluateFeatureGateUseCase.canAddReminder() {
-                    isShowingCreateReminder = true
-                } else {
-                    isShowingPaywall = true
-                }
-            } catch {
-                isShowingPaywall = true
-            }
+    /// Long-running: keeps the grid in sync after sheet-driven saves. Ends when the calling task is cancelled.
+    func observeReminders() async {
+        for await reminders in reminderRepository.observeReminders() {
+            adapterViewModel.updateReminders(reminders)
         }
     }
 
-    func saveReminder(_ reminder: ReminderEvent) {
-        Task {
-            do {
-                try await scheduleReminderUseCase.execute(save: reminder)
-            } catch {
-                // Surface save failures instead of silently dropping the reminder.
-            }
-            await loadData()
+    func createReminderGate() async -> CreateReminderGate {
+        do {
+            return try await evaluateFeatureGateUseCase.canAddReminder() ? .allowed : .requiresPro
+        } catch {
+            return .requiresPro
         }
     }
 }
