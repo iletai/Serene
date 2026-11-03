@@ -15,12 +15,15 @@ struct ReminderDatePickerCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("HỆ LỊCH & THỜI ĐIỂM")
-                .font(.system(size: 11, weight: .medium))
+                .font(.caption2.weight(.medium))
                 .tracking(0.66)
-                .foregroundColor(.vnAccentImperialGold)
+                .foregroundColor(.vnAccentGoldText)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .accessibilityAddTraits(.isHeader)
 
             VNCard(
-                allPadding: VNSpacing.xl,
+                allPadding: VNSpacing.cardPadding,
                 cornerRadius: VNCornerRadius.card,
                 backgroundColor: Color.vnBackgroundSecondary,
                 borderColor: Color.vnAccentImperialGold.opacity(0.28),
@@ -53,11 +56,13 @@ struct ReminderDatePickerCard: View {
 
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             Text("Năm (tùy chọn)")
-                                .font(.system(size: 12, weight: .medium))
+                                .font(.caption.weight(.medium))
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.8)
                                 .foregroundColor(.vnTextSecondary)
                             TextField("VD: 2024", text: $year)
                                 .keyboardType(.numberPad)
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.callout.weight(.semibold))
                                 .foregroundColor(.vnTextPrimary)
                                 .focused($isYearFocused)
                                 .padding(.bottom, VNSpacing.sm)
@@ -72,7 +77,7 @@ struct ReminderDatePickerCard: View {
 
                     if dateType == .lunar {
                         Toggle("Là sự kiện trong Tháng Nhuận", isOn: $isLeapMonth)
-                            .font(.system(size: 13, weight: .medium))
+                            .font(.footnote.weight(.medium))
                             .foregroundColor(.vnTextPrimary)
                             .tint(Color.vnAccentHeritageRed)
                     }
@@ -80,12 +85,14 @@ struct ReminderDatePickerCard: View {
                     // Live Astronomical Preview
                     HStack(spacing: VNSpacing.xs) {
                         Image(systemName: "sparkles")
-                            .font(.system(size: 11))
+                            .font(.caption2)
                             .foregroundColor(.vnAccentHeritageRed)
+                            .accessibilityHidden(true)
                         Text(astronomicalPreviewText)
-                            .font(.system(size: 12, design: .serif))
+                            .font(.system(.caption, design: .serif))
                             .foregroundColor(.vnTextSecondary)
-                            .lineLimit(1)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
                     }
                     .padding(.horizontal, VNSpacing.sm)
                     .padding(.vertical, VNSpacing.sm)
@@ -100,11 +107,11 @@ struct ReminderDatePickerCard: View {
     private func pickerColumn<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text(title)
-                .font(.system(size: 12, weight: .medium))
+                .font(.caption.weight(.medium))
                 .foregroundColor(.vnTextSecondary)
             content()
                 .pickerStyle(.menu)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.callout.weight(.semibold))
                 .foregroundColor(.vnTextPrimary)
                 .padding(.bottom, VNSpacing.xs)
                 .background(Color.clear)

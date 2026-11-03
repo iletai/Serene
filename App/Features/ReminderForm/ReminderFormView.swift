@@ -4,11 +4,18 @@ import VNCalendarDesignSystem
 import VNCalendarLunar
 
 public struct ReminderFormView: View {
-    @Environment(\.dismiss) private var dismiss
+    enum Field: Hashable { case title, note }
+
+    @Environment(AppRouter.self) private var router
+    @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
     public var onSave: (ReminderEvent) -> Void
 
-    @FocusState private var isTitleFocused: Bool
+    @FocusState private var focusedField: Field?
     @State private var viewModel: ReminderFormViewModel
+    @State private var isConfirmingDiscard = false
+    @ScaledMetric(relativeTo: .caption2) private var bottomInset: CGFloat = VNSpacing.hero + VNSpacing.sectionGap
+
+    static let titleRequiredMessage = "Nhập tên người được tưởng nhớ trước"
 
     public init(
         existingReminder: ReminderEvent? = nil,
@@ -26,7 +33,7 @@ public struct ReminderFormView: View {
         @Bindable var vm = viewModel
         NavigationStack {
             ScrollView {
-                VStack(spacing: VNSpacing.xl) {
+                VStack(spacing: VNSpacing.sectionGap) {
                     ReminderHeaderView(
                         isEditing: vm.existingReminder != nil,
                         day: vm.day,
@@ -39,7 +46,9 @@ public struct ReminderFormView: View {
                     ReminderTitleSection(
                         title: $vm.title,
                         relationship: $vm.relationship,
-                        isFocused: $isTitleFocused
+                        focusedField: $focusedField,
+                        showsError: vm.showsTitleError,
+                        errorMessage: Self.titleRequiredMessage
                     )
                     ReminderDatePickerCard(
                         dateType: $vm.dateType,
@@ -59,8 +68,9 @@ public struct ReminderFormView: View {
                     notesSection(vm: vm)
                     saveActionButton(vm: vm)
                 }
-                .padding(.horizontal, VNSpacing.xl)
-                .padding(.vertical, VNSpacing.md)
+                .padding(.horizontal, VNSpacing.screenMargin)
+                .padding(.top, VNSpacing.md)
+                .padding(.bottom, bottomInset)
             }
             .scrollDismissesKeyboard(.interactively)
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
@@ -68,19 +78,31 @@ public struct ReminderFormView: View {
             .toolbarBackground(Color.vnBackgroundPrimary.opacity(0.9), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Đóng", action: { dismiss() })
-                        .foregroundColor(.vnTextSecondary)
+                ToolbarItem(placement: .topBarTrailing) {
+                    VNDismissButton { close() }
                 }
 
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
                     Button("Xong") {
-                        isTitleFocused = false
+                        focusedField = nil
                     }
                     .foregroundColor(.vnAccentDeepPrimary)
                 }
             }
+        }
+        .interactiveDismissDisabled(vm.isDirty)
+        .confirmationDialog("Bỏ thay đổi?", isPresented: $isConfirmingDiscard, titleVisibility: .visible) {
+            Button("Bỏ thay đổi", role: .destructive) { router.dismiss() }
+            Button("Tiếp tục chỉnh sửa", role: .cancel) {}
+        }
+    }
+
+    private func close() {
+        if viewModel.isDirty {
+            isConfirmingDiscard = true
+        } else {
+            router.dismiss()
         }
     }
 
@@ -89,25 +111,24 @@ public struct ReminderFormView: View {
         @Bindable var boundVM = vm
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text("GHI CHÚ THÊM")
-                .font(.system(size: 11, weight: .bold))
+                .font(.caption2.weight(.bold))
                 .tracking(0.5)
                 .foregroundColor(.vnTextTertiary)
+                .accessibilityAddTraits(.isHeader)
 
-            VStack(alignment: .leading, spacing: VNSpacing.sm) {
-                TextField("Ví dụ: Cúng gà luộc, xôi gấc, mời họ hàng nội tộc...", text: $boundVM.note, axis: .vertical)
-                    .font(.system(size: 14))
-                    .foregroundColor(.vnTextPrimary)
-                    .lineLimit(3...5)
-                    .padding(VNSpacing.md)
-                    .background(Color.vnBackgroundSecondary)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                            .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
-                    )
-                    .frame(minHeight: 70)
-                    .accessibilityLabel("Ghi chú / phân công cúng giỗ")
-            }
+            TextField("Ví dụ: Cúng gà luộc, xôi gấc, mời họ hàng nội tộc...", text: $boundVM.note, axis: .vertical)
+                .font(.subheadline)
+                .foregroundColor(.vnTextPrimary)
+                .lineLimit(3...5)
+                .focused($focusedField, equals: .note)
+                .padding(VNSpacing.md)
+                .background(Color.vnBackgroundSecondary)
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
+                .overlay(
+                    RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                        .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
+                )
+                .accessibilityLabel("Ghi chú / phân công cúng giỗ")
         }
     }
 
@@ -120,10 +141,15 @@ public struct ReminderFormView: View {
             size: .large,
             isFullWidth: true
         ) {
-            onSave(vm.buildReminder())
-            dismiss()
+            guard let reminder = vm.save() else {
+                focusedField = .title
+                return
+            }
+            VNHaptics.impact(.success, enabled: hapticFeedbackEnabled)
+            onSave(reminder)
+            router.dismiss()
         }
-        .disabled(!vm.isValid)
+        .accessibilityHint(vm.isValid ? "" : Self.titleRequiredMessage)
         .padding(.top, VNSpacing.md)
     }
 }
