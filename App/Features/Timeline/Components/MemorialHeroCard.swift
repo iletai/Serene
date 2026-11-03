@@ -31,7 +31,7 @@ struct MemorialHeroCard: View {
                 // Countdown Badge
                 Text(countdownText)
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.vnOnAccent)
                     .padding(.horizontal, VNSpacing.sm)
                     .padding(.vertical, VNSpacing.xs)
                     .background(Color.vnAccentHeritageRed)

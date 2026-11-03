@@ -101,7 +101,7 @@ public struct PrayerDetailView: View {
                 if showCopiedAlert {
                     Text("Đã sao chép bài văn khấn")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(.vnOnAccent)
                         .padding(.horizontal, VNSpacing.lg)
                         .padding(.vertical, VNSpacing.sm)
                         .background(Color.vnVermilionDark.opacity(0.95))

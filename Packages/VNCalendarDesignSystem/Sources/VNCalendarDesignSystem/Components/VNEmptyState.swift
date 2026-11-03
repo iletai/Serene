@@ -100,7 +100,7 @@ public struct VNEmptyState: View {
                         Text(ctaLabel)
                             .font(.system(size: 14, weight: .bold, design: .serif))
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(.vnOnAccent)
                     .padding(.horizontal, VNSpacing.xl)
                     .padding(.vertical, VNSpacing.md)
                     .frame(minHeight: 44) // HIG minimum touch target.

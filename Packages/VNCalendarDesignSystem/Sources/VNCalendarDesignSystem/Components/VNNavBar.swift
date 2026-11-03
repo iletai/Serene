@@ -65,7 +65,7 @@ public struct VNDismissButton: View {
         case .done:
             Text("Xong")
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(.white)
+                .foregroundColor(.vnOnAccent)
                 .padding(.horizontal, VNSpacing.md)
                 .padding(.vertical, VNSpacing.xs)
                 .background(Color.vnAccentHeritageRed)

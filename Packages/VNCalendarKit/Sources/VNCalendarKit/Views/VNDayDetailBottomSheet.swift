@@ -289,7 +289,7 @@ public struct VNDayDetailBottomSheet: View {
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 44)
                     .background(Color.vnAccentHeritageRed)
-                    .foregroundColor(.white)
+                    .foregroundColor(.vnOnAccent)
                     .clipShape(Capsule())
             }
         )

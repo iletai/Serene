@@ -57,8 +57,8 @@ public enum VNShadow {
     public static let card = ShadowConfig(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
     public static let warmDiffuse = ShadowConfig(color: Color.vnAccentHeritageRed.opacity(0.06), radius: 16, x: 0, y: 6)
     public static let floating = ShadowConfig(color: Color.vnAccentHeritageRed.opacity(0.08), radius: 12, x: 0, y: 6)
-    /// Faint folio shadow `0 4px 20px -2px rgba(90,84,79,0.05)` (DESIGN §4). Spread omitted: SwiftUI has no spread param.
-    public static let folio = ShadowConfig(color: Color(hex: 0x5A544F).opacity(0.05), radius: 20, x: 0, y: 4)
+    /// Faint neutral folio shadow `0 4px 20px rgba(0,0,0,0.05)`. Spread omitted: SwiftUI has no spread param.
+    public static let folio = ShadowConfig(color: Color.black.opacity(0.05), radius: 20, x: 0, y: 4)
     /// Soft modal shadow honoring "no heavy shadows" (DESIGN §4).
     public static let modal = ShadowConfig(color: Color.black.opacity(0.08), radius: 16, x: 0, y: 8)
 

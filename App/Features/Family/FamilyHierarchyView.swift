@@ -87,7 +87,7 @@ public struct FamilyHierarchyView: View {
             } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.vnOnAccent)
                     .frame(width: 44, height: 44)
                     .background(Color.vnAccentHeritageRed, in: RoundedRectangle(cornerRadius: VNCornerRadius.card))
             }
@@ -355,7 +355,7 @@ public struct FamilyHierarchyView: View {
             Text(member.category == .deathAnniversary || member.category == .ancestral ? "Đã thờ" : "Còn sống")
                 .font(.vnCaption2)
                 .fontWeight(.semibold)
-                .foregroundColor(isDeath ? .white : .vnTextSecondary)
+                .foregroundColor(isDeath ? .vnOnAccent : .vnTextSecondary)
                 .padding(.horizontal, VNSpacing.sm)
                 .padding(.vertical, VNSpacing.space2)
                 .background(isDeath ? Color.vnAccentDeepPrimary : Color.vnBackgroundTertiary)

@@ -97,7 +97,7 @@ public struct VNYearCalendarView: View {
         return Text("\(day.solarDay)")
             .font(.system(size: 9, weight: (isSelected || isToday) ? .bold : .regular))
             .foregroundColor(
-                isSelected ? .white :
+                isSelected ? .vnOnAccent :
                 (isToday ? .vnAccentImperialGold :
                 (isCurrentMonth ? (isSpecialLunar ? .vnAccentHeritageRed : .vnTextPrimary) : .vnTextTertiary.opacity(0.35)))
             )

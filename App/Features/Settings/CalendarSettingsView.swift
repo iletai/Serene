@@ -250,7 +250,7 @@ public struct CalendarSettingsView: View {
                 Spacer()
                 if isSyncing {
                     ProgressView()
-                        .tint(.white)
+                        .tint(Color.vnOnAccent)
                         .scaleEffect(0.9)
                     Text(String(localized: "settings.microcms.syncing"))
                         .font(.vnFootnote)

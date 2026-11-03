@@ -70,7 +70,7 @@ public struct VNDayCellView: View, Equatable {
     private var indicatorDot: some View {
         if dayModel?.hasAncestorDeathAnniversary == true {
             Circle()
-                .fill(isToday ? Color.white : Color.vnAccentHeritageRed)
+                .fill(isToday ? Color.vnOnAccent : Color.vnAccentHeritageRed)
                 .frame(width: 4, height: 4)
         } else if dayModel?.isAuspiciousDay == true {
             Circle()

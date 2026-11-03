@@ -152,7 +152,7 @@ public struct PaywallView: View {
                 HStack {
                     if vm.isPurchasing {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .progressViewStyle(CircularProgressViewStyle(tint: .vnOnAccent))
                             .accessibilityLabel("Đang xử lý thanh toán")
                     } else {
                         Text(ctaButtonTitle(vm: vm))
@@ -234,7 +234,7 @@ public struct PaywallView: View {
                                     .padding(.horizontal, VNSpacing.xs)
                                     .padding(.vertical, VNSpacing.space2)
                                     .background(Color.vnAccentHeritageRed)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(.vnOnAccent)
                                     .clipShape(Capsule())
                             }
                         }

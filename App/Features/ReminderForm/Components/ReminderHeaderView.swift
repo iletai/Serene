@@ -11,9 +11,9 @@ struct ReminderHeaderView: View {
     let dateType: CalendarDateType
     let isLeapMonth: Bool
 
-    // Faint folio shadow from canonical: 0 4px 20px -2px rgba(90,84,79,0.05).
+    // Faint neutral folio shadow: 0 4px 20px rgba(0,0,0,0.05).
     private static let folioShadow = VNShadow.ShadowConfig(
-        color: Color(red: 90.0 / 255.0, green: 84.0 / 255.0, blue: 79.0 / 255.0, opacity: 0.05),
+        color: Color.black.opacity(0.05),
         radius: 20,
         x: 0,
         y: 4
