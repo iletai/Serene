@@ -9,10 +9,6 @@ final class UpcomingTimelineViewModel {
     var reminders: [ReminderEvent] = []
     var searchQuery = ""
     var selectedFilter: MemorialFilterTab = .all
-    var isShowingCreateReminder = false
-    var isShowingPaywall = false
-    var editingReminder: ReminderEvent?
-    var selectedRitualTitle: String?
 
     private let reminderRepository: ReminderRepositoryProtocol
     private let scheduleReminderUseCase: ScheduleReminderUseCase
@@ -55,30 +51,28 @@ final class UpcomingTimelineViewModel {
 
     func load() async {
         guard let items = try? await reminderRepository.fetchAllReminders() else { return }
+        apply(items)
+    }
+
+    /// Long-running: refreshes after every save/delete (the reminder form saves outside this ViewModel).
+    func observe() async {
+        for await items in reminderRepository.observeReminders() {
+            apply(items)
+        }
+    }
+
+    func createReminderGate() async -> CreateReminderGate {
+        do {
+            return try await evaluateFeatureGateUseCase.canAddReminder() ? .allowed : .requiresPro
+        } catch {
+            return .requiresPro
+        }
+    }
+
+    private func apply(_ items: [ReminderEvent]) {
         let today = calendar.startOfDay(for: Date())
         self.reminders = items.sorted {
             $0.nextOccurrence(after: today, calendar: calendar) < $1.nextOccurrence(after: today, calendar: calendar)
-        }
-    }
-
-    func checkAndCreate() {
-        Task {
-            do {
-                if try await evaluateFeatureGateUseCase.canAddReminder() {
-                    isShowingCreateReminder = true
-                } else {
-                    isShowingPaywall = true
-                }
-            } catch {
-                isShowingPaywall = true
-            }
-        }
-    }
-
-    func save(_ reminder: ReminderEvent) {
-        Task {
-            try? await scheduleReminderUseCase.execute(save: reminder)
-            await load()
         }
     }
 

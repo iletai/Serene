@@ -2,6 +2,7 @@ import SwiftUI
 
 /// A standardised dismiss / close button for sheets and presented modals.
 /// Matches the top-bar 36pt icon frame + 44pt min hit-target pattern from DESIGN §4.
+/// Place it in a `ToolbarItem(placement: .topBarTrailing)`.
 ///
 /// Usage:
 /// ```swift
@@ -34,9 +35,11 @@ public struct VNDismissButton: View {
 
     public var body: some View {
         Button(action: action) {
+            // Frame + contentShape inside the label so the whole 44pt area is tappable.
             label
+                .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
+                .contentShape(Rectangle())
         }
-        .frame(minWidth: 44, minHeight: 44)
         .accessibilityLabel(accessibilityLabel)
     }
 
@@ -65,7 +68,7 @@ public struct VNDismissButton: View {
         case .done:
             Text("Xong")
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(.white)
+                .foregroundColor(.vnOnAccent)
                 .padding(.horizontal, VNSpacing.md)
                 .padding(.vertical, VNSpacing.xs)
                 .background(Color.vnAccentHeritageRed)

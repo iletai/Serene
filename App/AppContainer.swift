@@ -10,7 +10,13 @@ import VNCalendarLunar
 @Observable
 @MainActor
 public final class AppContainer {
-    public static let shared = AppContainer()
+    public static let shared: AppContainer = {
+        #if DEV
+        // UI tests only: `-UITestSeed` swaps in a seeded in-memory container (see UITestSupport).
+        if let seeded = UITestSupport.makeContainerIfRequested() { return seeded }
+        #endif
+        return AppContainer()
+    }()
 
     private let logger = Logger(subsystem: "com.iletai.annien", category: "AppContainer")
 

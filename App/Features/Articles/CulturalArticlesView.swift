@@ -4,7 +4,11 @@ import VNCalendarDesignSystem
 
 public struct CulturalArticlesView: View {
     @Environment(AppContainer.self) private var container
+    @Environment(AppRouter.self) private var router
     @State private var viewModel: CulturalArticlesViewModel?
+    @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
+    // Clears the floating tab pill, which grows with Dynamic Type.
+    @ScaledMetric(relativeTo: .caption2) private var tabBarClearance: CGFloat = VNSpacing.hero + VNSpacing.sectionGap
 
     private let categories = ["Tất cả", "Cúng Giỗ", "Lễ Tiết & Tết", "Rằm & Mùng 1"]
 
@@ -16,48 +20,44 @@ public struct CulturalArticlesView: View {
     }
 
     public var body: some View {
-        @Bindable var vm = activeViewModel
-        NavigationStack {
-            VStack(spacing: 0) {
-                topBar(vm: vm)
+        let vm = activeViewModel
+        VStack(spacing: 0) {
+            topBar(vm: vm)
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: VNSpacing.xl) {
-                        headerSection
-                        searchBarSection(vm: vm)
-                        categoryChipsSection(vm: vm)
+            ScrollView {
+                VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
+                    headerSection
+                    searchBarSection(vm: vm)
+                    categoryChipsSection(vm: vm)
 
-                        if vm.filteredHolidays.isEmpty {
-                            emptyStateSection(vm: vm)
-                        } else {
-                            LazyVStack(spacing: VNSpacing.md) {
-                                ForEach(vm.filteredHolidays) { holiday in
-                                    Button {
-                                        vm.selectedHoliday = holiday
-                                    } label: {
-                                        articleCard(holiday: holiday)
-                                    }
-                                    .buttonStyle(.plain)
-                                    .accessibilityHint("Xem chi tiết")
+                    if vm.filteredHolidays.isEmpty {
+                        emptyStateSection(vm: vm)
+                    } else {
+                        LazyVStack(spacing: VNSpacing.md) {
+                            ForEach(vm.filteredHolidays) { holiday in
+                                Button {
+                                    VNHaptics.impact(.light, enabled: hapticFeedbackEnabled)
+                                    router.present(sheet: .holiday(holiday))
+                                } label: {
+                                    articleCard(holiday: holiday)
                                 }
+                                .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+                                .accessibilityElement(children: .combine)
+                                .accessibilityHint("Xem chi tiết")
                             }
-                            .padding(.horizontal, VNSpacing.xl)
                         }
+                        .padding(.horizontal, VNSpacing.screenMargin)
                     }
-                    .padding(.bottom, VNSpacing.xl)
                 }
+                .padding(.bottom, tabBarClearance)
             }
-            .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-            .toolbar(.hidden, for: .navigationBar)
-            .sheet(item: $vm.selectedHoliday) { item in
-                HolidayDetailSheet(holiday: item)
+        }
+        .background(Color.vnBackgroundPrimary.ignoresSafeArea())
+        .task {
+            if viewModel == nil {
+                viewModel = activeViewModel
             }
-            .task {
-                if viewModel == nil {
-                    viewModel = activeViewModel
-                }
-                await viewModel?.load()
-            }
+            await viewModel?.load()
         }
     }
 
@@ -74,22 +74,24 @@ public struct CulturalArticlesView: View {
                     .font(.vnCaption2)
                     .foregroundColor(.vnTextSecondary)
             }
+            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
 
             Spacer()
 
             Button {
+                VNHaptics.impact(.light, enabled: hapticFeedbackEnabled)
                 vm.resetFilters()
             } label: {
                 Image(systemName: "arrow.counterclockwise")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundColor(.vnTextSecondary)
-                    .frame(width: 44, height: 44)
+                    .frame(width: VNSize.minTapTarget, height: VNSize.minTapTarget)
                     .background(Color.vnBackgroundTertiary, in: RoundedRectangle(cornerRadius: VNCornerRadius.card))
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Đặt lại tìm kiếm")
         }
-        .padding(.horizontal, VNSpacing.xl)
+        .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.vertical, VNSpacing.sm)
         .background(Color.vnBackgroundPrimary.opacity(0.9))
         .background(.ultraThinMaterial)
@@ -105,13 +107,13 @@ public struct CulturalArticlesView: View {
             HStack(spacing: VNSpacing.xs) {
                 Image(systemName: "book.pages.fill")
                     .font(.vnCaption2)
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
                     .accessibilityHidden(true)
                 Text("VĂN HOÁ & LỄ TIẾT")
                     .font(.vnCaption2)
                     .fontWeight(.bold)
                     .tracking(1.0)
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
             }
             .padding(.horizontal, VNSpacing.sm)
             .padding(.vertical, VNSpacing.xs)
@@ -123,11 +125,12 @@ public struct CulturalArticlesView: View {
                 .foregroundColor(.vnTextPrimary)
 
             Text("Tri thức ngàn năm về lễ nghi, văn khấn và phong tục truyền thống Việt Nam")
-                .font(.system(size: 13, design: .serif))
+                .font(.system(.footnote, design: .serif))
                 .italic()
                 .foregroundColor(.vnTextSecondary)
         }
-        .padding(.horizontal, VNSpacing.xl)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+        .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.top, VNSpacing.md)
     }
 
@@ -153,21 +156,21 @@ public struct CulturalArticlesView: View {
                         .font(.vnFootnote)
                 }
                 .buttonStyle(.plain)
-                .frame(minWidth: 44, minHeight: 44)
+                .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
                 .accessibilityLabel("Xóa tìm kiếm")
             }
         }
         .padding(.horizontal, VNSpacing.md)
         .padding(.vertical, VNSpacing.md)
-        .frame(minHeight: 44)
+        .frame(minHeight: VNSize.minTapTarget)
         .background(Color.vnBackgroundSecondary)
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
                 .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
         )
-        .padding(.horizontal, VNSpacing.xl)
+        .padding(.horizontal, VNSpacing.screenMargin)
     }
 
     // MARK: - Category Filter Chips
@@ -178,6 +181,7 @@ public struct CulturalArticlesView: View {
                 ForEach(categories, id: \.self) { cat in
                     let isSelected = vm.selectedCategory == cat
                     Button {
+                        VNHaptics.impact(.light, enabled: hapticFeedbackEnabled)
                         withAnimation(.easeInOut(duration: 0.15)) {
                             vm.selectedCategory = cat
                         }
@@ -185,7 +189,7 @@ public struct CulturalArticlesView: View {
                         Text(cat)
                             .font(.vnCaption1)
                             .fontWeight(isSelected ? .semibold : .regular)
-                            .frame(minHeight: 44)
+                            .frame(minHeight: VNSize.minTapTarget)
                             .padding(.horizontal, VNSpacing.lg)
                             .background(isSelected ? Color.vnAccentRedSurface : Color.clear)
                             .foregroundColor(isSelected ? Color.vnAccentDeepPrimary : .vnTextSecondary)
@@ -203,7 +207,7 @@ public struct CulturalArticlesView: View {
                     .accessibilityAddTraits(isSelected ? [.isSelected, .isButton] : .isButton)
                 }
             }
-            .padding(.horizontal, VNSpacing.xl)
+            .padding(.horizontal, VNSpacing.screenMargin)
             .padding(.vertical, VNSpacing.space2)
         }
     }
@@ -213,14 +217,14 @@ public struct CulturalArticlesView: View {
     private func emptyStateSection(vm: CulturalArticlesViewModel) -> some View {
         VStack(spacing: VNSpacing.md) {
             Text("Không Tìm Thấy Bài Viết")
-                .font(.system(size: 22, weight: .semibold, design: .serif))
+                .font(.system(.title2, design: .serif).weight(.semibold))
                 .foregroundColor(.vnTextPrimary)
 
             Text("Thử từ khoá hoặc bộ lọc khác để khám phá tri thức lễ nghi truyền thống.")
-                .font(.system(size: 14))
+                .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
-                .padding(.horizontal, VNSpacing.xl)
+                .padding(.horizontal, VNSpacing.screenMargin)
 
             VNButton("Xem Tất Cả", variant: .primary, size: .medium) {
                 vm.resetFilters()
@@ -228,8 +232,8 @@ public struct CulturalArticlesView: View {
             .padding(.top, VNSpacing.xs)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, VNSpacing.xxl)
-        .padding(.horizontal, VNSpacing.xl)
+        .padding(.vertical, VNSpacing.sectionGap)
+        .padding(.horizontal, VNSpacing.screenMargin)
     }
 
     // MARK: - Article Card
@@ -240,8 +244,9 @@ public struct CulturalArticlesView: View {
             VStack(alignment: .leading, spacing: VNSpacing.sm) {
                 HStack(alignment: .top) {
                     Text(holiday.title)
-                        .font(.system(size: 17, weight: .semibold, design: .serif))
+                        .font(.system(.headline, design: .serif))
                         .foregroundColor(.vnTextPrimary)
+                        .multilineTextAlignment(.leading)
 
                     Spacer()
 
@@ -256,31 +261,32 @@ public struct CulturalArticlesView: View {
                 }
 
                 Text(holiday.summary)
-                    .font(.system(size: 12))
+                    .font(.caption)
                     .foregroundColor(.vnTextSecondary)
+                    .multilineTextAlignment(.leading)
                     .lineLimit(2)
 
                 HStack(spacing: VNSpacing.xs) {
                     if holiday.rituals != nil {
                         Label("Có Bài Văn Khấn", systemImage: "book.pages.fill")
-                            .font(.system(size: 11, weight: .semibold))
+                            .font(.caption2.weight(.semibold))
                             .foregroundColor(Color.vnAccentDeepPrimary)
                     } else {
                         Text(isLunar ? "Âm lịch" : "Dương lịch")
-                            .font(.system(size: 11))
+                            .font(.caption2)
                             .foregroundColor(.vnTextSecondary)
                     }
 
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.caption.weight(.semibold))
                         .foregroundColor(.vnTextTertiary)
                         .accessibilityHidden(true)
                 }
                 .padding(.top, VNSpacing.space2)
             }
-            .padding(VNSpacing.xl)
+            .padding(VNSpacing.cardPadding)
         }
         .background(Color.vnBackgroundSecondary)
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
@@ -294,22 +300,25 @@ public struct CulturalArticlesView: View {
 
 public struct HolidayDetailSheet: View {
     public let holiday: Holiday
-    @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
+    @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
 
     public var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: VNSpacing.xl) {
+                VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
                     // Header
                     VStack(alignment: .leading, spacing: VNSpacing.xs) {
                         let calendarName = holiday.calendarType == .lunar ? "Âm Lịch" : "Dương Lịch"
                         Text("Ngày \(holiday.day) Tháng \(holiday.month) \(calendarName)")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(.subheadline.bold())
                             .foregroundColor(.vnAccentHeritageRed)
 
                         Text(holiday.title)
                             .font(.vnTitleHero)
                             .foregroundColor(.vnTextPrimary)
+                            .minimumScaleFactor(0.8)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                     }
 
                     VNRowDivider()
@@ -317,28 +326,28 @@ public struct HolidayDetailSheet: View {
                     // Summary / Meaning
                     VStack(alignment: .leading, spacing: VNSpacing.xs) {
                         Text("Ý NGHĨA & NGUỒN GỐC")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.caption2.bold())
                             .foregroundColor(.vnTextSecondary)
                             .tracking(0.8)
 
                         Text(holiday.summary)
-                            .font(.system(size: 15, design: .serif))
+                            .font(.system(.subheadline, design: .serif))
                             .foregroundColor(.vnTextPrimary)
-                            .lineSpacing(5)
+                            .lineSpacing(VNSpacing.xs)
                     }
 
                     if let customs = holiday.customs {
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             Text("PHONG TỤC NÊN LÀM")
-                                .font(.system(size: 11, weight: .bold))
+                                .font(.caption2.bold())
                                 .foregroundColor(.vnStatusSuccess)
                                 .tracking(0.8)
 
                             Text(customs)
-                                .font(.system(size: 14))
+                                .font(.subheadline)
                                 .foregroundColor(.vnTextPrimary)
-                                .lineSpacing(4)
-                                .padding(VNSpacing.xl)
+                                .lineSpacing(VNSpacing.xs)
+                                .padding(VNSpacing.cardPadding)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(Color.vnBackgroundSecondary)
                                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
@@ -352,15 +361,15 @@ public struct HolidayDetailSheet: View {
                     if let taboos = holiday.taboos {
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             Text("ĐIỀU KIÊNG KỴ")
-                                .font(.system(size: 11, weight: .bold))
+                                .font(.caption2.bold())
                                 .foregroundColor(.vnStatusError)
                                 .tracking(0.8)
 
                             Text(taboos)
-                                .font(.system(size: 14))
+                                .font(.subheadline)
                                 .foregroundColor(.vnTextPrimary)
-                                .lineSpacing(4)
-                                .padding(VNSpacing.xl)
+                                .lineSpacing(VNSpacing.xs)
+                                .padding(VNSpacing.cardPadding)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(Color.vnBackgroundSecondary)
                                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
@@ -375,8 +384,8 @@ public struct HolidayDetailSheet: View {
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             HStack {
                                 Text("BÀI VĂN KHẤN TRUYỀN THỐNG")
-                                    .font(.system(size: 11, weight: .bold))
-                                    .foregroundColor(.vnAccentImperialGold)
+                                    .font(.caption2.bold())
+                                    .foregroundColor(.vnAccentGoldText)
                                     .tracking(0.8)
 
                                 Spacer()
@@ -384,24 +393,23 @@ public struct HolidayDetailSheet: View {
                                 Button {
                                     #if canImport(UIKit)
                                     UIPasteboard.general.string = rituals
-                                    let generator = UINotificationFeedbackGenerator()
-                                    generator.notificationOccurred(.success)
                                     #endif
+                                    VNHaptics.impact(.success, enabled: hapticFeedbackEnabled)
                                 } label: {
                                     Label("Sao Chép", systemImage: "doc.on.doc")
-                                        .font(.system(size: 11, weight: .semibold))
+                                        .font(.caption2.weight(.semibold))
                                         .foregroundColor(.vnAccentHeritageRed)
-                                        .frame(minHeight: 44)
+                                        .frame(minHeight: VNSize.minTapTarget)
                                         .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
                             }
 
                             Text(rituals)
-                                .font(.system(size: 15, design: .serif))
+                                .font(.system(.subheadline, design: .serif))
                                 .foregroundColor(.vnTextPrimary)
-                                .lineSpacing(7)
-                                .padding(VNSpacing.xl)
+                                .lineSpacing(VNSpacing.sm)
+                                .padding(VNSpacing.cardPadding)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(Color.vnBackgroundSecondary)
                                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
@@ -412,17 +420,13 @@ public struct HolidayDetailSheet: View {
                         }
                     }
                 }
-                .padding(.horizontal, VNSpacing.xl)
-                .padding(.bottom, VNSpacing.xxl)
+                .padding(.horizontal, VNSpacing.screenMargin)
+                .padding(.bottom, VNSpacing.sectionGap)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Đóng") { dismiss() }
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.vnAccentHeritageRed)
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
+                    VNDismissButton(style: .text("Đóng")) { router.dismissModals() }
                 }
             }
         }

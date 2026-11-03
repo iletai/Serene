@@ -12,7 +12,10 @@ public struct VNCalendarContainerView: View {
     }()
 
     @Bindable var viewModel: VNCalendarAdapterViewModel
+    /// Fired directly from inline views, or only after the day-detail sheet has fully dismissed,
+    /// so the host can present its own sheet without colliding with this one.
     public var onAddReminderForSelectedDate: () -> Void = {}
+    @State private var addReminderAfterDismiss = false
 
     public init(
         viewModel: VNCalendarAdapterViewModel,
@@ -92,19 +95,23 @@ public struct VNCalendarContainerView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: viewModel.displayMode)
-        .sheet(isPresented: $viewModel.isDetailSheetPresented) {
+        .sheet(isPresented: $viewModel.isDetailSheetPresented, onDismiss: {
+            guard addReminderAfterDismiss else { return }
+            addReminderAfterDismiss = false
+            onAddReminderForSelectedDate()
+        }, content: {
             if let model = viewModel.selectedDayModel {
                 VNDayDetailBottomSheet(
                     dayModel: model,
                     onAddReminder: {
+                        addReminderAfterDismiss = true
                         viewModel.isDetailSheetPresented = false
-                        onAddReminderForSelectedDate()
                     }
                 )
                 .presentationDetents([.fraction(0.55), .fraction(0.85), .large])
                 .presentationDragIndicator(.visible)
             }
-        }
+        })
     }
 
     // MARK: - Calendar Legend
@@ -124,7 +131,7 @@ public struct VNCalendarContainerView: View {
     private func legendItem(symbol: String, label: String) -> some View {
         HStack(spacing: VNSpacing.xs) {
             Text(symbol)
-                .font(.system(size: 11))
+                .font(.caption2)
             legendLabel(label)
         }
     }
@@ -134,14 +141,14 @@ public struct VNCalendarContainerView: View {
             // Spec: legend dot exactly 8pt
             Circle()
                 .fill(dot)
-                .frame(width: 8, height: 8)
+                .frame(width: VNSpacing.sm, height: VNSpacing.sm)
             legendLabel(label)
         }
     }
 
     private func legendLabel(_ label: String) -> Text {
         Text(label)
-            .font(.system(size: 11, weight: .regular))
+            .font(.caption2)
             .foregroundColor(.vnTextSecondary)
     }
 
@@ -192,7 +199,7 @@ public struct VNCalendarContainerView: View {
 
     private func weekdayLabel(_ day: String, sunday: Bool = false) -> some View {
         Text(day)
-            .font(.system(size: 11, weight: sunday ? .bold : .semibold))
+            .font(.caption2.weight(sunday ? .bold : .semibold))
             .tracking(0.66)
             .foregroundColor(sunday ? .vnAccentHeritageRed : .vnTextSecondary)
             .frame(maxWidth: .infinity)

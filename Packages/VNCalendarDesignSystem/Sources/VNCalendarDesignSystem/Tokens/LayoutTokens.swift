@@ -12,6 +12,22 @@ public enum VNSpacing {
     /// Golden-ratio hero gap ≈ 20 × 1.618 = 32.36, rounded to 32pt (DESIGN §4 intentional golden-ratio proportions).
     public static let golden: CGFloat = 32
     public static let hero: CGFloat = 48
+    public static let screenMargin: CGFloat = 20
+    public static let cardPadding: CGFloat = 16
+    public static let sectionGap: CGFloat = 24
+}
+
+public enum VNSize {
+    /// HIG minimum tap target.
+    public static let minTapTarget: CGFloat = 44
+    public static let iconButton: CGFloat = 40
+    public static let iconBadge: CGFloat = 24
+}
+
+public enum VNLayout {
+    public static let tabBarMaxWidth: CGFloat = 520
+    public static let tabBarBottomInset: CGFloat = 12
+    public static let tabBarItemHeight: CGFloat = 48
 }
 
 public enum VNCornerRadius {
@@ -39,10 +55,10 @@ public enum VNBorderWidth {
 
 public enum VNShadow {
     public static let card = ShadowConfig(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
-    public static let warmDiffuse = ShadowConfig(color: Color.vnAccentHeritageRed.opacity(0.06), radius: 16, x: 0, y: 6)
-    public static let floating = ShadowConfig(color: Color.vnAccentHeritageRed.opacity(0.08), radius: 12, x: 0, y: 6)
-    /// Faint folio shadow `0 4px 20px -2px rgba(90,84,79,0.05)` (DESIGN §4). Spread omitted: SwiftUI has no spread param.
-    public static let folio = ShadowConfig(color: Color(hex: 0x5A544F).opacity(0.05), radius: 20, x: 0, y: 4)
+    public static let warmDiffuse = ShadowConfig(color: Color.black.opacity(0.06), radius: 16, x: 0, y: 6)
+    public static let floating = ShadowConfig(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 6)
+    /// Faint neutral folio shadow `0 4px 20px rgba(0,0,0,0.05)`. Spread omitted: SwiftUI has no spread param.
+    public static let folio = ShadowConfig(color: Color.black.opacity(0.05), radius: 20, x: 0, y: 4)
     /// Soft modal shadow honoring "no heavy shadows" (DESIGN §4).
     public static let modal = ShadowConfig(color: Color.black.opacity(0.08), radius: 16, x: 0, y: 8)
 

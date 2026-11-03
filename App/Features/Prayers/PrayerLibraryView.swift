@@ -5,6 +5,7 @@ import VNCalendarDomain
 public struct PrayerLibraryView: View {
     @Environment(AppContainer.self) private var container
     @State private var viewModel: PrayerLibraryViewModel?
+    @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
 
     public init() {}
 
@@ -82,7 +83,7 @@ public struct PrayerLibraryView: View {
                 .padding(.top, VNSpacing.space2)
 
             Text("Nghi thức cúng bái & phụng thờ linh thiêng chuẩn phong tục Việt")
-                .font(.system(size: 13, design: .serif))
+                .font(.system(.footnote, design: .serif))
                 .italic()
                 .foregroundColor(.vnTextSecondary)
         }
@@ -112,14 +113,14 @@ public struct PrayerLibraryView: View {
                         .font(.vnFootnote)
                 }
                 .buttonStyle(.plain)
-                .frame(minWidth: 44, minHeight: 44)
+                .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
                 .accessibilityLabel("Xóa tìm kiếm")
             }
         }
         .padding(.horizontal, VNSpacing.md)
         .padding(.vertical, VNSpacing.md)
-        .frame(minHeight: 44)
+        .frame(minHeight: VNSize.minTapTarget)
         .background(Color.vnBackgroundSecondary)
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
@@ -139,9 +140,9 @@ public struct PrayerLibraryView: View {
                     vm.selectedCategory = nil
                 } label: {
                     Text("Tất cả")
-                        .font(.system(size: 12, weight: .semibold, design: .serif))
+                        .font(.system(.caption, design: .serif, weight: .semibold))
                         .foregroundColor(vm.selectedCategory == nil ? .vnAccentDeepPrimary : .vnTextSecondary)
-                        .frame(minHeight: 44)
+                        .frame(minHeight: VNSize.minTapTarget)
                         .padding(.horizontal, VNSpacing.lg)
                         .background(vm.selectedCategory == nil ? Color.vnAccentRedSurface : Color.clear)
                         .clipShape(Capsule())
@@ -197,28 +198,31 @@ public struct PrayerLibraryView: View {
     private func prayerRowCard(for prayer: Prayer) -> some View {
         HStack(spacing: VNSpacing.md) {
             Image(systemName: "flame.fill")
-                .font(.system(size: 16))
+                .font(.callout)
                 .foregroundColor(.vnAccentHeritageRed)
-                .frame(width: 44, height: 44)
+                .frame(width: VNSize.minTapTarget, height: VNSize.minTapTarget)
+                .accessibilityHidden(true)
                 .background(Color.vnAccentRedSurface)
                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(prayer.title)
-                    .font(.system(size: 15, weight: .semibold, design: .serif))
+                    .font(.system(.subheadline, design: .serif, weight: .semibold))
                     .foregroundColor(.vnTextPrimary)
-                    .lineLimit(1)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
 
                 Text(prayer.occasion)
-                    .font(.system(size: 12))
+                    .font(.caption)
                     .foregroundColor(.vnTextSecondary)
-                    .lineLimit(1)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
+                .font(.caption.weight(.semibold))
                 .foregroundColor(.vnTextTertiary)
                 .accessibilityHidden(true)
         }
@@ -238,12 +242,13 @@ public struct PrayerLibraryView: View {
     private var emptyState: some View {
         VStack(spacing: VNSpacing.sm) {
             Image(systemName: "book.closed")
-                .font(.system(size: 36))
+                .font(.largeTitle)
                 .foregroundColor(.vnTextTertiary)
+                .accessibilityHidden(true)
                 .padding(.top, VNSpacing.lg)
 
             Text("Không tìm thấy bài văn khấn phù hợp")
-                .font(.system(size: 14, weight: .medium))
+                .font(.subheadline.weight(.medium))
                 .foregroundColor(.vnTextSecondary)
         }
         .frame(maxWidth: .infinity)
@@ -251,9 +256,6 @@ public struct PrayerLibraryView: View {
     }
 
     private func triggerHaptic() {
-        #if canImport(UIKit)
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        #endif
+        VNHaptics.impact(.light, enabled: hapticFeedbackEnabled)
     }
 }

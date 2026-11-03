@@ -70,7 +70,7 @@ public struct VNDayCellView: View, Equatable {
     private var indicatorDot: some View {
         if dayModel?.hasAncestorDeathAnniversary == true {
             Circle()
-                .fill(isToday ? Color.white : Color.vnAccentHeritageRed)
+                .fill(isToday ? Color.vnOnAccent : Color.vnAccentHeritageRed)
                 .frame(width: 4, height: 4)
         } else if dayModel?.isAuspiciousDay == true {
             Circle()
@@ -99,7 +99,7 @@ public struct VNDayCellView: View, Equatable {
     }
 
     private var solarColor: Color {
-        if isToday { return .vnRicePaperWhite }
+        if isToday { return .vnOnAccent }
         if isFullMoon { return .vnAccentImperialGold }
         if isFirstLunarDay { return .vnAccentHeritageRed }
         if !isCurrentMonth { return .vnTextTertiary }
@@ -107,7 +107,7 @@ public struct VNDayCellView: View, Equatable {
     }
 
     private var lunarColor: Color {
-        if isToday { return .vnRicePaperWhite }
+        if isToday { return .vnOnAccent }
         if isFullMoon { return .vnAccentImperialGold }
         if isFirstLunarDay { return .vnAccentHeritageRed }
         if !isCurrentMonth { return .vnTextTertiary.opacity(0.7) }

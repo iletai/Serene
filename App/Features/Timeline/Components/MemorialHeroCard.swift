@@ -17,7 +17,7 @@ struct MemorialHeroCard: View {
                     VNSealBadge.gio(size: .medium)
 
                     Text(reminder.relationship ?? "Gia Tiên")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.caption2.weight(.bold))
                         .tracking(0.8)
                         .foregroundColor(.vnAccentHeritageRed)
                         .padding(.horizontal, VNSpacing.sm)
@@ -30,8 +30,8 @@ struct MemorialHeroCard: View {
 
                 // Countdown Badge
                 Text(countdownText)
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(.caption.weight(.bold))
+                    .foregroundColor(.vnOnAccent)
                     .padding(.horizontal, VNSpacing.sm)
                     .padding(.vertical, VNSpacing.xs)
                     .background(Color.vnAccentHeritageRed)
@@ -39,41 +39,45 @@ struct MemorialHeroCard: View {
                     .shadow(color: VNShadow.floating.color, radius: VNShadow.floating.radius,
                             x: VNShadow.floating.x, y: VNShadow.floating.y)
             }
-            .padding(.horizontal, VNSpacing.xl)
+            .padding(.horizontal, VNSpacing.cardPadding)
             .padding(.top, VNSpacing.md)
 
-            // Memorial Title (New York Serif 22pt bold)
+            // Memorial Title (New York Serif, title2 bold)
             Text(reminder.title)
-                .font(.system(size: 22, weight: .bold, design: .serif))
+                .font(.system(.title2, design: .serif).weight(.bold))
                 .foregroundColor(.vnTextPrimary)
-                .padding(.horizontal, VNSpacing.xl)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, VNSpacing.cardPadding)
                 .padding(.top, VNSpacing.xs)
 
             // Date & Info Strip
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 HStack(spacing: VNSpacing.xs) {
                     Image(systemName: "calendar")
-                        .font(.system(size: 13))
+                        .font(.footnote)
                         .foregroundColor(.vnAccentHeritageRed)
+                        .accessibilityHidden(true)
                     Text(dateText)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                         .foregroundColor(.vnAccentHeritageRed)
                 }
 
                 if let note = reminder.note, !note.isEmpty {
                     HStack(alignment: .top, spacing: VNSpacing.xs) {
                         Image(systemName: "pencil.and.list.clipboard")
-                            .font(.system(size: 12))
+                            .font(.caption)
                             .foregroundColor(.vnTextSecondary)
+                            .accessibilityHidden(true)
                         Text(note)
-                            .font(.system(size: 12, design: .serif))
+                            .font(.system(.caption, design: .serif))
                             .italic()
                             .foregroundColor(.vnTextSecondary)
                             .lineLimit(2)
                     }
                 }
             }
-            .padding(VNSpacing.xl)
+            .padding(VNSpacing.cardPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.vnBackgroundPrimary)
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
@@ -81,7 +85,7 @@ struct MemorialHeroCard: View {
                 RoundedRectangle(cornerRadius: VNCornerRadius.card)
                     .stroke(Color.vnBorderSubtle.opacity(0.8), lineWidth: VNBorderWidth.regular)
             )
-            .padding(.horizontal, VNSpacing.xl)
+            .padding(.horizontal, VNSpacing.cardPadding)
             .padding(.top, VNSpacing.sm)
 
             // Bottom Actions
@@ -89,7 +93,7 @@ struct MemorialHeroCard: View {
                 VNButton("Xem Văn Khấn", icon: "book.pages.fill", variant: .primary, size: .small, isFullWidth: true, action: onQuickRitual)
                 VNButton("Chi Tiết", icon: "slider.horizontal.3", variant: .secondary, size: .small, isFullWidth: true, action: onEdit)
             }
-            .padding(VNSpacing.xl)
+            .padding(VNSpacing.cardPadding)
         }
         .background(Color.vnBackgroundSecondary)
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))

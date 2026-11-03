@@ -118,7 +118,7 @@ public struct VNBlockCalendarView: View {
 
             Text("LỊCH VẠN NIÊN")
                 .font(.system(size: 11, weight: .bold, design: .serif))
-                .foregroundColor(.vnRicePaperWhite)
+                .foregroundColor(.vnOnAccent)
                 .tracking(2.0)
 
             Spacer()
@@ -183,7 +183,7 @@ public struct VNBlockCalendarView: View {
             if let term = model.solarTermName {
                 Text("Tiết \(term)")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
                     .padding(.horizontal, VNSpacing.sm)
                     .padding(.vertical, VNSpacing.xs)
                     .background(Color.vnAccentImperialGold.opacity(0.12))
@@ -293,7 +293,7 @@ public struct VNBlockCalendarView: View {
                     .foregroundColor(.vnTextSecondary)
                 Text(model.wealthGodDirection)
                     .font(.system(size: 13, weight: .semibold, design: .serif))
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
             }
 
             Spacer()

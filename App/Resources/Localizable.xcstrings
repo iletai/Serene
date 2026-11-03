@@ -6903,6 +6903,23 @@
         }
       }
     },
+    "settings.calendar.week_start": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First day of week"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ngày bắt đầu tuần"
+          }
+        }
+      }
+    },
     "settings.calendar.week_start_monday": {
       "extractionState": "manual",
       "localizations": {

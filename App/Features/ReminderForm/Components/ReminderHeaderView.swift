@@ -11,9 +11,11 @@ struct ReminderHeaderView: View {
     let dateType: CalendarDateType
     let isLeapMonth: Bool
 
-    // Faint folio shadow from canonical: 0 4px 20px -2px rgba(90,84,79,0.05).
+    @ScaledMetric(relativeTo: .largeTitle) private var numeralSize: CGFloat = 56
+
+    // Faint neutral folio shadow: 0 4px 20px rgba(0,0,0,0.05).
     private static let folioShadow = VNShadow.ShadowConfig(
-        color: Color(red: 90.0 / 255.0, green: 84.0 / 255.0, blue: 79.0 / 255.0, opacity: 0.05),
+        color: Color.black.opacity(0.05),
         radius: 20,
         x: 0,
         y: 4
@@ -21,7 +23,7 @@ struct ReminderHeaderView: View {
 
     var body: some View {
         VNCard(
-            allPadding: VNSpacing.xl,
+            allPadding: VNSpacing.cardPadding,
             cornerRadius: VNCornerRadius.card,
             backgroundColor: Color.vnBackgroundSecondary,
             borderColor: Color.vnAccentImperialGold.opacity(0.28),
@@ -37,15 +39,18 @@ struct ReminderHeaderView: View {
                         .font(.vnCaption2)
                         .fontWeight(.medium)
                         .tracking(0.66)
-                        .foregroundColor(.vnAccentImperialGold)
+                        .foregroundColor(.vnAccentGoldText)
                 }
 
                 Text(isEditing ? "Chỉnh Sửa Sự Kiện" : "Thêm Sự Kiện & Lễ Tiết")
-                    .font(.vnTitleHero)
+                    .font(.system(.title, design: .serif, weight: .semibold))
                     .foregroundColor(.vnTextPrimary)
+                    .minimumScaleFactor(0.8)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                    .accessibilityAddTraits(.isHeader)
 
                 Text("Lưu giữ nếp nhà, vẹn tròn hiếu nghĩa")
-                    .font(.system(size: 13, weight: .regular, design: .serif))
+                    .font(.system(.footnote, design: .serif))
                     .italic()
                     .foregroundColor(.vnTextSecondary)
 
@@ -60,7 +65,7 @@ struct ReminderHeaderView: View {
     private var datePreview: some View {
         HStack(alignment: .center, spacing: VNSpacing.md) {
             Text("\(solarDate.day)")
-                .font(.system(size: 56, weight: .light))
+                .font(.system(size: numeralSize, weight: .light))
                 .foregroundColor(.vnTextPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
@@ -70,9 +75,9 @@ struct ReminderHeaderView: View {
                     .font(.vnCaption2)
                     .fontWeight(.medium)
                     .tracking(0.66)
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
                 Text("Ngày \(lunarDate.day) Tháng \(lunarDate.month)")
-                    .font(.system(size: 14, weight: .bold, design: .serif))
+                    .font(.system(.subheadline, design: .serif, weight: .bold))
                     .tracking(0.28)
                     .foregroundColor(.vnAccentHeritageRed)
                     .lineLimit(1)
@@ -86,6 +91,7 @@ struct ReminderHeaderView: View {
 
             VNSealBadge.gio(size: .small)
         }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 
     // MARK: - Preview conversion (display only, mirrors ReminderDatePickerCard)

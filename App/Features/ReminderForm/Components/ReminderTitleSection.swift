@@ -4,39 +4,53 @@ import VNCalendarDesignSystem
 struct ReminderTitleSection: View {
     @Binding var title: String
     @Binding var relationship: String
-    @FocusState.Binding var isFocused: Bool
+    var focusedField: FocusState<ReminderFormView.Field?>.Binding
+    let showsError: Bool
+    let errorMessage: String
+
+    private var isFocused: Bool { focusedField.wrappedValue == .title }
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("TÊN NGÀY GIỖ / SỰ KIỆN *")
-                .font(.system(size: 11, weight: .medium))
+                .font(.caption2.weight(.medium))
                 .tracking(0.66)
-                .foregroundColor(.vnAccentImperialGold)
+                .foregroundColor(.vnAccentGoldText)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .accessibilityAddTraits(.isHeader)
 
             VNCard(
-                allPadding: VNSpacing.xl,
+                allPadding: VNSpacing.cardPadding,
                 cornerRadius: VNCornerRadius.card,
                 backgroundColor: Color.vnBackgroundSecondary,
-                borderColor: Color.vnAccentImperialGold.opacity(0.28),
+                borderColor: showsError ? Color.vnStatusError : Color.vnAccentImperialGold.opacity(0.28),
                 shadow: nil
             ) {
                 VStack(alignment: .leading, spacing: VNSpacing.md) {
                     VStack(alignment: .leading, spacing: 0) {
                         TextField("VD: Giỗ Cụ Cố Nội, Sinh nhật Mẹ...", text: $title)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.callout.weight(.semibold))
                             .foregroundColor(.vnTextPrimary)
-                            .focused($isFocused)
-                            .submitLabel(.done)
+                            .focused(focusedField, equals: .title)
+                            .submitLabel(.next)
+                            .onSubmit { focusedField.wrappedValue = .note }
                             .padding(.bottom, VNSpacing.sm)
                         Rectangle()
-                            .fill(isFocused ? Color.vnAccentHeritageRed : Color.vnBorderSubtle)
-                            .frame(height: isFocused ? VNBorderWidth.active : VNBorderWidth.hairline)
+                            .fill(underlineColor)
+                            .frame(height: isFocused || showsError ? VNBorderWidth.active : VNBorderWidth.hairline)
+                    }
+
+                    if showsError {
+                        Label(errorMessage, systemImage: "exclamationmark.circle.fill")
+                            .font(.footnote)
+                            .foregroundColor(.vnStatusError)
                     }
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: VNSpacing.xs) {
                             Text("Vai vế:")
-                                .font(.system(size: 12))
+                                .font(.caption)
                                 .foregroundColor(.vnTextSecondary)
 
                             let roles = ["Nội Tộc", "Ngoại Tộc", "Cụ", "Ông", "Bà", "Cha / Bố", "Mẹ", "Bác", "Chú", "Cô", "Dì", "Anh / Chị"]
@@ -50,6 +64,11 @@ struct ReminderTitleSection: View {
         }
     }
 
+    private var underlineColor: Color {
+        if showsError { return .vnStatusError }
+        return isFocused ? .vnAccentHeritageRed : .vnBorderSubtle
+    }
+
     private func roleChip(role: String) -> some View {
         let isSelected = relationship == role
         return Button(
@@ -61,9 +80,9 @@ struct ReminderTitleSection: View {
             },
             label: {
                 Text(role)
-                    .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
+                    .font(.footnote.weight(isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? .vnAccentDeepPrimary : .vnTextSecondary)
-                    .padding(.horizontal, VNSpacing.sm)
+                    .padding(.horizontal, VNSpacing.md)
                     .padding(.vertical, VNSpacing.xs)
                     .background(isSelected ? Color.vnAccentRedSurface : Color.clear)
                     .clipShape(Capsule())
@@ -73,7 +92,11 @@ struct ReminderTitleSection: View {
                             lineWidth: VNBorderWidth.regular
                         )
                     )
+                    .frame(minHeight: VNSize.minTapTarget)
+                    .contentShape(Rectangle())
             }
         )
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

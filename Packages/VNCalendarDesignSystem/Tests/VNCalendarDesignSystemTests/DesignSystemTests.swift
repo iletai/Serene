@@ -99,11 +99,11 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertEqual(VNShadow.modal.radius, 16)
         XCTAssertEqual(VNShadow.modal.color, Color.black.opacity(0.08))
 
-        // Folio shadow: 0 4px 20px rgba(90,84,79,0.05) — spread omitted (SwiftUI has none).
+        // Folio shadow: 0 4px 20px rgba(0,0,0,0.05) — spread omitted (SwiftUI has none).
         XCTAssertEqual(VNShadow.folio.radius, 20)
         XCTAssertEqual(VNShadow.folio.y, 4)
         XCTAssertEqual(VNShadow.folio.x, 0)
-        XCTAssertEqual(VNShadow.folio.color, Color(hex: 0x5A544F).opacity(0.05))
+        XCTAssertEqual(VNShadow.folio.color, Color.black.opacity(0.05))
     }
 
     func testBadgeViewStyles() {

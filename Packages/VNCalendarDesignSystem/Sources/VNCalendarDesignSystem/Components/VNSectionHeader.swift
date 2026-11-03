@@ -88,7 +88,7 @@ public struct VNSectionHeader: View {
         case .seal(let text, let color):
             Text(text)
                 .font(.system(size: 9, weight: .bold, design: .serif))
-                .foregroundColor(.vnRicePaperWhite)
+                .foregroundColor(.vnOnAccent)
                 .padding(.horizontal, VNSpacing.xs)
                 .padding(.vertical, VNSpacing.space2)
                 .background(color)

@@ -35,29 +35,11 @@ public struct VNDayDetailBottomSheet: View {
             .toolbar {
                 #if os(iOS)
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 22))
-                            .foregroundColor(.vnTextTertiary)
-                    }
-                    .frame(minWidth: 44, minHeight: 44)
-                    .contentShape(Rectangle())
-                    .accessibilityLabel("Đóng")
+                    VNDismissButton { dismiss() }
                 }
                 #else
                 ToolbarItem(placement: .automatic) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 22))
-                            .foregroundColor(.vnTextTertiary)
-                    }
-                    .frame(minWidth: 44, minHeight: 44)
-                    .contentShape(Rectangle())
-                    .accessibilityLabel("Đóng")
+                    VNDismissButton { dismiss() }
                 }
                 #endif
             }
@@ -68,12 +50,12 @@ public struct VNDayDetailBottomSheet: View {
     private var headerDateCluster: some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text(solarDateText)
-                .font(.system(size: 15, weight: .medium))
+                .font(.subheadline.weight(.medium))
                 .foregroundColor(.vnTextSecondary)
 
             HStack(spacing: VNSpacing.sm) {
                 Text(lunarHeroText)
-                    .font(.system(size: 26, weight: .bold, design: .serif))
+                    .font(.system(.title, design: .serif).weight(.bold))
                     .foregroundColor(.vnAccentHeritageRed)
 
                 if dayModel.isFirstDayOfLunarMonth {
@@ -86,7 +68,7 @@ public struct VNDayDetailBottomSheet: View {
             }
 
             Text("Năm \(dayModel.lunarYearCanChi) • Tháng \(dayModel.lunarMonthCanChi) • Ngày \(dayModel.lunarDayCanChi)")
-                .font(.system(size: 13, weight: .regular))
+                .font(.footnote)
                 .foregroundColor(.vnTextSecondary)
 
             culturalBadgesRow
@@ -114,8 +96,8 @@ public struct VNDayDetailBottomSheet: View {
         HStack(spacing: VNSpacing.xs) {
             if let term = dayModel.solarTermName {
                 Text("Tiết \(term)")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.vnAccentImperialGold)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(.vnAccentGoldText)
                     .padding(.horizontal, VNSpacing.sm)
                     .padding(.vertical, VNSpacing.xs)
                     .background(Color.vnAccentImperialGold.opacity(0.15))
@@ -124,7 +106,7 @@ public struct VNDayDetailBottomSheet: View {
 
             if dayModel.isToday {
                 Text("Hôm nay")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
                     .foregroundColor(.vnAccentHeritageRed)
                     .padding(.horizontal, VNSpacing.sm)
                     .padding(.vertical, VNSpacing.xs)
@@ -134,7 +116,7 @@ public struct VNDayDetailBottomSheet: View {
 
             if dayModel.isAuspiciousDay {
                 Text("Hoàng Đạo")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
                     .foregroundColor(.vnStatusSuccess)
                     .padding(.horizontal, VNSpacing.sm)
                     .padding(.vertical, VNSpacing.xs)
@@ -148,7 +130,7 @@ public struct VNDayDetailBottomSheet: View {
     private var auspiciousHoursSection: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("KHUNG GIỜ HOÀNG ĐẠO")
-                .font(.system(size: 11, weight: .bold))
+                .font(.caption2.weight(.bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
@@ -166,9 +148,10 @@ public struct VNDayDetailBottomSheet: View {
                             .frame(width: VNSpacing.xs, height: VNSpacing.xs)
 
                         Text("\(branch.vietnameseName) (\(branch.timeRange))")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.caption2.weight(.medium))
                             .foregroundColor(.vnTextPrimary)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, VNSpacing.sm)
@@ -189,11 +172,12 @@ public struct VNDayDetailBottomSheet: View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
                 Image(systemName: "quote.opening")
-                    .font(.system(size: 12))
+                    .font(.caption)
+                    .accessibilityHidden(true)
                     .foregroundColor(.vnAccentHeritageRed)
 
                 Text("CA DAO • TỤC NGỮ TRUYỀN THỐNG")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.caption2.weight(.bold))
                     .foregroundColor(.vnTextSecondary)
                     .tracking(0.6)
 
@@ -201,7 +185,7 @@ public struct VNDayDetailBottomSheet: View {
             }
 
             Text(dayModel.folkQuote.quote)
-                .font(.system(size: 13, weight: .medium, design: .serif).italic())
+                .font(.system(.footnote, design: .serif).weight(.medium).italic())
                 .foregroundColor(.vnTextPrimary)
                 .lineSpacing(3)
                 .fixedSize(horizontal: false, vertical: true)
@@ -209,7 +193,7 @@ public struct VNDayDetailBottomSheet: View {
             HStack {
                 Spacer()
                 Text("— \(dayModel.folkQuote.authorOrOrigin)")
-                    .font(.system(size: 11, weight: .regular, design: .serif))
+                    .font(.system(.caption2, design: .serif))
                     .foregroundColor(.vnTextSecondary)
             }
         }
@@ -226,15 +210,16 @@ public struct VNDayDetailBottomSheet: View {
     private var familyEventsSection: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("SỰ KIỆN & GIA ĐÌNH")
-                .font(.system(size: 11, weight: .bold))
+                .font(.caption2.weight(.bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
             if dayModel.anniversaries.isEmpty {
                 HStack(spacing: VNSpacing.sm) {
                     Image(systemName: "calendar.badge.clock")
-                        .font(.system(size: 16))
+                        .font(.callout)
                         .foregroundColor(.vnTextTertiary)
+                        .accessibilityHidden(true)
 
                     Text("Không có sự kiện hoặc ngày giỗ nào cho ngày này.")
                         .font(.vnFootnote)
@@ -254,7 +239,7 @@ public struct VNDayDetailBottomSheet: View {
 
                             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                                 Text(item.title)
-                                    .font(.system(size: 14, weight: .semibold, design: .serif))
+                                    .font(.system(.subheadline, design: .serif).weight(.semibold))
                                     .foregroundColor(.vnTextPrimary)
 
                                 Text(item.isAncestorDeath ? "Kỳ Giỗ Gia Tiên" : "Sự Kiện Kỷ Niệm")
@@ -285,11 +270,11 @@ public struct VNDayDetailBottomSheet: View {
             action: onAddReminder,
             label: {
                 Label("Thêm Ngày Nhớ Cho Ngày Này", systemImage: "plus")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
-                    .frame(minHeight: 44)
+                    .frame(minHeight: VNSize.minTapTarget)
                     .background(Color.vnAccentHeritageRed)
-                    .foregroundColor(.white)
+                    .foregroundColor(.vnOnAccent)
                     .clipShape(Capsule())
             }
         )

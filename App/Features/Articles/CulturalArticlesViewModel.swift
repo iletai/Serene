@@ -6,7 +6,6 @@ import VNCalendarDomain
 @MainActor
 final class CulturalArticlesViewModel {
     var holidays: [Holiday] = []
-    var selectedHoliday: Holiday?
     var searchQuery = ""
     var selectedCategory: String = "Tất cả"
 

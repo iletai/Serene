@@ -12,12 +12,15 @@ struct ReminderOffsetsCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("NHẮC NHỞ CHUẨN BỊ LỄ NGHI (08:00 SÁNG)")
-                .font(.system(size: 11, weight: .medium))
+                .font(.caption2.weight(.medium))
                 .tracking(0.66)
-                .foregroundColor(.vnAccentImperialGold)
+                .foregroundColor(.vnAccentGoldText)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .accessibilityAddTraits(.isHeader)
 
             VNCard(
-                allPadding: VNSpacing.xl,
+                allPadding: VNSpacing.cardPadding,
                 cornerRadius: VNCornerRadius.card,
                 backgroundColor: Color.vnBackgroundSecondary,
                 borderColor: Color.vnAccentImperialGold.opacity(0.28),
@@ -42,20 +45,26 @@ struct ReminderOffsetsCard: View {
             label: {
                 HStack(spacing: VNSpacing.sm) {
                     Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                         .foregroundColor(selected ? .vnAccentDeepPrimary : .vnTextSecondary)
+                        .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         Text(title)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.callout.weight(.semibold))
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
                             .foregroundColor(selected ? .vnAccentDeepPrimary : .vnTextSecondary)
                         Text(subtitle)
-                            .font(.system(size: 12))
+                            .font(.caption)
                             .foregroundColor(.vnTextSecondary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
                     }
                     Spacer(minLength: 0)
                 }
                 .padding(.horizontal, VNSpacing.md)
                 .padding(.vertical, VNSpacing.sm)
+                .frame(minHeight: VNSize.minTapTarget)
                 .background(selected ? Color.vnAccentRedSurface : Color.clear)
                 .clipShape(Capsule())
                 .overlay(
@@ -66,6 +75,8 @@ struct ReminderOffsetsCard: View {
                 )
             }
         )
-        .buttonStyle(.plain)
+        .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

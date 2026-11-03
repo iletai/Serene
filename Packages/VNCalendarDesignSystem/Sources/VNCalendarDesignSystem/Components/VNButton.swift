@@ -79,8 +79,11 @@ public struct VNButtonStyle: ButtonStyle {
 
     private var foregroundColor: Color {
         switch variant {
-        case .primary, .gold, .destructive:
-            return .vnRicePaperWhite
+        case .primary, .destructive:
+            return .vnOnAccent
+        case .gold:
+            // Fixed dark ink: gold fill is light in both modes (6.9:1 light, 10.3:1 dark)
+            return .vnDeepCalligraphicInk
         case .secondary:
             return .vnTextPrimary
         case .tertiary:

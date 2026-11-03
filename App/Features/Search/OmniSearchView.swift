@@ -4,8 +4,9 @@ import VNCalendarDesignSystem
 import VNCalendarLunar
 
 public struct OmniSearchView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
     @Environment(AppContainer.self) private var container
+    @ScaledMetric(relativeTo: .callout) private var iconBox: CGFloat = VNSize.iconButton
     @State private var viewModel: OmniSearchViewModel?
     @FocusState private var isSearchFocused: Bool
 
@@ -13,7 +14,10 @@ public struct OmniSearchView: View {
 
     private var activeViewModel: OmniSearchViewModel {
         if let existing = viewModel { return existing }
-        return OmniSearchViewModel(naturalSearchUseCase: container.naturalSearchUseCase)
+        return OmniSearchViewModel(
+            naturalSearchUseCase: container.naturalSearchUseCase,
+            evaluateFeatureGateUseCase: container.evaluateFeatureGateUseCase
+        )
     }
 
     public var body: some View {
@@ -36,13 +40,13 @@ public struct OmniSearchView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                .padding(.horizontal, VNSpacing.xl)
+                .padding(.horizontal, VNSpacing.screenMargin)
                 .padding(.top, VNSpacing.xl)
                 .padding(.bottom, VNSpacing.xxl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .vnNavBar(title: "Tra Cứu Thông Minh") {
-                VNDismissButton(style: .text("Đóng")) { dismiss() }
+                VNDismissButton { router.dismissModals() }
             }
             .task {
                 if viewModel == nil {
@@ -59,11 +63,12 @@ public struct OmniSearchView: View {
         VStack(spacing: 0) {
             HStack(spacing: VNSpacing.sm) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 15))
+                    .font(.subheadline)
                     .foregroundColor(isSearchFocused ? .vnAccentHeritageRed : .vnTextTertiary)
+                    .accessibilityHidden(true)
 
                 TextField("", text: $boundVM.searchText, prompt: Text("Tìm giỗ ông, 15/8 âm, rằm tháng 7..."))
-                    .font(.system(size: 15))
+                    .font(.subheadline)
                     .foregroundColor(.vnTextPrimary)
                     .focused($isSearchFocused)
                     .submitLabel(.search)
@@ -74,17 +79,17 @@ public struct OmniSearchView: View {
                         vm.performSearch(query: "")
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 15))
+                            .font(.subheadline)
                             .foregroundColor(.vnTextTertiary)
                     }
-                    .frame(minWidth: 44, minHeight: 44)
+                    .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                     .contentShape(Rectangle())
                     .accessibilityLabel("Xóa tìm kiếm")
                 }
             }
             .padding(.horizontal, VNSpacing.md)
             .padding(.vertical, VNSpacing.sm)
-            .frame(minHeight: 44)
+            .frame(minHeight: VNSize.minTapTarget)
             .background(Color.vnSurfaceElevated)
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
 
@@ -102,9 +107,10 @@ public struct OmniSearchView: View {
         folioCard {
             HStack(alignment: .top, spacing: VNSpacing.md) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.vnAccentImperialGold)
-                    .frame(width: 40, height: 40)
+                    .font(.callout.weight(.medium))
+                    .foregroundColor(.vnAccentGoldText)
+                    .frame(width: iconBox, height: iconBox)
+                    .accessibilityHidden(true)
                     .background(Color.vnAccentImperialGold.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                     .overlay(
@@ -115,7 +121,7 @@ public struct OmniSearchView: View {
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
                     HStack(spacing: VNSpacing.sm) {
                         Text("Phân Tích Ngày Nhanh")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.caption2.weight(.medium))
                             .tracking(0.7)
                             .foregroundColor(.vnOnGoldContainer)
                             .padding(.horizontal, VNSpacing.sm)
@@ -125,25 +131,51 @@ public struct OmniSearchView: View {
                     }
 
                     Text(parsed.label)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.callout.weight(.semibold))
                         .foregroundColor(.vnTextPrimary)
+                        .minimumScaleFactor(0.8)
 
                     if let conv = vm.resolvedConvertedDateText {
                         Text(conv)
-                            .font(.system(size: 13))
+                            .font(.footnote)
                             .foregroundColor(.vnAccentHeritageRed)
                     }
+
+                    createReminderButton(vm: vm)
                 }
             }
-            .padding(VNSpacing.lg)
+            .padding(VNSpacing.cardPadding)
         }
+    }
+
+    /// Dismisses Search, then gates and presents the form (or Paywall) from the same router.
+    private func createReminderButton(vm: OmniSearchViewModel) -> some View {
+        Button {
+            guard !vm.isCheckingGate else { return }
+            let initialDate = vm.resolvedSolarDate
+            router.dismissModals()
+            Task {
+                await Task.yield()
+                switch await vm.createReminderGate() {
+                case .allowed: router.present(sheet: .reminderForm(editing: nil, initialDate: initialDate))
+                case .requiresPro: router.present(sheet: .paywall)
+                }
+            }
+        } label: {
+            Label("Tạo ngày nhớ cho ngày này", systemImage: "plus.circle.fill")
+                .font(.footnote.weight(.semibold))
+                .foregroundColor(.vnAccentDeepPrimary)
+                .frame(minHeight: VNSize.minTapTarget)
+                .contentShape(Rectangle())
+        }
+        .disabled(vm.isCheckingGate)
     }
 
     // MARK: - Matched Events & Holidays
     private func resultsList(vm: OmniSearchViewModel) -> some View {
         VStack(spacing: VNSpacing.sm) {
             Text("Sự Kiện & Ngày Lễ Trùng Khớp")
-                .font(.system(size: 11, weight: .medium))
+                .font(.caption2.weight(.medium))
                 .tracking(0.7)
                 .foregroundColor(.vnOnGoldContainer)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -162,7 +194,7 @@ public struct OmniSearchView: View {
                 case .holiday(let h):
                     resultCard(
                         icon: "leaf.fill",
-                        tint: .vnAccentImperialGold,
+                        tint: .vnAccentGoldText,
                         title: h.title,
                         detail: h.summary
                     )
@@ -175,9 +207,10 @@ public struct OmniSearchView: View {
         folioCard {
             HStack(alignment: .top, spacing: VNSpacing.md) {
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.callout.weight(.medium))
                     .foregroundColor(tint)
-                    .frame(width: 40, height: 40)
+                    .frame(width: iconBox, height: iconBox)
+                    .accessibilityHidden(true)
                     .background(tint.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                     .overlay(
@@ -187,16 +220,18 @@ public struct OmniSearchView: View {
 
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
                     Text(title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.callout.weight(.semibold))
                         .foregroundColor(.vnTextPrimary)
+                        .minimumScaleFactor(0.8)
 
                     Text(detail)
-                        .font(.system(size: 13))
+                        .font(.footnote)
                         .foregroundColor(.vnTextSecondary)
                         .lineLimit(2)
                 }
             }
-            .padding(VNSpacing.lg)
+            .padding(VNSpacing.cardPadding)
+            .accessibilityElement(children: .combine)
         }
     }
 

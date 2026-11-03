@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 import VNCalendarDomain
 import VNCalendarDesignSystem
 import VNCalendarLunar
@@ -7,6 +8,8 @@ public struct TodayDashboardCard: View {
     public let details: DayCalendarDetails?
     public var onAddReminder: () -> Void
     public var onQuickSearch: () -> Void
+    @ScaledMetric(relativeTo: .largeTitle) private var solarNumeralSize: CGFloat = 56
+    @ScaledMetric(relativeTo: .title) private var lunarNumeralSize: CGFloat = 28
 
     public init(
         details: DayCalendarDetails?,
@@ -130,16 +133,29 @@ public struct TodayDashboardCard: View {
 
     // MARK: - Hero Header (Weekday + Auspicious Pill)
     private var heroHeader: some View {
-        HStack(alignment: .top, spacing: VNSpacing.sm) {
-            if let title = weekdayTitle {
-                Text(title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(.vnTextSecondary)
+        // Side by side when it fits; stacked at large accessibility sizes.
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .top, spacing: VNSpacing.sm) {
+                weekdayText
+                Spacer(minLength: 0)
+                hoangDaoPill
             }
+            VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                weekdayText
+                hoangDaoPill
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
 
-            Spacer(minLength: 0)
-
-            hoangDaoPill
+    @ViewBuilder
+    private var weekdayText: some View {
+        if let title = weekdayTitle {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.vnTextSecondary)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
         }
     }
 
@@ -147,9 +163,12 @@ public struct TodayDashboardCard: View {
         VStack(alignment: .trailing, spacing: VNSpacing.xs) {
             HStack(spacing: VNSpacing.xs) {
                 Image(systemName: "sun.max")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
+                    .accessibilityHidden(true)
                 Text(dayStar.isAuspicious ? "HOÀNG ĐẠO" : "HẮC ĐẠO")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
+                    .lineLimit(1)
+                    .fixedSize()
                     .tracking(0.66)
             }
             .foregroundColor(.vnAccentDeepPrimary)
@@ -162,7 +181,7 @@ public struct TodayDashboardCard: View {
             )
 
             Text("Sao \(dayStar.vietnameseName)")
-                .font(.system(size: 11, weight: .regular))
+                .font(.caption2)
                 .foregroundColor(.vnTextSecondary)
         }
     }
@@ -171,18 +190,18 @@ public struct TodayDashboardCard: View {
     private var solarNumeralRow: some View {
         HStack(alignment: .firstTextBaseline, spacing: VNSpacing.sm) {
             Text("\(currentSolarDate.day)")
-                .font(.system(size: 56, weight: .light))
+                .font(.system(size: solarNumeralSize, weight: .light))
                 .foregroundColor(.vnTextPrimary)
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("DƯƠNG LỊCH")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
                     .tracking(0.66)
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
 
                 if let week = weekOfYearText {
                     Text(week)
-                        .font(.system(size: 12, weight: .regular))
+                        .font(.caption)
                         .foregroundColor(.vnTextSecondary)
                 }
             }
@@ -190,6 +209,7 @@ public struct TodayDashboardCard: View {
             Spacer(minLength: 0)
         }
         .padding(.top, VNSpacing.xs)
+        .accessibilityElement(children: .combine)
     }
 
     // Centered sun ornament breaking the hairline (canonical hero divider).
@@ -197,12 +217,13 @@ public struct TodayDashboardCard: View {
         ZStack {
             Divider().background(Color.vnBorderSubtle.opacity(0.6))
             Image(systemName: "sun.max.fill")
-                .font(.system(size: 12))
+                .font(.caption)
                 .foregroundColor(Color.vnBorderSubtle.opacity(0.6))
                 .padding(.horizontal, VNSpacing.xs)
                 .background(Color.vnBackgroundSecondary)
         }
         .padding(.vertical, VNSpacing.sm)
+        .accessibilityHidden(true)
     }
 
     // MARK: - Lunar Callout + Can Chi
@@ -210,28 +231,34 @@ public struct TodayDashboardCard: View {
         HStack(spacing: VNSpacing.md) {
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text("ÂM LỊCH")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption2.weight(.medium))
                     .tracking(0.66)
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
 
                 Text("Ngày \(currentLunarDate.day)")
-                    .font(.system(size: 28, weight: .semibold, design: .serif))
+                    .font(.system(size: lunarNumeralSize, weight: .semibold, design: .serif))
                     .foregroundColor(.vnAccentHeritageRed)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Text(lunarMonthName)
-                    .font(.system(size: 18, weight: .semibold, design: .serif))
+                    .font(.system(.headline, design: .serif).weight(.semibold))
                     .foregroundColor(.vnTextPrimary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
             }
+            .accessibilityElement(children: .combine)
 
             Rectangle()
                 .fill(Color.vnBorderSubtle.opacity(0.6))
-                .frame(width: 1)
+                .frame(width: VNBorderWidth.hairline)
+                .accessibilityHidden(true)
 
             VStack(spacing: VNSpacing.xs) {
                 canChiRow(label: "Ngày", value: currentCanChi.day.description)
                 canChiRow(label: "Tháng", value: currentCanChi.month.description)
                 canChiRow(label: "Năm", value: currentCanChi.year.description)
-                canChiRow(label: "Ngũ Hành", value: dayElementName, valueColor: .vnAccentImperialGold)
+                canChiRow(label: "Ngũ Hành", value: dayElementName, valueColor: .vnAccentGoldText)
             }
         }
         .padding(.vertical, VNSpacing.sm)
@@ -240,16 +267,18 @@ public struct TodayDashboardCard: View {
     private func canChiRow(label: String, value: String, valueColor: Color = .vnTextPrimary) -> some View {
         HStack(spacing: VNSpacing.sm) {
             Text(label)
-                .font(.system(size: 12, weight: .regular))
+                .font(.caption)
                 .foregroundColor(.vnTextSecondary)
 
             Spacer(minLength: 0)
 
             Text(value)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.subheadline.weight(.semibold))
                 .foregroundColor(valueColor)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -272,16 +301,17 @@ private struct TodayHeroGuidance: View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack(spacing: VNSpacing.sm) {
                 Text("GIỜ HOÀNG ĐẠO")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
                     .tracking(0.66)
                     .foregroundColor(.vnTextSecondary)
 
                 Spacer(minLength: 0)
 
                 Text("\(hours.count) giờ lành")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.vnAccentImperialGold)
+                    .font(.caption2.weight(.medium))
+                    .foregroundColor(.vnAccentGoldText)
             }
+            .accessibilityElement(children: .combine)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: VNSpacing.xs) {
@@ -296,11 +326,11 @@ private struct TodayHeroGuidance: View {
     private func hourChip(for branch: EarthlyBranch) -> some View {
         VStack(spacing: VNSpacing.space2) {
             Text(branch.vietnameseName)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.caption2.weight(.semibold))
                 .foregroundColor(.vnAccentDeepPrimary)
 
             Text(hourRangeText(branch))
-                .font(.system(size: 10, weight: .regular))
+                .font(.caption2)
                 .foregroundColor(.vnTextSecondary)
         }
         .padding(.horizontal, VNSpacing.sm)
@@ -311,6 +341,7 @@ private struct TodayHeroGuidance: View {
             RoundedRectangle(cornerRadius: VNCornerRadius.small)
                 .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
         )
+        .accessibilityElement(children: .combine)
     }
 
     private func hourRangeText(_ branch: EarthlyBranch) -> String {
@@ -324,7 +355,7 @@ private struct TodayHeroGuidance: View {
             guidancePanel(
                 title: "Việc Nên Làm",
                 icon: "checkmark.circle.fill",
-                tint: .vnAccentImperialGold,
+                tint: .vnAccentGoldText,
                 background: .vnAccentGoldSurface,
                 text: suitable
             )
@@ -343,16 +374,19 @@ private struct TodayHeroGuidance: View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack(spacing: VNSpacing.xs) {
                 Image(systemName: icon)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.footnote.weight(.semibold))
                     .foregroundColor(tint)
+                    .accessibilityHidden(true)
 
                 Text(title)
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
                     .foregroundColor(.vnTextPrimary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
             }
 
             Text(text)
-                .font(.system(size: 12, weight: .regular))
+                .font(.caption)
                 .foregroundColor(.vnTextPrimary)
                 .lineSpacing(2)
         }
@@ -364,6 +398,7 @@ private struct TodayHeroGuidance: View {
             RoundedRectangle(cornerRadius: VNCornerRadius.small)
                 .stroke(Color.vnBorderSubtle.opacity(0.6), lineWidth: VNBorderWidth.hairline)
         )
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -376,6 +411,7 @@ private struct TodayCardActions: View {
     var body: some View {
         HStack(spacing: VNSpacing.sm) {
             VNButton("Thêm Ngày Nhớ", icon: "plus", variant: .primary, size: .small, isFullWidth: true, action: onAddReminder)
+                .popoverTip(AddReminderTip())
             VNButton("Tra Cứu", icon: "magnifyingglass", variant: .secondary, size: .small, isFullWidth: true, action: onQuickSearch)
         }
     }
