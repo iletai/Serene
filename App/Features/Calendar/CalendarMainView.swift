@@ -6,6 +6,9 @@ import VNCalendarLunar
 
 public struct CalendarMainView: View {
     @Environment(AppContainer.self) private var container
+    @Environment(AppRouter.self) private var router
+    @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
+    @ScaledMetric(relativeTo: .caption2) private var sealSize = VNSize.iconButton
     @State private var viewModel: CalendarMainViewModel?
 
     public init() {}
@@ -15,83 +18,67 @@ public struct CalendarMainView: View {
         return CalendarMainViewModel(
             getMonthCalendarUseCase: container.getMonthCalendarUseCase,
             reminderRepository: container.reminderRepository,
-            scheduleReminderUseCase: container.scheduleReminderUseCase,
             evaluateFeatureGateUseCase: container.evaluateFeatureGateUseCase
         )
     }
 
     public var body: some View {
-        @Bindable var vm = activeViewModel
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: VNSpacing.xl) {
-                    // Month callout: tiết khí eyebrow + month/year headline + Can Chi seal
-                    monthCalloutRow(vm: vm)
+        let vm = activeViewModel
+        ScrollView {
+            VStack(spacing: VNSpacing.sectionGap) {
+                // Month callout: tiết khí eyebrow + month/year headline + Can Chi seal
+                monthCalloutRow(vm: vm)
 
-                    // Hero almanac card (selected day dashboard)
-                    TodayDashboardCard(
-                        details: vm.todayDetails,
-                        onAddReminder: {
-                            vm.checkAndShowReminderForm()
-                        },
-                        onQuickSearch: {
-                            vm.isShowingSearch = true
-                        }
-                    )
-                    .padding(.horizontal, VNSpacing.xl)
-
-                    // Multi-Mode Calendar Container (Nhật Lịch • Tháng • Tuần • Năm)
-                    VNCalendarContainerView(
-                        viewModel: vm.adapterViewModel,
-                        onAddReminderForSelectedDate: {
-                            vm.checkAndShowReminderForm()
-                        }
-                    )
-                    .background(Color.vnSurfaceElevated.opacity(0.8))
-                    .clipShape(RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius)
-                            .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.hairline)
-                    )
-                    .shadow(
-                        color: VNCard<EmptyView>.folioShadow.color,
-                        radius: VNCard<EmptyView>.folioShadow.radius,
-                        x: VNCard<EmptyView>.folioShadow.x,
-                        y: VNCard<EmptyView>.folioShadow.y
-                    )
-                    .padding(.horizontal, VNSpacing.xl)
-                }
-                .padding(.bottom, VNSpacing.xl)
-            }
-            .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-            .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .top, spacing: 0) {
-                topNavigationHeader(vm: vm)
-            }
-            .sheet(isPresented: $vm.isShowingCreateReminder) {
-                ReminderFormView(
-                    initialDate: vm.adapterViewModel.selectedDate,
-                    onSave: { newReminder in
-                        vm.saveReminder(newReminder)
-                    }
+                // Hero almanac card (selected day dashboard)
+                TodayDashboardCard(
+                    details: vm.todayDetails,
+                    onAddReminder: { presentReminderForm(vm: vm) },
+                    onQuickSearch: { router.present(sheet: .search) }
                 )
-                .presentationDetents([.fraction(0.92), .large])
-                .presentationDragIndicator(.visible)
+                .padding(.horizontal, VNSpacing.screenMargin)
+
+                // Multi-Mode Calendar Container (Nhật Lịch • Tháng • Tuần • Năm).
+                // The package fires this only after its own day sheet has finished dismissing.
+                VNCalendarContainerView(
+                    viewModel: vm.adapterViewModel,
+                    onAddReminderForSelectedDate: { presentReminderForm(vm: vm) }
+                )
+                .background(Color.vnSurfaceElevated.opacity(0.8))
+                .clipShape(RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius))
+                .overlay(
+                    RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius)
+                        .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.hairline)
+                )
+                .shadow(
+                    color: VNCard<EmptyView>.folioShadow.color,
+                    radius: VNCard<EmptyView>.folioShadow.radius,
+                    x: VNCard<EmptyView>.folioShadow.x,
+                    y: VNCard<EmptyView>.folioShadow.y
+                )
+                .padding(.horizontal, VNSpacing.screenMargin)
             }
-            .sheet(isPresented: $vm.isShowingPaywall) {
-                PaywallView()
+            .padding(.bottom, VNSpacing.sectionGap)
+        }
+        .background(Color.vnBackgroundPrimary.ignoresSafeArea())
+        .safeAreaInset(edge: .top, spacing: 0) {
+            topNavigationHeader(vm: vm)
+        }
+        .task {
+            if viewModel == nil {
+                viewModel = activeViewModel
             }
-            .sheet(isPresented: $vm.isShowingSearch) {
-                OmniSearchView()
-            }
-            .sheet(isPresented: $vm.isShowingSettings) {
-                SettingsView()
-            }
-            .task {
-                if viewModel == nil {
-                    viewModel = activeViewModel
-                }
-                await viewModel?.loadData()
+            await viewModel?.loadData()
+            await viewModel?.observeReminders()
+        }
+    }
+
+    private func presentReminderForm(vm: CalendarMainViewModel) {
+        Task {
+            switch await vm.createReminderGate() {
+            case .allowed:
+                router.present(sheet: .reminderForm(editing: nil, initialDate: vm.adapterViewModel.selectedDate))
+            case .requiresPro:
+                router.present(sheet: .paywall)
             }
         }
     }
@@ -103,20 +90,23 @@ public struct CalendarMainView: View {
                 icon: "calendar.badge.clock",
                 accessibilityLabel: "Xem hôm nay"
             ) {
-                triggerHaptic()
+                VNHaptics.impact(enabled: hapticFeedbackEnabled)
                 vm.adapterViewModel.selectToday()
             }
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("AN NIÊN")
-                    .font(.system(size: 18, weight: .semibold, design: .serif))
+                    .font(.system(.headline, design: .serif).weight(.semibold))
                     .foregroundColor(.vnAccentDeepPrimary)
 
                 Text(lunarSubtitle(vm: vm))
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption2.weight(.medium))
                     .tracking(0.66)
                     .foregroundColor(.vnTextSecondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
@@ -126,11 +116,11 @@ public struct CalendarMainView: View {
                 icon: "gearshape",
                 accessibilityLabel: "Cài đặt ứng dụng"
             ) {
-                triggerHaptic()
-                vm.isShowingSettings = true
+                VNHaptics.impact(enabled: hapticFeedbackEnabled)
+                router.present(sheet: .settings)
             }
         }
-        .padding(.horizontal, VNSpacing.xl)
+        .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.vertical, VNSpacing.sm)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
@@ -138,6 +128,8 @@ public struct CalendarMainView: View {
                 .background(.ultraThinMaterial)
         )
         .shadow(color: VNShadow.card.color, radius: VNShadow.card.radius, x: VNShadow.card.x, y: VNShadow.card.y)
+        // Top-bar chrome caps its growth like system nav bars; content below scales fully.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 
     private func yearSwitcherPill(vm: CalendarMainViewModel) -> some View {
@@ -145,7 +137,7 @@ public struct CalendarMainView: View {
         return Menu {
             ForEach((currentYear - 5)...(currentYear + 5), id: \.self) { year in
                 Button {
-                    triggerHaptic()
+                    VNHaptics.impact(enabled: hapticFeedbackEnabled)
                     vm.adapterViewModel.selectMonth(displaySolarMonth(vm: vm), year: year)
                 } label: {
                     Text(String(year))
@@ -154,16 +146,18 @@ public struct CalendarMainView: View {
         } label: {
             HStack(spacing: VNSpacing.xs) {
                 Text(String(currentYear))
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption2.weight(.medium))
+                    .lineLimit(1)
+                    .fixedSize()
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
             }
             .foregroundColor(.vnTextSecondary)
             .padding(.horizontal, VNSpacing.sm)
             .padding(.vertical, VNSpacing.xs)
-            .background(Color.vnAncientSand, in: RoundedRectangle(cornerRadius: VNCornerRadius.small))
+            .background(Color.vnBackgroundTertiary, in: RoundedRectangle(cornerRadius: VNCornerRadius.small))
         }
-        .frame(minHeight: 44)
+        .frame(minHeight: VNSize.minTapTarget)
         .accessibilityLabel("Đổi năm")
         .accessibilityValue(String(currentYear))
     }
@@ -187,15 +181,15 @@ public struct CalendarMainView: View {
     ) -> some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.subheadline.weight(.semibold))
                 .foregroundColor(.vnTextSecondary)
-                .frame(width: 36, height: 36)
+                .frame(width: VNSize.iconButton, height: VNSize.iconButton)
                 .background(Color.vnBackgroundSecondary, in: RoundedRectangle(cornerRadius: VNCornerRadius.card))
                 .overlay(
                     RoundedRectangle(cornerRadius: VNCornerRadius.card)
                         .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                 )
-                .frame(minWidth: 44, minHeight: 44)
+                .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -207,20 +201,25 @@ public struct CalendarMainView: View {
         HStack(alignment: .center, spacing: VNSpacing.md) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(monthCalloutEyebrow(vm: vm))
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption2.weight(.medium))
                     .tracking(1.1)
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.8)
 
                 Text(monthCalloutTitle(vm: vm))
-                    .font(.system(size: 22, weight: .semibold, design: .serif))
+                    .font(.system(.title2, design: .serif).weight(.semibold))
                     .foregroundColor(.vnTextPrimary)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.8)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer(minLength: VNSpacing.sm)
 
             monthSealBadge(vm: vm)
         }
-        .padding(.horizontal, VNSpacing.xl)
+        .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.top, VNSpacing.xs)
     }
 
@@ -230,9 +229,12 @@ public struct CalendarMainView: View {
             Text(yearPair.stem.vietnameseName.uppercased())
             Text(yearPair.branch.vietnameseName.uppercased())
         }
-        .font(.system(size: 10, weight: .bold, design: .serif))
+        .font(.system(.caption2, design: .serif).weight(.bold))
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
         .foregroundColor(.vnAccentDeepPrimary)
-        .frame(width: 40, height: 40)
+        // ponytail: decorative seal capped at 1.5x so the month title keeps the row width.
+        .frame(width: min(sealSize, VNSize.iconButton * 1.5), height: min(sealSize, VNSize.iconButton * 1.5))
         .background(Color.vnSurfaceElevated)
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
         .overlay(
@@ -245,6 +247,8 @@ public struct CalendarMainView: View {
                 .stroke(Color.vnAccentDeepPrimary.opacity(0.4), lineWidth: VNBorderWidth.hairline)
         )
         .shadow(color: Color.vnAccentDeepPrimary.opacity(0.15), radius: 3, x: 0, y: 2)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .accessibilityElement(children: .ignore)
         .accessibilityLabel("Ấn triện năm \(yearPair.description)")
     }
 
@@ -289,12 +293,5 @@ public struct CalendarMainView: View {
         let year = cal.component(.year, from: vm.adapterViewModel.displayMonthDate)
         let yearPair = CanChiPair.year(for: year)
         return "Năm \(yearPair.description) • Âm Dương Hợp Lịch"
-    }
-
-    private func triggerHaptic() {
-        #if canImport(UIKit)
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        #endif
     }
 }
