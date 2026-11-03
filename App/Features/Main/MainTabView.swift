@@ -95,7 +95,7 @@ public struct MainTabView: View {
         )
     }
 
-    /// Tab roots still own a NavigationStack until their Phase 2 migration; the outer bar stays hidden.
+    /// Tab roots draw their own header; the container's navigation bar stays hidden.
     @ViewBuilder
     private func tabRoot(for tab: MainTab) -> some View {
         Group {
