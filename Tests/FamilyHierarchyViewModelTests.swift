@@ -22,8 +22,12 @@ final class FamilyHierarchyViewModelTests: XCTestCase {
             items.append(reminder)
         }
         func deleteReminder(by id: UUID) async throws { items.removeAll { $0.id == id } }
+        var continuation: AsyncStream<[ReminderEvent]>.Continuation?
         func observeReminders() -> AsyncStream<[ReminderEvent]> {
-            AsyncStream { continuation in continuation.yield(self.items) }
+            AsyncStream { continuation in
+                self.continuation = continuation
+                continuation.yield(self.items)
+            }
         }
     }
 
@@ -94,10 +98,14 @@ final class FamilyHierarchyViewModelTests: XCTestCase {
         repo.items = reminders(2)
         let viewModel = makeViewModel(repo: repo, sub: MockSubRepo())
 
-        // Mock stream yields once and never finishes, so cancel after the first value lands.
+        // Mock stream never finishes, so cancel once the second emission lands.
         let task = Task { await viewModel.observe() }
         for _ in 0..<50 where viewModel.reminders.isEmpty { await Task.yield() }
-        task.cancel()
         XCTAssertEqual(viewModel.reminders.count, 2)
+
+        repo.continuation?.yield(reminders(3))
+        for _ in 0..<50 where viewModel.reminders.count != 3 { await Task.yield() }
+        task.cancel()
+        XCTAssertEqual(viewModel.reminders.count, 3)
     }
 }

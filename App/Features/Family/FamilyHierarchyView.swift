@@ -305,8 +305,21 @@ public struct FamilyHierarchyView: View {
             .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
             .accessibilityElement(children: .combine)
             .accessibilityLabel([member.title, member.relationship ?? ""].filter { !$0.isEmpty }.joined(separator: ", "))
+            .accessibilityValue("\(anniversaryText(member)), \(statusText(member))")
             .accessibilityHint("Chỉnh sửa chi tiết tiền nhân")
         }
+    }
+
+    private func isWorshipped(_ member: ReminderEvent) -> Bool {
+        member.category == .deathAnniversary || member.category == .ancestral
+    }
+
+    private func anniversaryText(_ member: ReminderEvent) -> String {
+        "Giỗ \(member.day)/\(member.month) \(member.dateType == .lunar ? "ÂL" : "Dương")"
+    }
+
+    private func statusText(_ member: ReminderEvent) -> String {
+        isWorshipped(member) ? "Đã thờ" : "Còn sống"
     }
 
     private func rankLetter(from rank: String) -> String {
@@ -316,7 +329,7 @@ public struct FamilyHierarchyView: View {
 
     // MARK: - Member Card
     private func memberCard(member: ReminderEvent) -> some View {
-        let isDeath = member.category == .deathAnniversary || member.category == .ancestral
+        let isDeath = isWorshipped(member)
         return HStack(spacing: VNSpacing.md) {
             if member.category == .deathAnniversary {
                 VNSealBadge.gio(size: .small)
@@ -335,7 +348,6 @@ public struct FamilyHierarchyView: View {
                 Text(member.title)
                     .font(.system(.subheadline, design: .serif).weight(.semibold))
                     .foregroundColor(.vnTextPrimary)
-                    .lineLimit(2)
                     .minimumScaleFactor(0.8)
 
                 HStack(spacing: VNSpacing.xs) {
@@ -345,7 +357,7 @@ public struct FamilyHierarchyView: View {
                             .foregroundColor(.vnTextSecondary)
                     }
 
-                    Text("• Giỗ \(member.day)/\(member.month) \(member.dateType == .lunar ? "ÂL" : "Dương")")
+                    Text("• \(anniversaryText(member))")
                         .font(.caption)
                         .foregroundColor(.vnTextSecondary)
                 }
@@ -359,7 +371,7 @@ public struct FamilyHierarchyView: View {
 
             Spacer()
 
-            Text(member.category == .deathAnniversary || member.category == .ancestral ? "Đã thờ" : "Còn sống")
+            Text(statusText(member))
                 .font(.vnCaption2)
                 .fontWeight(.semibold)
                 .foregroundColor(isDeath ? .vnOnAccent : .vnTextSecondary)
