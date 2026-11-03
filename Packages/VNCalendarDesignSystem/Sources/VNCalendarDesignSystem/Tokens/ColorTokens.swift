@@ -33,70 +33,33 @@ public extension Color {
         #endif
     }
 
-    // MARK: - Light Mode Base Tokens (Vietnamese Lunar Editorial - Authentic Materiality)
-    /// Gạo Mới / Giấy Dó (#FEF9F1) - Canvas Background
-    static let vnNewRiceIvory = Color(hex: 0xFEF9F1)
+    // MARK: - Legacy Named Base Tokens (fixed, non-adaptive; repointed to the neutral VNPalette)
+    private static func light(_ pair: (light: UInt32, dark: UInt32)) -> Color { Color(hex: UInt(pair.light)) }
+    private static func dark(_ pair: (light: UInt32, dark: UInt32)) -> Color { Color(hex: UInt(pair.dark)) }
 
-    /// Vải Xô Nâng Cấp (#F8F3EB) - Elevated Card Surfaces Level 1
-    static let vnWovenLinen = Color(hex: 0xF8F3EB)
+    static let vnNewRiceIvory = light(VNPalette.backgroundPrimary)
+    static let vnWovenLinen = light(VNPalette.backgroundSecondary)
+    static let vnContainerSurface = light(VNPalette.backgroundTertiary)
+    static let vnAncientSand = light(VNPalette.backgroundTertiary)
+    static let vnDeepCalligraphicInk = light(VNPalette.textPrimary)
+    static let vnHearthAshGray = light(VNPalette.textSecondary)
+    static let vnMistGray = light(VNPalette.textTertiary)
+    static let vnCinnabarLacquerRed = light(VNPalette.accentHeritageRed)
+    static let vnVermilionDark = light(VNPalette.accentDeepPrimary)
+    static let vnVermilionSurface = light(VNPalette.accentRedSurface)
+    /// Decorative gold (#C5A059); not for text
+    static let vnImperialChrysanthemumGold = light(VNPalette.accentImperialGold)
+    static let vnGoldSurface = light(VNPalette.accentGoldSurface)
+    static let vnOldRiceBorder = light(VNPalette.borderSubtle)
 
-    /// Khung Đệm Vải Dệt (#EFE8DC) - Container Surface Level 2
-    static let vnContainerSurface = Color(hex: 0xEFE8DC)
-
-    /// Bãi Cát Cổ (#ECE8E0) - Tertiary Surface & Group Chips
-    static let vnAncientSand = Color(hex: 0xECE8E0)
-
-    /// Mực Tàu Nho (#1D1C17) - Primary Typography & Numerals
-    static let vnDeepCalligraphicInk = Color(hex: 0x1D1C17)
-
-    /// Tro Bếp Trầm (#59413C) - Secondary Meta & Lunar Dates
-    static let vnHearthAshGray = Color(hex: 0x59413C)
-
-    /// Khói Lam Mờ (#8D706B) - Tertiary Text & Placeholders
-    static let vnMistGray = Color(hex: 0x8D706B)
-
-    /// Đỏ Son Chu Sa (#C23B22) - Primary Accent (Giỗ, Mùng 1, Rằm 15 ÂL, Ấn Triện)
-    static let vnCinnabarLacquerRed = Color(hex: 0xC23B22)
-
-    /// Đỏ Son Đậm (#A0220B) - Dark Vermilion (Nút ấn, Viền đậm)
-    static let vnVermilionDark = Color(hex: 0xA0220B)
-
-    /// Nền Son Nhạt (#F5E3DA) - Soft Vermilion Tint Surface
-    static let vnVermilionSurface = Color(hex: 0xF5E3DA)
-
-    /// Vàng Quỳ Hoàng Cúc (#C5A059) - Accent Gold (Tiết Khí, Hoàng Đạo)
-    static let vnImperialChrysanthemumGold = Color(hex: 0xC5A059)
-
-    /// Nền Vàng Quỳ Nhạt (#F8F2E4) - Soft Gold Tint Surface
-    static let vnGoldSurface = Color(hex: 0xF8F2E4)
-
-    /// Tre Già Viền Mộc (#E1BFB8) - Hairline Dividers & Frames
-    static let vnOldRiceBorder = Color(hex: 0xE1BFB8)
-
-    // MARK: - Dark Mode Base Tokens
-    /// Than Mài (#181614) - Canvas Background Dark
-    static let vnLacquerCharcoal = Color(hex: 0x181614)
-
-    /// Gỗ Mun Ấm (#24201D) - Elevated Cards Dark
-    static let vnWarmEbony = Color(hex: 0x24201D)
-
-    /// Gỗ Mun Tối (#2E2925) - Tertiary Surface Dark
-    static let vnDarkSand = Color(hex: 0x2E2925)
-
-    /// Giấy Dó Trắng (#FAF7F0) - Primary Text Dark
-    static let vnRicePaperWhite = Color(hex: 0xFAF7F0)
-
-    /// Khói Mờ (#A89F91) - Secondary Text Dark
-    static let vnMutedHearth = Color(hex: 0xA89F91)
-
-    /// Than Tàn Đỏ (#D9534F) - Accent Red Dark
-    static let vnCinnabarEmbers = Color(hex: 0xD9534F)
-
-    /// Đồng Thau Cổ (#E9CB8F) - Accent Gold Dark
-    static let vnAntiqueBrass = Color(hex: 0xE9CB8F)
-
-    /// Viền Tối (#38322D) - Hairline Divider Dark
-    static let vnDarkBorder = Color(hex: 0x38322D)
+    static let vnLacquerCharcoal = dark(VNPalette.backgroundPrimary)
+    static let vnWarmEbony = dark(VNPalette.backgroundSecondary)
+    static let vnDarkSand = dark(VNPalette.backgroundTertiary)
+    static let vnRicePaperWhite = dark(VNPalette.textPrimary)
+    static let vnMutedHearth = dark(VNPalette.textSecondary)
+    static let vnCinnabarEmbers = dark(VNPalette.accentHeritageRed)
+    static let vnAntiqueBrass = dark(VNPalette.accentImperialGold)
+    static let vnDarkBorder = dark(VNPalette.borderSubtle)
 
     // MARK: - Semantic Adaptive Tokens (Neutral Porcelain + Jade, values in VNPalette)
     private static func palette(_ pair: (light: UInt32, dark: UInt32)) -> Color {
@@ -157,7 +120,7 @@ public enum VNPalette {
 
     public static let textPrimary: Pair = (0x1B1D1F, 0xF2F1EC)
     public static let textSecondary: Pair = (0x4A4F52, 0xB4B7B5)
-    public static let textTertiary: Pair = (0x6A7074, 0x8E9391)
+    public static let textTertiary: Pair = (0x666C70, 0x8E9391)
 
     public static let accentHeritageRed: Pair = (0xB5341D, 0xE8715C)
     public static let accentDeepPrimary: Pair = (0x8F2410, 0xD9534F)
@@ -171,8 +134,8 @@ public enum VNPalette {
     public static let onGoldContainer: Pair = (0x6B4E0E, 0xFFDEA5)
     public static let onAccent: Pair = (0xFFFFFF, 0x131415)
 
-    public static let borderSubtle: Pair = (0xDADDD8, 0x38322D)
-    public static let borderStrong: Pair = (0x8C9296, 0x6E7375)
+    public static let borderSubtle: Pair = (0xDADDD8, 0x2E3133)
+    public static let borderStrong: Pair = (0x8A9094, 0x6E7375)
 
     public static let statusSuccess: Pair = (0x2E6F40, 0x5DB67E)
     public static let statusWarning: Pair = (0x9A5300, 0xE9A23B)

@@ -163,7 +163,7 @@ public struct PaywallView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, VNSpacing.lg)
                 .background(Color.vnAccentHeritageRed)
-                .foregroundColor(.vnRicePaperWhite)
+                .foregroundColor(.vnOnAccent)
                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
             }
         )

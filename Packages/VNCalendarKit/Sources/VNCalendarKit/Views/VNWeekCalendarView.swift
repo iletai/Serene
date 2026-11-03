@@ -99,19 +99,19 @@ public struct VNWeekCalendarView: View {
                         // Thứ (T2, T3...)
                         Text(shortWeekday(from: day.weekdayName))
                             .font(.system(size: 11, weight: .semibold))
-                            .foregroundColor(isSelected ? .vnRicePaperWhite : .vnTextSecondary)
+                            .foregroundColor(isSelected ? .vnOnAccent : .vnTextSecondary)
 
                         // Ngày Dương
                         Text("\(day.solarDay)")
                             .font(.system(size: 16, weight: isSelected ? .bold : .semibold, design: .serif))
-                            .foregroundColor(isSelected ? .vnRicePaperWhite : .vnTextPrimary)
+                            .foregroundColor(isSelected ? .vnOnAccent : .vnTextPrimary)
 
                         // Ngày Âm (1/8 hoặc 23)
                         let isHighlight = day.isFirstDayOfLunarMonth || day.isFullMoonDay
                         Text(day.lunarDayText)
                             .font(.system(size: 10, weight: isHighlight ? .bold : .regular))
                             .foregroundColor(
-                                isSelected ? .vnRicePaperWhite.opacity(0.9) : (isHighlight ? .vnAccentHeritageRed : .vnTextSecondary)
+                                isSelected ? .vnOnAccent : (isHighlight ? .vnAccentHeritageRed : .vnTextSecondary)
                             )
 
                         // Dấu chấm sự kiện

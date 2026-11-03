@@ -80,7 +80,7 @@ public struct VNButtonStyle: ButtonStyle {
     private var foregroundColor: Color {
         switch variant {
         case .primary, .gold, .destructive:
-            return .vnRicePaperWhite
+            return .vnOnAccent
         case .secondary:
             return .vnTextPrimary
         case .tertiary:

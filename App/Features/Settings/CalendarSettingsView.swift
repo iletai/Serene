@@ -264,7 +264,7 @@ public struct CalendarSettingsView: View {
             }
             .padding(.vertical, VNSpacing.md)
             .background(Color.vnAccentHeritageRed)
-            .foregroundColor(.vnRicePaperWhite)
+            .foregroundColor(.vnOnAccent)
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous)

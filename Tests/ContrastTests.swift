@@ -36,9 +36,27 @@ final class ContrastTests: XCTestCase {
     func testOnAccentAgainstRedAndJade() {
         for useDark in [false, true] {
             let on = useDark ? VNPalette.onAccent.dark : VNPalette.onAccent.light
-            for fill in [VNPalette.accentHeritageRed, VNPalette.accentJade] {
+            for fill in [VNPalette.accentHeritageRed, VNPalette.accentJade, VNPalette.accentDeepPrimary] {
                 XCTAssertGreaterThanOrEqual(ratio(on, useDark ? fill.dark : fill.light), 4.5)
             }
+        }
+    }
+
+    func testTertiaryAndGoldTextOnAllBackgrounds() {
+        for useDark in [false, true] {
+            let bgs = [VNPalette.backgroundPrimary, VNPalette.backgroundSecondary, VNPalette.backgroundTertiary]
+            for bg in bgs { for t in [VNPalette.textTertiary, VNPalette.accentGoldText] {
+                XCTAssertGreaterThanOrEqual(ratio(useDark ? t.dark : t.light, useDark ? bg.dark : bg.light), 4.5)
+            } }
+        }
+    }
+
+    func testJadeOnJadeSurfaceAndBorderStrong() {
+        for useDark in [false, true] {
+            let pick = { (pair: VNPalette.Pair) in useDark ? pair.dark : pair.light }
+            XCTAssertGreaterThanOrEqual(ratio(pick(VNPalette.accentJade), pick(VNPalette.accentJadeSurface)), 4.5)
+            // Non-text UI component contrast (WCAG 1.4.11)
+            XCTAssertGreaterThanOrEqual(ratio(pick(VNPalette.borderStrong), pick(VNPalette.backgroundPrimary)), 3.0)
         }
     }
 }

@@ -30,7 +30,7 @@ struct MemorialTimelineCard: View {
         if isPassed { return .vnTextSecondary }
         switch reminder.category {
         case .deathAnniversary, .ancestral: return .vnAccentHeritageRed
-        case .worship: return .vnImperialChrysanthemumGold
+        case .worship: return .vnAccentGoldText
         default: return .vnTextSecondary
         }
     }
@@ -62,7 +62,7 @@ struct MemorialTimelineCard: View {
     private var pillForeground: Color {
         if isPassed { return .vnTextSecondary }
         if isToday { return .vnOnGoldContainer }
-        return .vnRicePaperWhite
+        return .vnOnAccent
     }
 
     var body: some View {
