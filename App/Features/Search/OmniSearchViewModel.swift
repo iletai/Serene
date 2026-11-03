@@ -10,12 +10,28 @@ final class OmniSearchViewModel {
     var searchResults: [SearchResultItem] = []
     var parsedDate: ParsedDateResult?
     var resolvedConvertedDateText: String?
+    /// Solar date of the parsed query; seeds the reminder form.
+    private(set) var resolvedSolarDate: Date?
+    /// In-flight guard so repeated taps run one gate check.
+    private(set) var isCheckingGate = false
 
     private let naturalSearchUseCase: NaturalSearchUseCase
+    private let evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase
     private var searchTask: Task<Void, Never>?
 
-    init(naturalSearchUseCase: NaturalSearchUseCase) {
+    init(naturalSearchUseCase: NaturalSearchUseCase, evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase) {
         self.naturalSearchUseCase = naturalSearchUseCase
+        self.evaluateFeatureGateUseCase = evaluateFeatureGateUseCase
+    }
+
+    func createReminderGate() async -> CreateReminderGate {
+        isCheckingGate = true
+        defer { isCheckingGate = false }
+        do {
+            return try await evaluateFeatureGateUseCase.canAddReminder() ? .allowed : .requiresPro
+        } catch {
+            return .requiresPro
+        }
     }
 
     func performSearch(query: String) {
@@ -25,6 +41,7 @@ final class OmniSearchViewModel {
             searchResults = []
             parsedDate = nil
             resolvedConvertedDateText = nil
+            resolvedSolarDate = nil
             return
         }
 
@@ -37,16 +54,19 @@ final class OmniSearchViewModel {
                 if let lunar = p.lunarDate {
                     let solar = await engine.convertToSolar(from: lunar)
                     let canChi = await engine.computeCanChi(for: solar)
+                    resolvedSolarDate = solar.date
                     resolvedConvertedDateText = "Tương ứng Dương lịch: \(solar.day)/\(solar.month)/\(solar.year) " +
                         "(Năm \(canChi.year.description))"
                 } else if let solar = p.solarDate {
                     let lunar = await engine.convertToLunar(from: solar)
                     let canChi = await engine.computeCanChi(for: solar)
+                    resolvedSolarDate = solar.date
                     resolvedConvertedDateText = "Tương ứng Âm lịch: \(lunar.day)/\(lunar.month)/\(lunar.year) ÂL " +
                         "(Năm \(canChi.year.description))"
                 }
             } else {
                 resolvedConvertedDateText = nil
+                resolvedSolarDate = nil
             }
 
             if let results = try? await naturalSearchUseCase.execute(query: trimmed) {
