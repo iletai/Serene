@@ -45,7 +45,6 @@ public struct MainTabView: View {
     /// One router per tab, created once so each tab keeps its stack and sheet across switches.
     @State private var routers: [MainTab: AppRouter]
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
-    @ScaledMetric(relativeTo: .title3) private var tabIconSize: CGFloat = 22
 
     init(pendingDeepLink: Binding<DeepLinkHandler.Action?> = .constant(nil)) {
         _pendingDeepLink = pendingDeepLink
@@ -122,6 +121,8 @@ public struct MainTabView: View {
         .padding(.horizontal, VNSpacing.lg)
         .padding(.vertical, VNSpacing.md)
         .frame(maxWidth: VNLayout.tabBarMaxWidth)
+        // Bar chrome caps its growth like the system tab bar so labels never truncate.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .background {
             Capsule()
                 .fill(Color.vnSurfaceElevated.opacity(0.85))
@@ -146,7 +147,8 @@ public struct MainTabView: View {
         } label: {
             VStack(spacing: VNSpacing.space2) {
                 Image(systemName: tab.icon(isSelected: isSelected))
-                    .font(.system(size: tabIconSize, weight: isSelected ? .semibold : .regular))
+                    // title2 is 22pt at default size and, unlike @ScaledMetric, honours the bar's type-size cap.
+                    .font(.title2.weight(isSelected ? .semibold : .regular))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextSecondary)
                     .scaleEffect(isSelected ? 1.08 : 1.0)
@@ -155,7 +157,7 @@ public struct MainTabView: View {
                     .font(.caption2.weight(isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextSecondary)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.85)
+                    .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity, minHeight: VNLayout.tabBarItemHeight)
             .contentShape(Rectangle())
