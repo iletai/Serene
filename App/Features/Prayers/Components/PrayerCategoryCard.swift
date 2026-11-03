@@ -7,6 +7,7 @@ public struct PrayerCategoryCard: View {
     public let count: Int
     public let isSelected: Bool
     public let action: () -> Void
+    @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
 
     public init(
         category: PrayerCategory,
@@ -23,7 +24,7 @@ public struct PrayerCategoryCard: View {
     public var body: some View {
         Button(
             action: {
-                triggerHaptic()
+                VNHaptics.impact(.light, enabled: hapticFeedbackEnabled)
                 action()
             },
             label: {
@@ -52,7 +53,7 @@ public struct PrayerCategoryCard: View {
                 }
                 .padding(.horizontal, VNSpacing.md)
                 .padding(.vertical, VNSpacing.sm)
-                .frame(minHeight: 44)
+                .frame(minHeight: VNSize.minTapTarget)
                 .background(isSelected ? Color.vnAccentRedSurface : Color.clear)
                 .clipShape(Capsule())
                 .overlay(
@@ -67,12 +68,5 @@ public struct PrayerCategoryCard: View {
         .buttonStyle(.plain)
         .contentShape(Capsule())
         .accessibilityAddTraits(isSelected ? [.isSelected, .isButton] : .isButton)
-    }
-
-    private func triggerHaptic() {
-        #if canImport(UIKit)
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        #endif
     }
 }

@@ -27,6 +27,11 @@ final class ReminderFormViewModel {
 
     let existingReminder: ReminderEvent?
 
+    /// Set by a save attempt with an empty title; drives the inline error row.
+    private(set) var saveAttempted = false
+    /// Field values at load (or last save); `isDirty` compares against it.
+    private var baseline: [AnyHashable] = []
+
     init(existingReminder: ReminderEvent? = nil, initialDate: Date? = nil) {
         self.existingReminder = existingReminder
 
@@ -50,11 +55,34 @@ final class ReminderFormViewModel {
             notify14DaysBefore = offsets.contains(-14)
             notify30DaysBefore = offsets.contains(-30)
         } else if let date = initialDate {
-            var cal = Calendar(identifier: .gregorian)
-            cal.timeZone = VNTime.vietnam
-            day = cal.component(.day, from: date)
-            month = cal.component(.month, from: date)
+            // The form defaults to lunar, so seed it with the lunar equivalent of the solar date.
+            let lunar = LunarAstronomicalEngine.shared.convertToLunar(from: SolarDate(from: date))
+            day = lunar.day
+            month = lunar.month
+            isLeapMonth = lunar.isLeapMonth
         }
+        baseline = fingerprint
+    }
+
+    private var fingerprint: [AnyHashable] {
+        [title, category, dateType, day, month, year, isLeapMonth, recurrence, relationship, note,
+         notifyOnDay, notify1DayBefore, notify3DaysBefore, notify7DaysBefore, notify14DaysBefore, notify30DaysBefore]
+    }
+
+    /// True once any field differs from its loaded value; guards against losing edits on dismiss.
+    var isDirty: Bool { fingerprint != baseline }
+
+    var showsTitleError: Bool { saveAttempted && !isValid }
+
+    /// Returns the reminder to persist, or nil (and flags the title error) when the title is empty.
+    func save() -> ReminderEvent? {
+        guard isValid else {
+            saveAttempted = true
+            return nil
+        }
+        let reminder = buildReminder()
+        baseline = fingerprint
+        return reminder
     }
 
     var isValid: Bool {

@@ -29,14 +29,26 @@ public struct CalendarSettingsView: View {
 
     public init() {}
 
-    /// Leading inset aligning row subtitles under the 40pt icon plus its 12pt gap (rowLabel).
-    private static let settingsSubtitleLeadingInset: CGFloat = 52
-    /// Leading inset aligning row dividers past the 40pt icon, 12pt gap and 16pt card padding.
-    private static let settingsRowDividerLeadingInset: CGFloat = 68
+    /// Row icon tile; scales with Dynamic Type so the glyph never overflows it.
+    @ScaledMetric(relativeTo: .callout) private var scaledIconBox: CGFloat = VNSize.iconButton
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// Capped so accessibility sizes leave room for the label.
+    private var iconBox: CGFloat { min(scaledIconBox, VNSize.iconButton * 1.4) }
+    /// Stacks label above control at accessibility sizes so neither gets crushed.
+    private var rowLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: VNSpacing.sm))
+            : AnyLayout(HStackLayout())
+    }
+
+    /// Leading inset aligning row subtitles under the icon tile plus its gap (rowLabel).
+    private var settingsSubtitleLeadingInset: CGFloat { iconBox + VNSpacing.md }
+    /// Leading inset aligning row dividers past the icon tile, its gap and the card padding.
+    private var settingsRowDividerLeadingInset: CGFloat { iconBox + VNSpacing.md + VNSpacing.cardPadding }
 
     public var body: some View {
         ScrollView {
-            VStack(spacing: VNSpacing.xl) {
+            VStack(spacing: VNSpacing.sectionGap) {
                 headerSummaryBanner
 
                 calendarModesGroup
@@ -47,7 +59,7 @@ public struct CalendarSettingsView: View {
 
                 astronomicalTimezoneGroup
             }
-            .padding(.horizontal, VNSpacing.xl)
+            .padding(.horizontal, VNSpacing.screenMargin)
             .padding(.top, VNSpacing.xl)
             .padding(.bottom, VNSpacing.xxl)
         }
@@ -70,6 +82,8 @@ public struct CalendarSettingsView: View {
             Text(String(localized: "settings.calendar.subtitle"))
                 .font(.vnTitleCeremonial)
                 .foregroundColor(.vnTextPrimary)
+                .multilineTextAlignment(.center)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
 
             Text(String(localized: "settings.calendar.subtitle_desc"))
                 .font(.vnCaption1)
@@ -105,9 +119,9 @@ public struct CalendarSettingsView: View {
 
                 rowDivider
 
-                HStack {
-                    rowLabel(icon: "calendar", tint: .vnAccentImperialGold, title: String(localized: "settings.calendar.week_start"))
-                    Spacer()
+                rowLayout {
+                    rowLabel(icon: "calendar", tint: .vnAccentGoldText, title: String(localized: "settings.calendar.week_start"))
+                    Spacer(minLength: 0)
                     Picker(String(localized: "settings.calendar.week_start"), selection: $startOfWeek) {
                         Text(String(localized: "settings.calendar.week_start_monday")).tag(2)
                         Text(String(localized: "settings.calendar.week_start_sunday")).tag(1)
@@ -121,7 +135,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $highlightFullAndNewMoon) {
-                    rowLabel(icon: "moon.stars.fill", tint: .vnAccentImperialGold, title: String(localized: "settings.calendar.highlight_full_new_moon"))
+                    rowLabel(icon: "moon.stars.fill", tint: .vnAccentGoldText, title: String(localized: "settings.calendar.highlight_full_new_moon"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -130,7 +144,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $showAuspiciousHours) {
-                    rowLabel(icon: "clock.badge.checkmark.fill", tint: .vnAccentImperialGold, title: String(localized: "settings.calendar.show_auspicious_hours"))
+                    rowLabel(icon: "clock.badge.checkmark.fill", tint: .vnAccentGoldText, title: String(localized: "settings.calendar.show_auspicious_hours"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -139,7 +153,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $showSolarTermsAndTruc) {
-                    rowLabel(icon: "sun.haze.fill", tint: .vnAccentImperialGold, title: String(localized: "settings.calendar.show_solar_terms"))
+                    rowLabel(icon: "sun.haze.fill", tint: .vnAccentGoldText, title: String(localized: "settings.calendar.show_solar_terms"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -169,7 +183,7 @@ public struct CalendarSettingsView: View {
                 rowDivider
 
                 Toggle(isOn: $microCMSWifiOnly) {
-                    rowLabel(icon: "wifi", tint: .vnAccentImperialGold, title: String(localized: "settings.microcms.wifi_only"))
+                    rowLabel(icon: "wifi", tint: .vnAccentGoldText, title: String(localized: "settings.microcms.wifi_only"))
                 }
                 .tint(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.lg)
@@ -193,10 +207,11 @@ public struct CalendarSettingsView: View {
             if let banner = syncStatusBanner {
                 HStack(spacing: VNSpacing.xs) {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 12))
+                        .font(.caption)
                         .foregroundColor(.vnStatusSuccess)
+                        .accessibilityHidden(true)
                     Text(banner)
-                        .font(.system(size: 12))
+                        .font(.caption)
                         .foregroundColor(.vnTextSecondary)
                 }
                 .padding(.horizontal, VNSpacing.sm)
@@ -221,7 +236,7 @@ public struct CalendarSettingsView: View {
                 Spacer()
 
                 Text("v2.4-stable")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .font(.system(.caption2, design: .monospaced, weight: .bold))
                     .padding(.horizontal, VNSpacing.sm)
                     .padding(.vertical, VNSpacing.space2)
                     .background(Color.vnAccentImperialGold.opacity(0.18))
@@ -236,7 +251,7 @@ public struct CalendarSettingsView: View {
             }
 
             Text(String(format: String(localized: "settings.microcms.last_sync"), lastSyncTimestamp))
-                .font(.system(size: 11))
+                .font(.caption2)
                 .foregroundColor(.vnTextSecondary)
         }
         .padding(VNSpacing.lg)
@@ -256,13 +271,15 @@ public struct CalendarSettingsView: View {
                         .font(.vnFootnote)
                 } else {
                     Image(systemName: "arrow.triangle.2.circlepath")
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.footnote.weight(.bold))
+                        .accessibilityHidden(true)
                     Text(String(localized: "settings.microcms.sync_now"))
                         .font(.vnFootnote)
                 }
                 Spacer()
             }
             .padding(.vertical, VNSpacing.md)
+            .frame(minHeight: VNSize.minTapTarget)
             .background(Color.vnAccentHeritageRed)
             .foregroundColor(.vnOnAccent)
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
@@ -283,11 +300,11 @@ public struct CalendarSettingsView: View {
             groupedCard {
                 Toggle(isOn: $showDailyQuote) {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                        rowLabel(icon: "quote.opening", tint: .vnAccentImperialGold, title: String(localized: "settings.daily.quote"))
+                        rowLabel(icon: "quote.opening", tint: .vnAccentGoldText, title: String(localized: "settings.daily.quote"))
                         Text(String(localized: "settings.daily.quote_desc"))
-                            .font(.system(size: 12))
+                            .font(.caption)
                             .foregroundColor(.vnTextSecondary)
-                            .padding(.leading, Self.settingsSubtitleLeadingInset)
+                            .padding(.leading, settingsSubtitleLeadingInset)
                     }
                 }
                 .tint(.vnAccentHeritageRed)
@@ -318,12 +335,12 @@ public struct CalendarSettingsView: View {
                         rowLabel(icon: "globe.asia.australia.fill", tint: .vnAccentHeritageRed, title: String(localized: "settings.timezone.lunar"))
                         Spacer()
                         Text("GMT+7")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.vnAccentImperialGold)
+                            .font(.footnote.weight(.bold))
+                            .foregroundColor(.vnAccentGoldText)
                     }
 
                     Text(String(localized: "settings.timezone.astronomy_desc"))
-                        .font(.system(size: 12))
+                        .font(.caption)
                         .foregroundColor(.vnTextSecondary)
                         .lineSpacing(3)
                         .padding(.top, VNSpacing.space2)
@@ -337,10 +354,11 @@ public struct CalendarSettingsView: View {
     private func cmsStatPill(icon: String, text: String) -> some View {
         HStack(spacing: VNSpacing.xs) {
             Image(systemName: icon)
-                .font(.system(size: 11))
+                .font(.caption2)
                 .foregroundColor(.vnOnGoldContainer)
+                .accessibilityHidden(true)
             Text(text)
-                .font(.system(size: 11, weight: .medium))
+                .font(.caption2.weight(.medium))
                 .foregroundColor(.vnOnGoldContainer)
         }
         .padding(.horizontal, VNSpacing.sm)
@@ -351,7 +369,7 @@ public struct CalendarSettingsView: View {
 
     private func sectionHeader(title: String) -> some View {
         Text(title)
-            .font(.system(size: 11, weight: .medium))
+            .font(.caption2.weight(.medium))
             .tracking(0.7)
             .foregroundColor(.vnOnGoldContainer)
             .padding(.horizontal, VNSpacing.xs)
@@ -373,10 +391,10 @@ public struct CalendarSettingsView: View {
     private func rowLabel(icon: String, tint: Color, title: String) -> some View {
         HStack(spacing: VNSpacing.md) {
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
+                .font(.callout.weight(.medium))
                 .foregroundColor(tint)
                 .accessibilityHidden(true)
-                .frame(width: 40, height: 40)
+                .frame(width: iconBox, height: iconBox)
                 .background(tint.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 .overlay(
@@ -384,13 +402,14 @@ public struct CalendarSettingsView: View {
                         .stroke(tint.opacity(0.22), lineWidth: VNBorderWidth.regular)
                 )
             Text(title)
-                .font(.system(size: 16))
+                .font(.callout)
                 .foregroundColor(.vnTextPrimary)
+                .minimumScaleFactor(0.8)
         }
     }
 
     private var rowDivider: some View {
-        VNRowDivider(leadingInset: Self.settingsRowDividerLeadingInset)
+        VNRowDivider(leadingInset: settingsRowDividerLeadingInset)
     }
 
     // MARK: - Sync Action
@@ -409,12 +428,7 @@ public struct CalendarSettingsView: View {
                 lastSyncTimestamp = "Hôm nay, \(nowStr)"
                 syncStatusBanner = "Đã đồng bộ 48 văn khấn & 12 lễ tiết mới nhất."
 
-                if isHapticEnabled {
-                    #if os(iOS)
-                    let feedback = UINotificationFeedbackGenerator()
-                    feedback.notificationOccurred(.success)
-                    #endif
-                }
+                VNHaptics.impact(.success, enabled: isHapticEnabled)
             } catch {
                 syncStatusBanner = "Dữ liệu ngoại tuyến bản địa đã sẵn sàng."
             }

@@ -5,11 +5,12 @@ import VNCalendarData
 import VNCalendarDomain
 
 public struct PaywallView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
     @Environment(\.openURL) private var openURL
     @Environment(AppContainer.self) private var container
     @State private var viewModel: PaywallViewModel?
     @State private var legalLinksService = LegalLinksService.shared
+    @ScaledMetric(relativeTo: .caption2) private var badgeSize: CGFloat = VNSize.iconBadge
 
     public init() {}
 
@@ -59,18 +60,7 @@ public struct PaywallView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(
-                        action: { dismiss() },
-                        label: {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(.vnTextPrimary)
-                                .frame(width: 36, height: 36)
-                                .background(Color.vnBackgroundSecondary)
-                                .clipShape(Circle())
-                        }
-                    )
-                    .accessibilityLabel("Đóng bảng nâng cấp")
+                    VNDismissButton { router.dismissModals() }
                 }
             }
         }
@@ -86,12 +76,15 @@ public struct PaywallView: View {
             Text("paywall.title")
                 .font(.vnTitleHero)
                 .foregroundColor(.vnAccentDeepPrimary)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.8)
+                .accessibilityAddTraits(.isHeader)
 
             Text("paywall.subtitle")
                 .font(.vnBody)
                 .foregroundColor(.vnTextSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, VNSpacing.xl)
+                .padding(.horizontal, VNSpacing.screenMargin)
         }
     }
 
@@ -103,14 +96,14 @@ public struct PaywallView: View {
             featureRow(icon: "checkmark", title: "paywall.feature.pro_widgets")
             featureRow(icon: "checkmark", title: "paywall.feature.ics_export")
         }
-        .padding(VNSpacing.xl)
+        .padding(VNSpacing.cardPadding)
         .background(Color.vnBackgroundSecondary)
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
                 .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
         )
-        .padding(.horizontal, VNSpacing.xl)
+        .padding(.horizontal, VNSpacing.screenMargin)
     }
 
     @ViewBuilder
@@ -130,8 +123,8 @@ public struct PaywallView: View {
                         Task { await vm.loadProducts() }
                     }
                     .font(.vnFootnote)
-                    .foregroundColor(.vnAccentImperialGold)
-                    .frame(minHeight: 44)
+                    .foregroundColor(.vnAccentGoldText)
+                    .frame(minHeight: VNSize.minTapTarget)
                     .contentShape(Rectangle())
                 }
             } else {
@@ -140,13 +133,13 @@ public struct PaywallView: View {
                 }
             }
         }
-        .padding(.horizontal, VNSpacing.xl)
+        .padding(.horizontal, VNSpacing.screenMargin)
     }
 
     private func purchaseCTA(vm: PaywallViewModel) -> some View {
         Button(
             action: {
-                vm.purchase { dismiss() }
+                vm.purchase { router.dismissModals() }
             },
             label: {
                 HStack {
@@ -168,16 +161,16 @@ public struct PaywallView: View {
             }
         )
         .disabled(vm.isPurchasing || vm.products.isEmpty)
-        .padding(.horizontal, VNSpacing.xl)
+        .padding(.horizontal, VNSpacing.screenMargin)
     }
 
     private func restoreButton(vm: PaywallViewModel) -> some View {
         Button("paywall.restore") {
-            vm.restorePurchases { dismiss() }
+            vm.restorePurchases { router.dismissModals() }
         }
         .font(.vnFootnote)
         .foregroundColor(.vnTextSecondary)
-        .frame(minHeight: 44)
+        .frame(minHeight: VNSize.minTapTarget)
         .contentShape(Rectangle())
         .padding(.bottom, VNSpacing.md)
     }
@@ -197,16 +190,17 @@ public struct PaywallView: View {
         }
         .font(.vnFootnote)
         .foregroundColor(.vnTextSecondary)
+        .frame(minHeight: VNSize.minTapTarget)
         .disabled(url == nil)
     }
 
     private func featureRow(icon: String, title: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: VNSpacing.md) {
             Image(systemName: "checkmark")
-                .font(.system(size: 11, weight: .bold))
+                .font(.caption2.weight(.bold))
                 .foregroundColor(.vnOnGoldContainer)
                 .accessibilityHidden(true)
-                .frame(width: 22, height: 22)
+                .frame(width: badgeSize, height: badgeSize)
                 .background(Color.vnGoldContainer.opacity(0.5))
                 .clipShape(Circle())
 
@@ -214,6 +208,7 @@ public struct PaywallView: View {
                 .font(.vnHeadline)
                 .foregroundColor(.vnTextPrimary)
         }
+        .accessibilityElement(children: .combine)
     }
 
     private func productCard(product: Product, vm: PaywallViewModel) -> some View {
@@ -248,7 +243,7 @@ public struct PaywallView: View {
                         .fontWeight(.bold)
                         .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextPrimary)
                 }
-                .padding(VNSpacing.xl)
+                .padding(VNSpacing.cardPadding)
                 .background(isSelected ? Color.vnAccentRedSurface : Color.vnBackgroundSecondary)
                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 .overlay(

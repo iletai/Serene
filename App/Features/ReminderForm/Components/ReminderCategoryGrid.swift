@@ -4,13 +4,17 @@ import VNCalendarDesignSystem
 
 struct ReminderCategoryGrid: View {
     @Binding var selectedCategory: ReminderCategory
+    @ScaledMetric(relativeTo: .subheadline) private var iconBox: CGFloat = 28
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("PHÂN LOẠI SỰ KIỆN")
-                .font(.system(size: 11, weight: .medium))
+                .font(.caption2.weight(.medium))
                 .tracking(0.66)
-                .foregroundColor(.vnAccentImperialGold)
+                .foregroundColor(.vnAccentGoldText)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .accessibilityAddTraits(.isHeader)
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: VNSpacing.sm) {
                 categoryCard(cat: .deathAnniversary, icon: "flame.fill", subtitle: "Hiếu đạo tổ tiên", isMain: true)
@@ -31,9 +35,10 @@ struct ReminderCategoryGrid: View {
             label: {
                 HStack(spacing: VNSpacing.sm) {
                     Image(systemName: icon)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnAccentImperialGold)
-                        .frame(width: 28, height: 28)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnAccentGoldText)
+                        .frame(width: iconBox, height: iconBox)
+                        .accessibilityHidden(true)
                         .background(
                             RoundedRectangle(cornerRadius: VNCornerRadius.small)
                                 .fill(isSelected ? Color.vnAccentRedSurface : Color.vnBackgroundPrimary)
@@ -41,20 +46,22 @@ struct ReminderCategoryGrid: View {
 
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         Text(cat.title)
-                            .font(.system(size: 13, weight: .semibold, design: .serif))
+                            .font(.system(.footnote, design: .serif, weight: .semibold))
                             .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextPrimary)
-                            .lineLimit(1)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
                         Text(subtitle)
-                            .font(.system(size: 10))
+                            .font(.caption2)
                             .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextSecondary)
-                            .lineLimit(1)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
                     }
 
                     Spacer(minLength: 0)
 
                     if isMain {
                         Text("Chính")
-                            .font(.system(size: 9, weight: .semibold, design: .serif))
+                            .font(.system(.caption2, design: .serif, weight: .semibold))
                             .foregroundColor(.vnAccentHeritageRed)
                             .padding(.horizontal, VNSpacing.xs)
                             .padding(.vertical, VNSpacing.space2)
@@ -62,6 +69,7 @@ struct ReminderCategoryGrid: View {
                     }
                 }
                 .padding(VNSpacing.sm)
+                .frame(maxWidth: .infinity, minHeight: VNSize.minTapTarget, alignment: .leading)
                 .background(isSelected ? Color.vnAccentRedSurface : Color.vnBackgroundTertiary)
                 .clipShape(tileShape)
                 .overlay(
@@ -70,6 +78,8 @@ struct ReminderCategoryGrid: View {
                 )
             }
         )
-        .buttonStyle(.plain)
+        .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
