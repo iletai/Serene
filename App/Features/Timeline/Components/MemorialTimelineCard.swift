@@ -66,12 +66,26 @@ struct MemorialTimelineCard: View {
     }
 
     var body: some View {
+        // Nested ritual VNButton keeps its own tap; the card body opens the editor.
+        Button(action: onEdit) {
+            cardContent
+        }
+        .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+        .accessibilityElement(children: .combine)
+        .accessibilityAction(named: "Chỉnh sửa") { onEdit() }
+        .accessibilityActions {
+            if isMemorial { Button("Xem Văn Khấn", action: onViewRitual) }
+        }
+        .contextMenu { cardMenu }
+    }
+
+    private var cardContent: some View {
         HStack(alignment: .top, spacing: VNSpacing.md) {
             iconTile
             contentColumn
             if !isMemorial { trailingChevron }
         }
-        .padding(VNSpacing.xl)
+        .padding(VNSpacing.cardPadding)
         .background(Color.vnBackgroundSecondary)
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
@@ -81,17 +95,14 @@ struct MemorialTimelineCard: View {
         .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
         .opacity(isPassed ? 0.8 : 1)
         .contentShape(Rectangle())
-        .onTapGesture { onEdit() }
-        .accessibilityAddTraits(.isButton)
-        .accessibilityAction(named: "Chỉnh sửa") { onEdit() }
-        .contextMenu { cardMenu }
     }
 
     private var iconTile: some View {
         Image(systemName: tileIcon)
-            .font(.system(size: 20))
+            .font(.title3)
             .foregroundColor(tileForeground)
-            .frame(width: 40, height: 40)
+            .frame(width: VNSize.iconButton, height: VNSize.iconButton)
+            .accessibilityHidden(true)
             .background(tileBackground)
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
             .overlay(
@@ -124,10 +135,12 @@ struct MemorialTimelineCard: View {
     private var titleRow: some View {
         HStack(spacing: VNSpacing.sm) {
             Text(reminder.title)
-                .font(.system(size: 16, weight: .semibold, design: .serif))
+                .font(.system(.callout, design: .serif).weight(.semibold))
                 .foregroundColor(.vnTextPrimary)
+                .multilineTextAlignment(.leading)
                 .lineLimit(2)
-            Spacer(minLength: 4)
+                .minimumScaleFactor(0.8)
+            Spacer(minLength: VNSpacing.xs)
             Text(countdownText)
                 .font(.vnCaption2)
                 .fontWeight(.semibold)
@@ -141,15 +154,15 @@ struct MemorialTimelineCard: View {
 
     private var dateRow: some View {
         HStack(spacing: VNSpacing.xs) {
-            Image(systemName: "calendar").font(.system(size: 11)).accessibilityHidden(true)
-            Text(dateText).font(.system(size: 12, weight: .medium)).monospacedDigit()
+            Image(systemName: "calendar").font(.caption2).accessibilityHidden(true)
+            Text(dateText).font(.caption.weight(.medium)).monospacedDigit()
         }
         .foregroundColor(.vnTextSecondary)
     }
 
     private func noteRow(_ note: String) -> some View {
         Text(note)
-            .font(.system(size: 12, design: .serif))
+            .font(.system(.caption, design: .serif))
             .italic()
             .foregroundColor(.vnTextSecondary)
             .lineLimit(1)
@@ -161,7 +174,7 @@ struct MemorialTimelineCard: View {
 
     private var trailingChevron: some View {
         Image(systemName: "chevron.right")
-            .font(.system(size: 13, weight: .semibold))
+            .font(.footnote.weight(.semibold))
             .foregroundColor(.vnTextTertiary)
             .padding(.top, VNSpacing.space2)
             .accessibilityHidden(true)

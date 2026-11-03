@@ -12,12 +12,12 @@ struct MemorialTimelineDivider: View {
 
             HStack(spacing: VNSpacing.xs) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 11))
+                    .font(.caption2)
                     .accessibilityHidden(true)
                     .foregroundColor(.vnAccentImperialGold)
 
                 Text(title)
-                    .font(.system(size: 12, weight: .semibold, design: .serif))
+                    .font(.system(.caption, design: .serif).weight(.semibold))
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(1)
             }
