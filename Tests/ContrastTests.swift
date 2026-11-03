@@ -59,4 +59,12 @@ final class ContrastTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(ratio(pick(VNPalette.borderStrong), pick(VNPalette.backgroundPrimary)), 3.0)
         }
     }
+
+    func testGoldButtonInkOnGoldFill() {
+        // VNButton .gold: fixed light-mode ink (vnDeepCalligraphicInk) on vnAccentImperialGold in both modes
+        let ink = VNPalette.textPrimary.light
+        for fill in [VNPalette.accentImperialGold.light, VNPalette.accentImperialGold.dark] {
+            XCTAssertGreaterThanOrEqual(ratio(ink, fill), 4.5)
+        }
+    }
 }
