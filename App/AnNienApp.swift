@@ -14,8 +14,11 @@ struct AnNienApp: App {
     @AppStorage("appLanguage") private var appLanguage: String = "system"
     @State private var scheduleTask: Task<Void, Never>?
     @State private var updateAction: AppUpdateAction = .none
+    @State private var deepLinks = DeepLinkCenter.shared
 
     init() {
+        // Must be set before launch finishes so a cold-start notification tap is delivered.
+        UNUserNotificationCenter.current().delegate = DeepLinkCenter.shared
         // Register local notification categories at startup
         Task { @MainActor in
             await SmartNotificationEngine.shared.registerCategories()
@@ -40,8 +43,9 @@ struct AnNienApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            MainTabView(pendingDeepLink: $deepLinks.pendingAction)
                 .environment(container)
+                .onOpenURL { deepLinks.open($0) }
                 .preferredColorScheme(preferredScheme)
                 .environment(\.locale, selectedLocale)
                 .task {

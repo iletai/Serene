@@ -1,7 +1,8 @@
+import BaseNavigationStack
 import SwiftUI
 import VNCalendarDesignSystem
 
-public enum MainTab: Int, CaseIterable, Identifiable {
+public enum MainTab: Int, CaseIterable, Identifiable, Sendable {
     case calendar = 0
     case memorial = 1
     case rituals = 2
@@ -38,27 +39,25 @@ public enum MainTab: Int, CaseIterable, Identifiable {
 }
 
 public struct MainTabView: View {
-    @State private var selectedTab = 0
+    @Binding private var pendingDeepLink: DeepLinkHandler.Action?
+    @State private var selectedTab: MainTab = .calendar
+    /// One router per tab, created once so each tab keeps its stack and sheet across switches.
+    @State private var routers: [MainTab: AppRouter]
+    @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
+    @ScaledMetric(relativeTo: .title3) private var tabIconSize: CGFloat = 22
 
-    public init() {}
+    init(pendingDeepLink: Binding<DeepLinkHandler.Action?> = .constant(nil)) {
+        _pendingDeepLink = pendingDeepLink
+        _routers = State(initialValue: Dictionary(uniqueKeysWithValues: MainTab.allCases.map { ($0, AppRouter()) }))
+    }
 
     public var body: some View {
         TabView(selection: $selectedTab) {
-            CalendarMainView()
-                .tag(0)
-                .toolbar(.hidden, for: .tabBar)
-
-            UpcomingTimelineView()
-                .tag(1)
-                .toolbar(.hidden, for: .tabBar)
-
-            CulturalArticlesView()
-                .tag(2)
-                .toolbar(.hidden, for: .tabBar)
-
-            FamilyHierarchyView()
-                .tag(3)
-                .toolbar(.hidden, for: .tabBar)
+            ForEach(MainTab.allCases) { tab in
+                tabContainer(for: tab)
+                    .tag(tab)
+                    .toolbar(.hidden, for: .tabBar)
+            }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         // safeAreaInset reserves pill height in every tab's scroll content,
@@ -66,6 +65,46 @@ public struct MainTabView: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             customBottomTabBar
         }
+        .onChange(of: pendingDeepLink, initial: true) { _, action in
+            guard let action else { return }
+            handle(action)
+            pendingDeepLink = nil
+        }
+    }
+
+    private func handle(_ action: DeepLinkHandler.Action) {
+        switch action {
+        case .select(let tab):
+            selectedTab = tab
+        case .present(let tab, let sheet):
+            selectedTab = tab
+            routers[tab]?.present(sheet: sheet)
+        }
+    }
+
+    private func tabContainer(for tab: MainTab) -> some View {
+        let router = routers[tab] ?? AppRouter()
+        return BaseNavigationContainer(
+            router: router,
+            content: { tabRoot(for: tab) },
+            destination: { AppRouteView(route: $0) },
+            sheet: { AppSheetView(sheet: $0) },
+            cover: { _ in EmptyView() }
+        )
+    }
+
+    /// Tab roots still own a NavigationStack until their Phase 2 migration; the outer bar stays hidden.
+    @ViewBuilder
+    private func tabRoot(for tab: MainTab) -> some View {
+        Group {
+            switch tab {
+            case .calendar: CalendarMainView()
+            case .memorial: UpcomingTimelineView()
+            case .rituals: CulturalArticlesView()
+            case .family: FamilyHierarchyView()
+            }
+        }
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     // MARK: - Floating Pill Tab Bar
@@ -77,7 +116,7 @@ public struct MainTabView: View {
         }
         .padding(.horizontal, VNSpacing.lg)
         .padding(.vertical, VNSpacing.md)
-        .frame(maxWidth: 520)
+        .frame(maxWidth: VNLayout.tabBarMaxWidth)
         .background {
             Capsule()
                 .fill(Color.vnSurfaceElevated.opacity(0.85))
@@ -88,43 +127,36 @@ public struct MainTabView: View {
         .shadow(color: VNShadow.floating.color, radius: VNShadow.floating.radius,
                 x: VNShadow.floating.x, y: VNShadow.floating.y)
         .padding(.horizontal, VNSpacing.lg)
-        .padding(.bottom, 14)
+        .padding(.bottom, VNLayout.tabBarBottomInset)
     }
 
     private func tabButton(for tab: MainTab) -> some View {
-        let isSelected = selectedTab == tab.rawValue
+        let isSelected = selectedTab == tab
 
         return Button {
-            triggerHaptic()
+            VNHaptics.impact(enabled: hapticFeedbackEnabled)
             withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
-                selectedTab = tab.rawValue
+                selectedTab = tab
             }
         } label: {
             VStack(spacing: VNSpacing.space2) {
                 Image(systemName: tab.icon(isSelected: isSelected))
-                    .font(.system(size: 22, weight: isSelected ? .semibold : .regular))
+                    .font(.system(size: tabIconSize, weight: isSelected ? .semibold : .regular))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextSecondary)
                     .scaleEffect(isSelected ? 1.08 : 1.0)
 
                 Text(tab.title)
-                    .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
+                    .font(.caption2.weight(isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextSecondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
             }
-            .frame(maxWidth: .infinity, minHeight: 48)
+            .frame(maxWidth: .infinity, minHeight: VNLayout.tabBarItemHeight)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(tab.title)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-    }
-
-    private func triggerHaptic() {
-        #if canImport(UIKit)
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        #endif
     }
 }
