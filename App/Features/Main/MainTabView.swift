@@ -1,5 +1,6 @@
 import BaseNavigationStack
 import SwiftUI
+import TipKit
 import VNCalendarDesignSystem
 
 public enum MainTab: Int, CaseIterable, Identifiable, Sendable {
@@ -111,7 +112,11 @@ public struct MainTabView: View {
     private var customBottomTabBar: some View {
         HStack(spacing: 0) {
             ForEach(MainTab.allCases) { tab in
-                tabButton(for: tab)
+                if tab == .family {
+                    tabButton(for: tab).popoverTip(FamilyTabTip(), arrowEdge: .bottom)
+                } else {
+                    tabButton(for: tab)
+                }
             }
         }
         .padding(.horizontal, VNSpacing.lg)

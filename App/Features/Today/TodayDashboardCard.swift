@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 import VNCalendarDomain
 import VNCalendarDesignSystem
 import VNCalendarLunar
@@ -410,6 +411,7 @@ private struct TodayCardActions: View {
     var body: some View {
         HStack(spacing: VNSpacing.sm) {
             VNButton("Thêm Ngày Nhớ", icon: "plus", variant: .primary, size: .small, isFullWidth: true, action: onAddReminder)
+                .popoverTip(AddReminderTip())
             VNButton("Tra Cứu", icon: "magnifyingglass", variant: .secondary, size: .small, isFullWidth: true, action: onQuickSearch)
         }
     }

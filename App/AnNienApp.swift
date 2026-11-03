@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import TipKit
 import UserNotifications
 import AppUpdateKit
 import VNCalendarDesignSystem
@@ -19,6 +20,7 @@ struct AnNienApp: App {
     init() {
         // Must be set before launch finishes so a cold-start notification tap is delivered.
         UNUserNotificationCenter.current().delegate = DeepLinkCenter.shared
+        try? Tips.configure()
         // Register local notification categories at startup
         Task { @MainActor in
             await SmartNotificationEngine.shared.registerCategories()
