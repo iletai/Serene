@@ -93,8 +93,7 @@ public struct CulturalArticlesView: View {
         }
         .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.vertical, VNSpacing.sm)
-        .background(Color.vnBackgroundPrimary.opacity(0.9))
-        .background(.ultraThinMaterial)
+        .vnTopBarBackground()
         .overlay(alignment: .bottom) {
             Color.vnBorderSubtle.frame(height: VNBorderWidth.hairline)
         }

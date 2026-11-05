@@ -133,3 +133,18 @@ public extension View {
         #endif
     }
 }
+
+// MARK: - Tab-root header chrome
+
+public extension View {
+    /// Canonical background for custom tab-root headers: translucent rice-paper over material.
+    /// The fill extends under the status bar / Dynamic Island while the content keeps the safe area.
+    func vnTopBarBackground() -> some View {
+        background {
+            Rectangle()
+                .fill(Color.vnBackgroundPrimary.opacity(0.9))
+                .background(.ultraThinMaterial)
+                .ignoresSafeArea(.container, edges: .top)
+        }
+    }
+}

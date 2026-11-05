@@ -39,6 +39,7 @@ public struct FamilyHierarchyView: View {
                 genealogyContent(vm: vm)
             } else {
                 ScrollView { lockedContent }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -96,8 +97,7 @@ public struct FamilyHierarchyView: View {
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.vertical, VNSpacing.sm)
-        .background(Color.vnBackgroundPrimary.opacity(0.9))
-        .background(.ultraThinMaterial)
+        .vnTopBarBackground()
         .overlay(alignment: .bottom) {
             Color.vnBorderSubtle.frame(height: VNBorderWidth.hairline)
         }
@@ -115,8 +115,10 @@ public struct FamilyHierarchyView: View {
                     genealogyTreeSection(vm: vm)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, VNSpacing.sectionGap)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Locked State (free tier)

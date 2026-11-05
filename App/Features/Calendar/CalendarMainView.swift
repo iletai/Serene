@@ -125,10 +125,7 @@ public struct CalendarMainView: View {
         .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.vertical, VNSpacing.sm)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            Color.vnBackgroundPrimary.opacity(0.9)
-                .background(.ultraThinMaterial)
-        )
+        .vnTopBarBackground()
         .shadow(color: VNShadow.card.color, radius: VNShadow.card.radius, x: VNShadow.card.x, y: VNShadow.card.y)
         // Top-bar chrome caps its growth like system nav bars; content below scales fully.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
