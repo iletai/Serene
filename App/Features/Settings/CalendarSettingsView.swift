@@ -17,7 +17,7 @@ public struct CalendarSettingsView: View {
     @AppStorage("autoSyncMicroCMS") private var autoSyncMicroCMS = true
     @AppStorage("microCMSWifiOnly") private var microCMSWifiOnly = false
     @AppStorage("cachePrayersOffline") private var cachePrayersOffline = true
-    @AppStorage("microCMSLastSyncDate") private var lastSyncTimestamp = "Hôm nay, 21:00"
+    @AppStorage("microCMSLastSyncDate") private var lastSyncTimestamp = String(format: String(localized: "settings.microcms.last_sync_default"), "21:00")
 
     // Day Customization Preferences
     @AppStorage("showDailyAuspiciousQuote") private var showDailyQuote = true
@@ -25,6 +25,7 @@ public struct CalendarSettingsView: View {
 
     // Sync State
     @State private var isSyncing = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var syncStatusBanner: String?
 
     public init() {}
@@ -216,6 +217,7 @@ public struct CalendarSettingsView: View {
                 }
                 .padding(.horizontal, VNSpacing.sm)
                 .padding(.top, VNSpacing.space2)
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
     }
@@ -289,6 +291,7 @@ public struct CalendarSettingsView: View {
             )
         }
         .disabled(isSyncing)
+        .animation(reduceMotion ? nil : .smooth(duration: 0.25), value: isSyncing)
     }
 
     // MARK: - Section 3: Tùy Biến Lịch Ngày
@@ -425,12 +428,16 @@ public struct CalendarSettingsView: View {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "HH:mm, dd/MM"
                 let nowStr = formatter.string(from: Date())
-                lastSyncTimestamp = "Hôm nay, \(nowStr)"
-                syncStatusBanner = "Đã đồng bộ 48 văn khấn & 12 lễ tiết mới nhất."
+                lastSyncTimestamp = String(format: String(localized: "settings.microcms.last_sync_default"), nowStr)
+                withAnimation(reduceMotion ? nil : .smooth) {
+                    syncStatusBanner = String(localized: "settings.microcms.sync_done")
+                }
 
                 VNHaptics.impact(.success, enabled: isHapticEnabled)
             } catch {
-                syncStatusBanner = "Dữ liệu ngoại tuyến bản địa đã sẵn sàng."
+                withAnimation(reduceMotion ? nil : .smooth) {
+                    syncStatusBanner = String(localized: "settings.microcms.sync_offline")
+                }
             }
             isSyncing = false
         }

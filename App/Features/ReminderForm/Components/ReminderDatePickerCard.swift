@@ -22,7 +22,7 @@ struct ReminderDatePickerCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("HỆ LỊCH & THỜI ĐIỂM")
+            Text("reminder.date_header")
                 .font(.caption2.weight(.medium))
                 .tracking(0.66)
                 .foregroundColor(.vnAccentGoldText)
@@ -38,37 +38,37 @@ struct ReminderDatePickerCard: View {
                 shadow: nil
             ) {
                 VStack(spacing: VNSpacing.md) {
-                    Picker("Hệ Lịch", selection: $dateType) {
-                        Text("Âm Lịch (Khuyên Dùng)").tag(CalendarDateType.lunar)
-                        Text("Dương Lịch").tag(CalendarDateType.solar)
+                    Picker("reminder.date_type", selection: $dateType) {
+                        Text("reminder.date_type_lunar").tag(CalendarDateType.lunar)
+                        Text("reminder.date_type_solar").tag(CalendarDateType.solar)
                     }
                     .pickerStyle(.segmented)
                     .tint(Color.vnAccentHeritageRed)
 
                     columnsLayout {
-                        pickerColumn(title: "Ngày") {
-                            Picker("Ngày", selection: $day) {
+                        pickerColumn(title: String(localized: "reminder.day")) {
+                            Picker("reminder.day", selection: $day) {
                                 ForEach(1...31, id: \.self) { d in
                                     Text("\(d)").tag(d)
                                 }
                             }
                         }
 
-                        pickerColumn(title: "Tháng") {
-                            Picker("Tháng", selection: $month) {
+                        pickerColumn(title: String(localized: "reminder.month")) {
+                            Picker("reminder.month", selection: $month) {
                                 ForEach(1...12, id: \.self) { m in
-                                    Text("Tháng \(m)").tag(m)
+                                    Text(String(format: String(localized: "reminder.month_option"), m)).tag(m)
                                 }
                             }
                         }
 
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                            Text("Năm (tùy chọn)")
+                            Text("reminder.year_optional")
                                 .font(.caption.weight(.medium))
                                 .lineLimit(2)
                                 .minimumScaleFactor(0.8)
                                 .foregroundColor(.vnTextSecondary)
-                            TextField("VD: 2024", text: $year)
+                            TextField("reminder.year_placeholder", text: $year)
                                 .keyboardType(.numberPad)
                                 .font(.callout.weight(.semibold))
                                 .foregroundColor(.vnTextPrimary)
@@ -84,7 +84,7 @@ struct ReminderDatePickerCard: View {
                     }
 
                     if dateType == .lunar {
-                        Toggle("Là sự kiện trong Tháng Nhuận", isOn: $isLeapMonth)
+                        Toggle("reminder.leap_month", isOn: $isLeapMonth)
                             .font(.footnote.weight(.medium))
                             .foregroundColor(.vnTextPrimary)
                             .tint(Color.vnAccentHeritageRed)
@@ -140,16 +140,12 @@ struct ReminderDatePickerCard: View {
             let lunar = LunarDate(day: day, month: month, year: selectedYear, isLeapMonth: isLeapMonth)
             let solar = engine.convertToSolar(from: lunar)
             let canChi = engine.computeCanChi(for: solar)
-            let solarDayStr = String(format: "%02d", solar.day)
-            let solarMonthStr = String(format: "%02d", solar.month)
-            return "Dương lịch: \(solarDayStr)/\(solarMonthStr)/\(solar.year) (Năm \(canChi.year.description))"
+            return String(format: String(localized: "reminder.preview_solar"), solar.day, solar.month, solar.year, canChi.year.description)
         } else {
             let solar = SolarDate(day: day, month: month, year: selectedYear)
             let lunar = engine.convertToLunar(from: solar)
             let canChi = engine.computeCanChi(for: solar)
-            let lunarDayStr = String(format: "%02d", lunar.day)
-            let lunarMonthStr = String(format: "%02d", lunar.month)
-            return "Âm lịch: \(lunarDayStr)/\(lunarMonthStr)/\(lunar.year) (Năm \(canChi.year.description))"
+            return String(format: String(localized: "reminder.preview_lunar"), lunar.day, lunar.month, lunar.year, canChi.year.description)
         }
     }
 }

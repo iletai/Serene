@@ -13,33 +13,38 @@ public enum VNButtonSize: Sendable {
     case medium
     case large
 
-    /// HIG minimum 44pt touch target. The 36pt top bar is the sole 44-exception (DESIGN §4).
+    /// Visual height. Hit area is extended to 44pt separately (see `hitOutset`).
     public var minHeight: CGFloat {
         switch self {
-        case .small: return 44
-        case .medium: return 44
-        case .large: return 52
+        case .small: return VNSize.buttonSmall
+        case .medium: return VNSize.buttonMedium
+        case .large: return VNSize.buttonLarge
         }
     }
+
+    /// Per-side expansion of the tap area so compact buttons still meet the 44pt HIG target.
+    var hitOutset: CGFloat { max(0, (VNSize.minTapTarget - minHeight) / 2) }
 
     public var horizontalPadding: CGFloat {
         switch self {
-        case .small: return VNSpacing.sm
-        case .medium: return VNSpacing.lg
-        case .large: return VNSpacing.xl
+        case .small: return VNSpacing.md
+        case .medium: return VNSpacing.xl
+        case .large: return VNSpacing.xxl
         }
     }
 
-    public var fontSize: CGFloat {
+    /// Dynamic Type aware (replaces fixed 12/14/16pt sizes).
+    var textStyle: Font.TextStyle {
         switch self {
-        case .small: return 12
-        case .medium: return 14
-        case .large: return 16
+        case .small: return .footnote
+        case .medium: return .subheadline
+        case .large: return .body
         }
     }
 }
 
 public struct VNButtonStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     public let variant: VNButtonVariant
     public let size: VNButtonSize
     public let isFullWidth: Bool
@@ -56,11 +61,12 @@ public struct VNButtonStyle: ButtonStyle {
 
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: size.fontSize, weight: .semibold, design: .serif))
+            .font(.system(size.textStyle, design: .serif, weight: .semibold))
             .foregroundColor(foregroundColor)
             .padding(.horizontal, size.horizontalPadding)
             .frame(maxWidth: isFullWidth ? .infinity : nil)
             .frame(minHeight: size.minHeight)
+            .contentShape(Rectangle().inset(by: -size.hitOutset))
             .background(backgroundColor(isPressed: configuration.isPressed))
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
             .overlay(
@@ -73,8 +79,11 @@ public struct VNButtonStyle: ButtonStyle {
                 x: VNShadow.folio.x,
                 y: VNShadow.folio.y
             )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .animation(VNAnimation.cellSelection, value: configuration.isPressed)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.97 : 1.0)
+            .animation(
+                reduceMotion ? VNAnimation.reduced : (configuration.isPressed ? VNAnimation.pressDown : VNAnimation.press),
+                value: configuration.isPressed
+            )
     }
 
     private var foregroundColor: Color {
@@ -162,17 +171,19 @@ public struct VNButton: View {
         self.action = action
     }
 
+    @State private var tapCount = 0
+
     public var body: some View {
         Button(
             action: {
-                triggerHaptic()
+                tapCount += 1
                 action()
             },
             label: {
-                HStack(spacing: VNSpacing.xs) {
+                HStack(spacing: VNSpacing.sm) {
                     if let icon = icon {
                         Image(systemName: icon)
-                            .font(.system(size: size.fontSize - 1, weight: .bold))
+                            .font(.system(size.textStyle, weight: .bold))
                     }
                     Text(title)
                         .lineLimit(1)
@@ -181,12 +192,6 @@ public struct VNButton: View {
             }
         )
         .buttonStyle(VNButtonStyle(variant: variant, size: size, isFullWidth: isFullWidth))
-    }
-
-    private func triggerHaptic() {
-        #if canImport(UIKit)
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        #endif
+        .vnImpactFeedback(trigger: tapCount)
     }
 }

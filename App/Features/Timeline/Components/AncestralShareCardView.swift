@@ -44,11 +44,11 @@ public struct AncestralShareCardView: View {
         }
 
         let occ = SolarDate(from: nextDate, calendar: cal)
-        return "Ngày \(occ.day) tháng \(occ.month) năm \(occ.year)"
+        return String(format: String(localized: "timeline.share_solar_date"), occ.day, occ.month, occ.year)
     }
 
     private var lunarDateString: String {
-        "Ngày \(reminder.day) tháng \(reminder.month) Âm Lịch"
+        String(format: String(localized: "timeline.share_lunar_date"), reminder.day, reminder.month)
     }
 
     public var body: some View {
@@ -64,7 +64,7 @@ public struct AncestralShareCardView: View {
                 // Actions: Share to Zalo / iMessage
                 VStack(spacing: VNSpacing.sm) {
                     VNButton(
-                        "Chia Sẻ Thiệp Báo Giỗ Cho Gia Tộc",
+                        String(localized: "timeline.share_card_cta"),
                         icon: "square.and.arrow.up",
                         variant: .primary,
                         size: .large,
@@ -73,7 +73,7 @@ public struct AncestralShareCardView: View {
                         shareInvitation()
                     }
 
-                    Button("Đóng") {
+                    Button("action.close") {
                         dismiss()
                     }
                     .font(.subheadline.weight(.medium))
@@ -85,7 +85,7 @@ public struct AncestralShareCardView: View {
                 .padding(.bottom, VNSpacing.xl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-            .vnNavBar(title: "Thiệp Báo Kỵ Nhật")
+            .vnNavBar(title: String(localized: "timeline.share_view_title"))
         }
     }
 
@@ -97,7 +97,7 @@ public struct AncestralShareCardView: View {
             HStack {
                 Spacer()
                 VNSealBadge(
-                    text: reminder.category == .deathAnniversary ? "KỴ NHẬT" : "HIẾU ĐẠO",
+                    text: reminder.category == .deathAnniversary ? String(localized: "timeline.seal_death_anniversary") : String(localized: "timeline.seal_filial_piety"),
                     shape: .rounded(),
                     color: .cinnabarGold,
                     size: .medium
@@ -108,12 +108,12 @@ public struct AncestralShareCardView: View {
 
             // Header Title
             VStack(spacing: VNSpacing.xs) {
-                Text("THÔNG BÁO NGÀY GIỖ GIA TIÊN")
+                Text("timeline.share_card_title")
                     .font(.system(.footnote, design: .serif, weight: .bold))
                     .foregroundColor(.vnAccentHeritageRed)
                     .tracking(2.0)
 
-                Text("Kính cáo toàn thể dòng họ & con cháu nội ngoại")
+                Text("timeline.share_card_subtitle")
                     .font(.system(.caption2, design: .serif).italic())
                     .foregroundColor(.vnTextSecondary)
             }
@@ -146,7 +146,7 @@ public struct AncestralShareCardView: View {
             VStack(spacing: VNSpacing.sm) {
                 HStack(spacing: VNSpacing.md) {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                        Text("NGÀY ÂM LỊCH")
+                        Text("timeline.share_lunar_label")
                             .font(.caption2.weight(.bold))
                             .foregroundColor(.vnTextSecondary)
                         Text(lunarDateString)
@@ -157,7 +157,7 @@ public struct AncestralShareCardView: View {
                     Spacer()
 
                     VStack(alignment: .trailing, spacing: VNSpacing.space2) {
-                        Text("DƯƠNG LỊCH NĂM NAY")
+                        Text("timeline.share_solar_label")
                             .font(.caption2.weight(.bold))
                             .foregroundColor(.vnTextSecondary)
                         Text(nextDateString)
@@ -176,7 +176,7 @@ public struct AncestralShareCardView: View {
             .padding(.horizontal, VNSpacing.sm)
 
             if let note = reminder.note, !note.isEmpty {
-                Text("Địa điểm / Lời dặn: \(note)")
+                Text(String(format: String(localized: "timeline.share_note_format"), note))
                     .font(.system(.caption, design: .serif, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                     .multilineTextAlignment(.center)
@@ -185,7 +185,7 @@ public struct AncestralShareCardView: View {
 
             // Footer Stamp
             HStack {
-                Text("AN NIÊN • LỊCH VIỆT & NGÀY NHỚ")
+                Text("timeline.share_footer")
                     .font(.caption2.weight(.semibold))
                     .foregroundColor(.vnTextTertiary)
                     .tracking(1.0)
@@ -209,15 +209,8 @@ public struct AncestralShareCardView: View {
     }
 
     private func shareInvitation() {
-        let text = """
-        [THÔNG BÁO NGÀY GIỖ GIA TIÊN]
-        Kính nhớ: \(reminder.title) (\(reminder.relationship ?? "Tiền nhân"))
-        • Ngày Âm lịch: \(lunarDateString)
-        • Ngày Dương lịch năm nay: \(nextDateString)
-        \(reminder.note.map { "• Lời dặn: \($0)" } ?? "")
-        Kính mời toàn thể gia tộc tề tựu phụng sự đạo hiếu.
-        — Ứng dụng An Niên (Lịch Việt & Ngày Nhớ)
-        """
+        let noteLine = reminder.note.map { String(format: String(localized: "timeline.share_note_line"), $0) } ?? ""
+        let text = String(format: String(localized: "timeline.share_message"), reminder.title, reminder.relationship ?? String(localized: "timeline.share_default_relationship"), lunarDateString, nextDateString, noteLine)
 
         #if canImport(UIKit)
         let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)

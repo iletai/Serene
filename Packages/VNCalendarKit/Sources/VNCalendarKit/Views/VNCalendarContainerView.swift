@@ -11,6 +11,9 @@ public struct VNCalendarContainerView: View {
         return cal
     }()
 
+    /// Mode change: cross-fade with a slight scale; vnTransition degrades to opacity under Reduce Motion.
+    private static let modeTransition = AnyTransition.opacity.combined(with: .scale(scale: 0.97))
+
     @Bindable var viewModel: VNCalendarAdapterViewModel
     /// Fired directly from inline views, or only after the day-detail sheet has fully dismissed,
     /// so the host can present its own sheet without colliding with this one.
@@ -52,11 +55,11 @@ public struct VNCalendarContainerView: View {
                     onSelectToday: { viewModel.selectToday() },
                     onTapDetails: { viewModel.isDetailSheetPresented = true }
                 )
-                .transition(.opacity)
+                .vnTransition(Self.modeTransition)
 
             case .month:
                 monthGridView
-                    .transition(.opacity)
+                    .vnTransition(Self.modeTransition)
 
             case .week:
                 VNWeekCalendarView(
@@ -74,7 +77,7 @@ public struct VNCalendarContainerView: View {
                         viewModel.isDetailSheetPresented = true
                     }
                 )
-                .transition(.opacity)
+                .vnTransition(Self.modeTransition)
 
             case .year:
                 VNYearCalendarView(
@@ -87,14 +90,14 @@ public struct VNCalendarContainerView: View {
                         viewModel.selectDateKey(key, date: date)
                     }
                 )
-                .transition(.opacity)
+                .vnTransition(Self.modeTransition)
             }
 
             if viewModel.displayMode == .month {
                 legendRow
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: viewModel.displayMode)
+        .vnAnimation(VNAnimation.layout, value: viewModel.displayMode)
         .sheet(isPresented: $viewModel.isDetailSheetPresented, onDismiss: {
             guard addReminderAfterDismiss else { return }
             addReminderAfterDismiss = false
@@ -118,14 +121,14 @@ public struct VNCalendarContainerView: View {
 
     private var legendRow: some View {
         HStack(spacing: VNSpacing.md) {
-            legendItem(dot: .vnAccentImperialGold, label: "Ngày Hoàng Đạo")
-            legendItem(dot: .vnAccentHeritageRed, label: "Giỗ / Sự Kiện Gia Đình")
-            legendItem(symbol: "🌕", label: "Rằm / Mùng Một")
+            legendItem(dot: .vnAccentImperialGold, label: String(localized: "calendar.legend.auspicious_day"))
+            legendItem(dot: .vnAccentHeritageRed, label: String(localized: "calendar.legend.family_anniversary_or_event"))
+            legendItem(symbol: "🌕", label: String(localized: "calendar.legend.full_moon_or_first_day"))
         }
         .padding(.top, VNSpacing.xs)
         .padding(.bottom, VNSpacing.sm)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Chú thích: chấm vàng là ngày Hoàng Đạo, chấm đỏ là Giỗ, mặt trăng là Rằm Mùng Một")
+        .accessibilityLabel("calendar.legend.accessibility_summary")
     }
 
     private func legendItem(symbol: String, label: String) -> some View {

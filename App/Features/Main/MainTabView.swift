@@ -6,21 +6,18 @@ import VNCalendarDesignSystem
 public enum MainTab: Int, CaseIterable, Identifiable, Sendable {
     case calendar = 0
     case memorial = 1
-    case rituals = 2
-    case family = 3
+    case family = 2
 
     public var id: Int { rawValue }
 
     public var title: String {
         switch self {
         case .calendar:
-            return "Lịch Ngày"
+            return String(localized: "tab.calendar")
         case .memorial:
-            return "Ngày Giỗ"
-        case .rituals:
-            return "Văn Khấn"
+            return String(localized: "tab.memorials")
         case .family:
-            return "Gia Tộc"
+            return String(localized: "tab.family")
         }
     }
 
@@ -31,8 +28,6 @@ public enum MainTab: Int, CaseIterable, Identifiable, Sendable {
             return "calendar"
         case .memorial:
             return isSelected ? "flame.fill" : "flame"
-        case .rituals:
-            return isSelected ? "book.closed.fill" : "book.closed"
         case .family:
             return isSelected ? "person.3.fill" : "person.3"
         }
@@ -46,6 +41,12 @@ public struct MainTabView: View {
     /// tab keeps its stack and sheet across switches.
     @State private var routers: [AppRouter]
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var pillNamespace
+    /// Tabs shown at least once; unvisited tabs stay unbuilt (TabView's lazy behaviour) while visited ones keep state.
+    @State private var visitedTabs: Set<MainTab> = [.calendar]
+    /// Measured pill height, published to tab roots and pushed screens via `vnTabBarHeight`.
+    @State private var tabBarHeight: CGFloat = 0
 
     init(pendingDeepLink: Binding<DeepLinkHandler.Action?> = .constant(nil)) {
         _pendingDeepLink = pendingDeepLink
@@ -53,25 +54,46 @@ public struct MainTabView: View {
     }
 
     public var body: some View {
-        TabView(selection: $selectedTab) {
+        // ZStack instead of TabView: TabView swaps instantly with no hook for a transition.
+        ZStack {
             ForEach(MainTab.allCases) { tab in
-                tabContainer(for: tab)
-                    .tag(tab)
-                    .toolbar(.hidden, for: .tabBar)
+                if visitedTabs.contains(tab) {
+                    tabContainer(for: tab)
+                        .opacity(selectedTab == tab ? 1 : 0)
+                        .offset(x: reduceMotion || selectedTab == tab ? 0 : slideOffset(for: tab))
+                        .allowsHitTesting(selectedTab == tab)
+                        .accessibilityHidden(selectedTab != tab)
+                        .zIndex(selectedTab == tab ? 1 : 0)
+                }
             }
         }
+        .animation(tabAnimation, value: selectedTab)
+        .onChange(of: selectedTab, initial: true) { _, tab in visitedTabs.insert(tab) }
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        // safeAreaInset reserves pill height in every tab's scroll content,
-        // so nothing can scroll under the floating pill (ZStack overlay never did).
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+        // Overlay + measured height: safeAreaInset does not reliably reach content hosted inside NavigationStack,
+        // so each tab/pushed screen applies vnTabBarClearance() (contentMargins) from this environment value.
+        .overlay(alignment: .bottom) {
             customBottomTabBar
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { tabBarHeight = $0 }
         }
+        .environment(\.vnTabBarHeight, tabBarHeight)
         .onChange(of: pendingDeepLink, initial: true) { _, action in
             guard let action else { return }
             handle(action)
             pendingDeepLink = nil
         }
     }
+
+    private var tabAnimation: Animation {
+        reduceMotion ? .easeInOut(duration: 0.15) : .smooth(duration: 0.3)
+    }
+
+    /// Inactive tabs rest slightly to the side of the selected one so switching reads as a gentle slide.
+    private func slideOffset(for tab: MainTab) -> CGFloat {
+        tab.rawValue < selectedTab.rawValue ? -Self.slideDistance : Self.slideDistance
+    }
+
+    private static let slideDistance: CGFloat = 24
 
     private func handle(_ action: DeepLinkHandler.Action) {
         // A sheet on the current tab would otherwise stay up over the newly selected tab.
@@ -89,7 +111,8 @@ public struct MainTabView: View {
         BaseNavigationContainer(
             router: routers[tab.rawValue],
             content: { tabRoot(for: tab) },
-            destination: { AppRouteView(route: $0) },
+            // Pill stays visible on push, so pushed screens keep the clearance; sheets cover the pill and skip it.
+            destination: { AppRouteView(route: $0).vnTabBarClearance() },
             sheet: { AppSheetView(sheet: $0) },
             cover: { _ in EmptyView() }
         )
@@ -102,11 +125,11 @@ public struct MainTabView: View {
             switch tab {
             case .calendar: CalendarMainView()
             case .memorial: UpcomingTimelineView()
-            case .rituals: CulturalArticlesView()
             case .family: FamilyHierarchyView()
             }
         }
         .toolbar(.hidden, for: .navigationBar)
+        .vnTabBarClearance()
     }
 
     // MARK: - Floating Pill Tab Bar
@@ -121,7 +144,7 @@ public struct MainTabView: View {
             }
         }
         .padding(.horizontal, VNSpacing.lg)
-        .padding(.vertical, VNSpacing.md)
+        .padding(.vertical, VNSpacing.sm)
         .frame(maxWidth: VNLayout.tabBarMaxWidth)
         // Bar chrome caps its growth like the system tab bar so labels never truncate.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
@@ -143,7 +166,7 @@ public struct MainTabView: View {
 
         return Button {
             VNHaptics.impact(enabled: hapticFeedbackEnabled)
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+            withAnimation(tabAnimation) {
                 selectedTab = tab
             }
         } label: {
@@ -154,6 +177,8 @@ public struct MainTabView: View {
                     .symbolRenderingMode(.hierarchical)
                     .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextSecondary)
                     .scaleEffect(isSelected ? 1.08 : 1.0)
+                    .contentTransition(.symbolEffect(.replace))
+                    .symbolEffect(.bounce, value: reduceMotion ? false : isSelected)
 
                 Text(tab.title)
                     .font(.caption2.weight(isSelected ? .semibold : .regular))
@@ -163,6 +188,13 @@ public struct MainTabView: View {
             }
             .frame(maxWidth: .infinity, minHeight: VNLayout.tabBarItemHeight)
             .contentShape(Rectangle())
+            .background {
+                if isSelected {
+                    Capsule()
+                        .fill(Color.vnAccentHeritageRed.opacity(0.1))
+                        .matchedGeometryEffect(id: "selectedPill", in: pillNamespace)
+                }
+            }
         }
         .buttonStyle(.plain)
         .accessibilityLabel(tab.title)

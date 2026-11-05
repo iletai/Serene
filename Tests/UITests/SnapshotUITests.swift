@@ -24,20 +24,12 @@ final class SnapshotUITests: XCTestCase {
             snapshot("02-memorial")
         }
 
-        // 3. Văn Khấn tab
-        let ritualsTab = app.buttons["Văn Khấn"]
-        if ritualsTab.waitForExistence(timeout: 5) {
-            ritualsTab.tap()
-            sleep(1)
-            snapshot("03-rituals")
-        }
-
-        // 4. Gia Tộc tab
+        // 3. Gia Tộc tab
         let familyTab = app.buttons["Gia Tộc"]
         if familyTab.waitForExistence(timeout: 5) {
             familyTab.tap()
             sleep(1)
-            snapshot("04-family")
+            snapshot("03-family")
         }
     }
 }

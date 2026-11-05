@@ -8,8 +8,8 @@ public struct UpcomingTimelineView: View {
     @Environment(AppRouter.self) private var router
     @State private var viewModel: UpcomingTimelineViewModel?
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // The floating tab pill overlays the scroll view without a safe-area inset; it grows with Dynamic Type.
-    @ScaledMetric(relativeTo: .caption2) private var tabBarClearance: CGFloat = VNSpacing.hero + VNSpacing.sectionGap
 
     public init() {}
 
@@ -30,7 +30,7 @@ public struct UpcomingTimelineView: View {
                 headerSection(vm: vm)
                 searchBarSection(vm: vm)
                 MemorialFilterPills(
-                    selectedTab: $vm.selectedFilter,
+                    selectedTab: $vm.selectedFilter.animation(reduceMotion ? nil : .smooth(duration: 0.3)),
                     countForTab: { tab in
                         vm.reminders.filter { tab.matches(category: $0.category) }.count
                     }
@@ -38,7 +38,6 @@ public struct UpcomingTimelineView: View {
                 .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 contentSection(vm: vm)
             }
-            .padding(.bottom, tabBarClearance)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
         .task {
@@ -80,7 +79,7 @@ public struct UpcomingTimelineView: View {
                         .font(.caption2)
                         .accessibilityHidden(true)
                         .foregroundColor(.vnAccentHeritageRed)
-                    Text("KÍNH NHỚ TỔ TIÊN")
+                    Text("timeline.ancestor_eyebrow")
                         .font(.caption2.weight(.bold))
                         .tracking(1.0)
                         .foregroundColor(.vnAccentHeritageRed)
@@ -92,20 +91,20 @@ public struct UpcomingTimelineView: View {
 
                 Spacer()
 
-                VNButton("Thêm Mới", icon: "plus", variant: .primary, size: .small) {
+                VNButton(String(localized: "timeline.add_new"), icon: "plus", variant: .primary, size: .small) {
                     createReminder(vm: vm)
                 }
             }
 
             HStack(alignment: .lastTextBaseline) {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                    Text("Ngày Giỗ & Sự Kiện")
+                    Text("timeline.title")
                         .font(.system(.title, design: .serif).weight(.bold))
                         .foregroundColor(.vnTextPrimary)
                         .lineLimit(2)
                         .minimumScaleFactor(0.8)
 
-                    Text("Lưu truyền phụng sự đạo hiếu dòng họ gia tộc")
+                    Text("timeline.subtitle")
                         .font(.system(.footnote, design: .serif))
                         .italic()
                         .foregroundColor(.vnTextSecondary)
@@ -114,13 +113,15 @@ public struct UpcomingTimelineView: View {
                 Spacer()
 
                 if !vm.reminders.isEmpty {
-                    Text("\(vm.reminders.count) sự kiện")
+                    Text(String(format: String(localized: "timeline.events_count"), vm.reminders.count))
                         .font(.caption2.weight(.semibold))
                         .foregroundColor(.vnAccentHeritageRed)
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.xs)
                         .background(Color.vnAccentRedSurface)
                         .clipShape(Capsule())
+                    .contentTransition(.numericText())
+                    .animation(reduceMotion ? nil : .snappy, value: vm.reminders.count)
                 }
             }
             .padding(.top, VNSpacing.space2)
@@ -141,7 +142,7 @@ public struct UpcomingTimelineView: View {
                 .font(.subheadline)
                 .accessibilityHidden(true)
 
-            TextField("Tìm tên tiền nhân, ngày cúng, dòng họ...", text: $boundVM.searchQuery)
+            TextField("timeline.search_placeholder", text: $boundVM.searchQuery)
                 .font(.footnote)
 
             if !vm.searchQuery.isEmpty {
@@ -155,7 +156,7 @@ public struct UpcomingTimelineView: View {
                 .buttonStyle(.plain)
                 .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
-                .accessibilityLabel("Xóa tìm kiếm")
+                .accessibilityLabel("timeline.clear_search_accessibility")
             }
         }
         .padding(.horizontal, VNSpacing.md)
@@ -177,9 +178,9 @@ public struct UpcomingTimelineView: View {
         if vm.filteredReminders.isEmpty {
             VNEmptyState(
                 icon: "flame.fill",
-                title: "Gìn Giữ Đạo Hiếu Gia Tiên",
-                quote: "“Cây có cội mới trổ cành xanh lá\nNước có nguồn mới bủa khắp rạch sông”",
-                ctaLabel: "Thêm Ngày Giỗ Đầu Tiên",
+                title: String(localized: "timeline.empty_title"),
+                quote: String(localized: "timeline.empty_quote"),
+                ctaLabel: String(localized: "timeline.empty_cta_add"),
                 ctaIcon: "plus.circle.fill",
                 onCTA: { createReminder(vm: vm) }
             )
@@ -188,7 +189,7 @@ public struct UpcomingTimelineView: View {
             VStack(alignment: .leading, spacing: VNSpacing.md) {
                 if vm.searchQuery.isEmpty && vm.selectedFilter == .all, let hero = vm.urgentMemorial {
                     let monthStr = String(format: "%02d", hero.month)
-                    let calTypeStr = hero.dateType == .lunar ? "Âm Lịch" : "Dương Lịch"
+                    let calTypeStr = hero.dateType == .lunar ? String(localized: "timeline.calendar_type_lunar") : String(localized: "timeline.calendar_type_solar")
                     let dateText = "\(hero.day)/\(monthStr) \(calTypeStr)"
 
                     MemorialHeroCard(
@@ -199,12 +200,12 @@ public struct UpcomingTimelineView: View {
                         onEdit: { edit(hero) }
                     )
 
-                    MemorialTimelineDivider(title: "DANH SÁCH TIẾP THEO")
+                    MemorialTimelineDivider(title: String(localized: "timeline.upcoming_section_divider"))
                 }
 
-                ForEach(vm.filteredReminders) { reminder in
+                ForEach(Array(vm.filteredReminders.enumerated()), id: \.element.id) { index, reminder in
                     let monthStr = String(format: "%02d", reminder.month)
-                    let calTypeStr = reminder.dateType == .lunar ? "Âm Lịch" : "Dương Lịch"
+                    let calTypeStr = reminder.dateType == .lunar ? String(localized: "timeline.calendar_type_lunar") : String(localized: "timeline.calendar_type_solar")
                     let dateText = "\(reminder.day)/\(monthStr) \(calTypeStr)"
                     let countdown = vm.countdownText(for: reminder)
 
@@ -216,9 +217,34 @@ public struct UpcomingTimelineView: View {
                         onEdit: { edit(reminder) },
                         onDelete: { vm.delete(reminder) }
                     )
+                    .modifier(TimelineCardAppear(index: index, reduceMotion: reduceMotion))
                 }
             }
             .padding(.horizontal, VNSpacing.screenMargin)
         }
+    }
+}
+
+// MARK: - Card appear
+
+/// Staggered fade-up for the first few cards only; later cards just fade in as they scroll into view.
+private struct TimelineCardAppear: ViewModifier {
+    private static let staggeredCount = 8
+    let index: Int
+    let reduceMotion: Bool
+    @State private var appeared = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(appeared || reduceMotion ? 1 : 0)
+            .offset(y: appeared || reduceMotion ? 0 : 12)
+            .onAppear {
+                guard !appeared else { return }
+                guard index < Self.staggeredCount else {
+                    appeared = true
+                    return
+                }
+                withAnimation(.smooth(duration: 0.4).delay(Double(index) * 0.05)) { appeared = true }
+            }
     }
 }

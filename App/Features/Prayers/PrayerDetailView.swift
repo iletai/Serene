@@ -20,7 +20,12 @@ public struct PrayerDetailView: View {
         let lunar = LunarAstronomicalEngine.shared.convertToLunar(from: now)
         let canChi = LunarAstronomicalEngine.shared.computeCanChi(for: now)
 
-        let canChiDesc = "Năm \(canChi.year.description), Tháng \(canChi.month.description), Ngày \(canChi.day.description)"
+        let canChiDesc = String(
+            format: String(localized: "prayers.detail.can_chi_desc"),
+            canChi.year.description,
+            canChi.month.description,
+            canChi.day.description
+        )
         var text = prayer.prayerText
         text = text.replacingOccurrences(of: "[Ngày]", with: "\(lunar.day)")
         text = text.replacingOccurrences(of: "[Tháng]", with: "\(lunar.month)")
@@ -28,7 +33,7 @@ public struct PrayerDetailView: View {
         text = text.replacingOccurrences(of: "[Can Chi]", with: canChiDesc)
         text = text.replacingOccurrences(of: "[Năm Cũ]", with: "\(lunar.year)")
         text = text.replacingOccurrences(of: "[Năm Mới]", with: "\(lunar.year + 1)")
-        text = text.replacingOccurrences(of: "[Tiết khí]", with: "Tiết khí bản địa")
+        text = text.replacingOccurrences(of: "[Tiết khí]", with: String(localized: "prayers.detail.solar_term"))
         return text
     }
 
@@ -65,7 +70,7 @@ public struct PrayerDetailView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Đóng") {
+                    Button("action.close") {
                         dismiss()
                     }
                     .foregroundColor(.vnTextSecondary)
@@ -81,7 +86,7 @@ public struct PrayerDetailView: View {
                             Image(systemName: "doc.on.doc")
                                 .font(.vnFootnote)
                                 .accessibilityHidden(true)
-                            Text("Sao chép")
+                            Text("prayers.action.copy")
                                 .font(.vnFootnote)
                                 .fontWeight(.medium)
                         }
@@ -100,7 +105,7 @@ public struct PrayerDetailView: View {
             }
             .overlay(alignment: .bottom) {
                 if showCopiedAlert {
-                    Text("Đã sao chép bài văn khấn")
+                    Text("prayers.copied_toast")
                         .font(.footnote.weight(.semibold))
                         .foregroundColor(.vnOnAccent)
                         .padding(.horizontal, VNSpacing.lg)
@@ -135,7 +140,7 @@ public struct PrayerDetailView: View {
 
                 Spacer()
 
-                VNSealBadge(text: "CHUẨN", shape: .rounded(), color: .cinnabarGold, size: .small)
+                VNSealBadge(text: String(localized: "prayers.seal_standard"), shape: .rounded(), color: .cinnabarGold, size: .small)
             }
             .padding(.horizontal, VNSpacing.sm)
             .padding(.vertical, VNSpacing.xs)
@@ -163,10 +168,10 @@ public struct PrayerDetailView: View {
 
     private var offeringsCard: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("Lễ vật cần chuẩn bị")
+            Text("prayers.offerings_title")
                 .font(.system(.headline, design: .serif, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
-            Text("Mâm cúng dâng trước án tọa")
+            Text("prayers.offerings_subtitle")
                 .font(.caption2)
                 .foregroundColor(.vnTextSecondary)
 
@@ -213,7 +218,7 @@ public struct PrayerDetailView: View {
                         .fontWeight(.bold)
                         .foregroundColor(.vnAccentGoldText)
                         .accessibilityHidden(true)
-                    Text("Chuông Khánh")
+                    Text("prayers.bell")
                         .font(.vnCaption1)
                         .fontWeight(.semibold)
                         .foregroundColor(.vnTextPrimary)
@@ -236,13 +241,14 @@ public struct PrayerDetailView: View {
                         .font(.vnCaption1)
                         .fontWeight(.bold)
                         .foregroundColor(.vnTextPrimary)
-                        .frame(width: 44, height: 44)
+                        .frame(width: VNSize.buttonSmall, height: VNSize.buttonSmall)
                         .background(Color.vnBackgroundSecondary)
                         .clipShape(Circle())
+                        .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 }
                 .buttonStyle(.plain)
                 .contentShape(Circle())
-                .accessibilityLabel("Giảm cỡ chữ")
+                .accessibilityLabel("prayers.a11y_font_smaller")
 
                 Text("\(Int(fontSize))pt")
                     .font(.vnCaption2)
@@ -257,13 +263,14 @@ public struct PrayerDetailView: View {
                         .font(.vnCaption1)
                         .fontWeight(.bold)
                         .foregroundColor(.vnTextPrimary)
-                        .frame(width: 44, height: 44)
+                        .frame(width: VNSize.buttonSmall, height: VNSize.buttonSmall)
                         .background(Color.vnBackgroundSecondary)
                         .clipShape(Circle())
+                        .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 }
                 .buttonStyle(.plain)
                 .contentShape(Circle())
-                .accessibilityLabel("Tăng cỡ chữ")
+                .accessibilityLabel("prayers.a11y_font_larger")
             }
         }
     }
@@ -272,7 +279,7 @@ public struct PrayerDetailView: View {
 
     private var prayerTextCard: some View {
         VStack(alignment: .leading, spacing: VNSpacing.md) {
-            Text("Bài văn khấn")
+            Text("prayers.prayer_text_title")
                 .font(.system(.headline, design: .serif, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
 
@@ -302,7 +309,7 @@ public struct PrayerDetailView: View {
 
     private func notesCard(_ notes: String) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            Text("Lưu ý văn hóa & nghi lễ")
+            Text("prayers.notes_title")
                 .font(.system(.headline, design: .serif, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
 

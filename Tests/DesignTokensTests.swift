@@ -11,6 +11,6 @@ final class DesignTokensTests: XCTestCase {
         XCTAssertEqual(VNSize.iconBadge, 24)
         XCTAssertEqual(VNLayout.tabBarMaxWidth, 520)
         XCTAssertEqual(VNLayout.tabBarBottomInset, 12)
-        XCTAssertEqual(VNLayout.tabBarItemHeight, 48)
+        XCTAssertEqual(VNLayout.tabBarItemHeight, 44)
     }
 }

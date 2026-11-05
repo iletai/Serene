@@ -48,6 +48,8 @@ public struct VNChip: View {
         .padding(.vertical, VNSpacing.xs)
         .background(backgroundColor)
         .modifier(VNChipShapeModifier(isPill: variant.isPill, borderColor: borderColor))
+        .contentTransition(.opacity)
+        .vnAnimation(VNAnimation.selection, value: text)
         .accessibilityElement(children: .combine)
     }
 

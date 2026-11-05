@@ -14,7 +14,7 @@ public struct VNSearchField: View {
 
     @FocusState private var isFocused: Bool
 
-    public init(text: Binding<String>, placeholder: String = "Tìm kiếm…") {
+    public init(text: Binding<String>, placeholder: String = String(localized: "ds.search.placeholder")) {
         self._text = text
         self.placeholder = placeholder
     }
@@ -25,7 +25,7 @@ public struct VNSearchField: View {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 15))
                     .foregroundColor(isFocused ? .vnAccentHeritageRed : .vnTextTertiary)
-                    .animation(VNAnimation.cellSelection, value: isFocused)
+                    .vnAnimation(VNAnimation.selection, value: isFocused)
                     .accessibilityHidden(true)
 
                 TextField(
@@ -47,9 +47,11 @@ public struct VNSearchField: View {
                             .font(.system(size: 15))
                             .foregroundColor(.vnTextTertiary)
                     }
-                    .transition(.scale.combined(with: .opacity))
+                    .buttonStyle(.vnPress(scale: 0.85))
+                    .vnTransition(.scale.combined(with: .opacity))
                 }
             }
+            .vnAnimation(VNAnimation.selection, value: text.isEmpty)
             .padding(VNSpacing.md)
             .background(Color.vnBackgroundSecondary)
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
@@ -60,7 +62,7 @@ public struct VNSearchField: View {
                         lineWidth: isFocused ? VNBorderWidth.active : VNBorderWidth.hairline
                     )
             )
-            .animation(VNAnimation.cellSelection, value: isFocused)
+            .vnAnimation(VNAnimation.selection, value: isFocused)
         }
     }
 }

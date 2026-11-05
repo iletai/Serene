@@ -108,4 +108,11 @@ final class FamilyHierarchyViewModelTests: XCTestCase {
         task.cancel()
         XCTAssertEqual(viewModel.reminders.count, 3)
     }
+
+    func testRailBadgeKeepsFullRomanNumeral() {
+        let ranks = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI"]
+        for numeral in ranks {
+            XCTAssertEqual(FamilyMemberGroup.badgeText(fromRank: "ĐỜI \(numeral)"), numeral)
+        }
+    }
 }

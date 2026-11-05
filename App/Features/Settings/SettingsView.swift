@@ -119,7 +119,7 @@ public struct SettingsView: View {
                 VNSectionLabel(String(localized: "settings.privacy.header"))
                 VNGroupCard {
                     Button { router.push(.privacySecurity) } label: {
-                        VNSettingsRow(icon: "lock.shield.fill", title: String(localized: "settings.privacy.zero_knowledge_title"), subtitle: "Zero-Knowledge Privacy", tint: .vnAccentDeepPrimary)
+                        VNSettingsRow(icon: "lock.shield.fill", title: String(localized: "settings.privacy.zero_knowledge_title"), subtitle: String(localized: "settings.privacy.zero_knowledge_subtitle"), tint: .vnAccentDeepPrimary)
                     }
                     .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                 }
@@ -167,11 +167,11 @@ public struct AppearanceLanguageSettingsView: View {
 
                 // Language Card
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    VNSectionLabel("NGÔN NGỮ ỨNG DỤNG / APP LANGUAGE")
+                    VNSectionLabel(String(localized: "settings.language.header"))
 
                     VStack(spacing: 0) {
-                        Picker("Ngôn ngữ", selection: $appLanguage) {
-                            Text("Hệ thống (System)").tag("system")
+                        Picker(String(localized: "settings.language.title"), selection: $appLanguage) {
+                            Text(String(localized: "settings.language.system")).tag("system")
                             Text("Tiếng Việt").tag("vi")
                             Text("English").tag("en")
                         }
@@ -218,6 +218,7 @@ public struct DataBackupSettingsView: View {
                                 if vm.isSyncingContent { ProgressView().scaleEffect(0.8) }
                             }
                         }
+                        .buttonStyle(.vnRowPress)
 
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
@@ -226,6 +227,7 @@ public struct DataBackupSettingsView: View {
                         } label: {
                             actionRow(String(localized: "settings.data.export_json"), icon: "square.and.arrow.up") { EmptyView() }
                         }
+                        .buttonStyle(.vnRowPress)
 
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
@@ -234,6 +236,7 @@ public struct DataBackupSettingsView: View {
                         } label: {
                             actionRow(String(localized: "settings.data.export_ics"), icon: "calendar.badge.plus") { EmptyView() }
                         }
+                        .buttonStyle(.vnRowPress)
 
                         if let msg = vm.backupStatusMessage {
                             VNRowDivider()

@@ -32,7 +32,7 @@ struct VNDayEvaluationView: View {
             Divider().background(Color.vnBorderSubtle)
 
             HStack(alignment: .top, spacing: VNSpacing.xs) {
-                Text("Trực:")
+                Text("daydetail.officer.label")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(.vnTextSecondary)
 
@@ -44,11 +44,11 @@ struct VNDayEvaluationView: View {
 
             if let term = dayModel.solarTermName {
                 HStack(alignment: .top, spacing: VNSpacing.xs) {
-                    Text("Tiết khí:")
+                    Text("daydetail.solar_term.label")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.vnTextSecondary)
 
-                    Text("Tiết \(term) — Khí tiết bản địa phương Nam")
+                    Text(String(format: String(localized: "daydetail.solar_term.description"), term))
                         .font(.system(size: 13, weight: .regular))
                         .foregroundColor(.vnTextPrimary)
                 }
@@ -71,14 +71,14 @@ struct VNDayDirectionsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("HƯỚNG XUẤT HÀNH CÁT LỢI")
+            Text("daydetail.section.directions")
                 .font(.system(size: 11, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
             HStack(spacing: VNSpacing.md) {
-                directionPill(title: "Hỷ Thần (May Mắn)", direction: dayModel.joyGodDirection, color: .vnAccentHeritageRed)
-                directionPill(title: "Tài Thần (Tài Lộc)", direction: dayModel.wealthGodDirection, color: .vnAccentImperialGold)
+                directionPill(title: String(localized: "daydetail.direction.joy_god_explained"), direction: dayModel.joyGodDirection, color: .vnAccentHeritageRed)
+                directionPill(title: String(localized: "daydetail.direction.wealth_god_explained"), direction: dayModel.wealthGodDirection, color: .vnAccentImperialGold)
             }
         }
     }
@@ -111,7 +111,7 @@ struct VNDayActivitiesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("VIỆC NÊN LÀM & KIÊNG CỮ")
+            Text("daydetail.section.activities")
                 .font(.system(size: 11, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
@@ -119,7 +119,7 @@ struct VNDayActivitiesView: View {
             VStack(alignment: .leading, spacing: VNSpacing.sm) {
                 activityRow(
                     icon: "checkmark.circle.fill",
-                    label: "Nên làm:",
+                    label: String(localized: "daydetail.activities.suitable_label"),
                     color: .vnStatusSuccess,
                     content: dayModel.suitableActivities.joined(separator: " • "),
                     contentColor: .vnTextPrimary
@@ -129,7 +129,7 @@ struct VNDayActivitiesView: View {
 
                 activityRow(
                     icon: "xmark.circle.fill",
-                    label: "Kiêng cữ:",
+                    label: String(localized: "daydetail.activities.taboo_label"),
                     color: .vnStatusError,
                     content: dayModel.tabooActivities.joined(separator: " • "),
                     contentColor: .vnTextSecondary
@@ -161,5 +161,29 @@ struct VNDayActivitiesView: View {
                     .foregroundColor(contentColor)
             }
         }
+    }
+}
+
+// MARK: - Section appear
+
+/// Fade-up reveal for the sheet's sections; index-based delay stays short so the sheet never feels slow.
+private struct VNSheetSectionAppear: ViewModifier {
+    let index: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var appeared = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(appeared || reduceMotion ? 1 : 0)
+            .offset(y: appeared || reduceMotion ? 0 : 10)
+            .onAppear {
+                withAnimation(.smooth(duration: 0.35).delay(0.08 + Double(index) * 0.04)) { appeared = true }
+            }
+    }
+}
+
+extension View {
+    func vnSheetSectionAppear(_ index: Int) -> some View {
+        modifier(VNSheetSectionAppear(index: index))
     }
 }

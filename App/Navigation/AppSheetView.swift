@@ -7,7 +7,7 @@ struct AppSheetView: View {
     @Environment(AppContainer.self) private var container
 
     var body: some View {
-        content.presentationDragIndicator(.visible)
+        content
     }
 
     @ViewBuilder
@@ -18,7 +18,6 @@ struct AppSheetView: View {
                 // Errors are dropped, matching the tab ViewModels' existing save paths.
                 Task { try? await container.scheduleReminderUseCase.execute(save: reminder) }
             }
-            .presentationDetents([.large])
         case .paywall:
             PaywallView()
         case .search:

@@ -25,6 +25,13 @@ public struct VNBadgeView: View {
     }
 
     public var body: some View {
+        content
+            .contentTransition(.numericText())
+            .vnAnimation(VNAnimation.layout, value: text)
+    }
+
+    @ViewBuilder
+    private var content: some View {
         switch style {
         case .rounded(let radius):
             Text(text)

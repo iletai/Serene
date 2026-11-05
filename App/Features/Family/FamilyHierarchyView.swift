@@ -8,6 +8,11 @@ public struct FamilyMemberGroup: Identifiable {
     public let generationTitle: String
     public let generationRank: String
     public let members: [ReminderEvent]
+
+    /// Rail badge text: the numeral of a rank like "ĐỜI II" ("II"); works for any length (I...X+).
+    public static func badgeText(fromRank rank: String) -> String {
+        rank.split(separator: " ").last.map(String.init) ?? rank
+    }
 }
 
 public struct FamilyHierarchyView: View {
@@ -16,10 +21,14 @@ public struct FamilyHierarchyView: View {
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
     @State private var viewModel: FamilyHierarchyViewModel?
     @State private var isCheckingGate = false
-    @ScaledMetric(relativeTo: .footnote) private var railBadgeSize: CGFloat = 32
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ScaledMetric(relativeTo: .footnote) private var railBadgeScaled: CGFloat = 32
     @ScaledMetric(relativeTo: .footnote) private var memberBadgeSize: CGFloat = VNSize.iconButton
 
     public init() {}
+
+    /// Capped so the rail never steals card width at large Dynamic Type.
+    private var railBadgeWidth: CGFloat { min(railBadgeScaled, VNSize.iconButton + VNSpacing.sm) }
 
     private var activeViewModel: FamilyHierarchyViewModel {
         if let existing = viewModel { return existing }
@@ -39,6 +48,7 @@ public struct FamilyHierarchyView: View {
                 genealogyContent(vm: vm)
             } else {
                 ScrollView { lockedContent }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -71,10 +81,10 @@ public struct FamilyHierarchyView: View {
     private func topBar(vm: FamilyHierarchyViewModel) -> some View {
         HStack(spacing: VNSpacing.sm) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                Text("Gia Phả")
+                Text("family.title")
                     .font(.system(.headline, design: .serif).weight(.bold))
                     .foregroundColor(Color.vnAccentDeepPrimary)
-                Text("Kính tổ phụng gia")
+                Text("family.subtitle")
                     .font(.caption2)
                     .foregroundColor(.vnTextSecondary)
             }
@@ -91,13 +101,12 @@ public struct FamilyHierarchyView: View {
                     .background(Color.vnAccentHeritageRed, in: RoundedRectangle(cornerRadius: VNCornerRadius.card))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Thêm tiền nhân")
+            .accessibilityLabel("family.a11y_add")
         }
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.vertical, VNSpacing.sm)
-        .background(Color.vnBackgroundPrimary.opacity(0.9))
-        .background(.ultraThinMaterial)
+        .vnTopBarBackground()
         .overlay(alignment: .bottom) {
             Color.vnBorderSubtle.frame(height: VNBorderWidth.hairline)
         }
@@ -115,8 +124,10 @@ public struct FamilyHierarchyView: View {
                     genealogyTreeSection(vm: vm)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, VNSpacing.sectionGap)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Locked State (free tier)
@@ -128,19 +139,19 @@ public struct FamilyHierarchyView: View {
                 .padding(.top, VNSpacing.xxl)
                 .accessibilityHidden(true)
 
-            Text("Chế Độ Gia Phả Pro")
+            Text("family.locked_title")
                 .font(.system(.title2, design: .serif).weight(.semibold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
 
-            Text("Mở khoá cây gia phả nhiều thế hệ, vai vế tổ tiên và sơ đồ phụng thờ dòng tộc.")
+            Text("family.locked_body")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(VNSpacing.xs)
                 .padding(.horizontal, VNSpacing.screenMargin)
 
-            VNButton("Nâng Cấp Pro", icon: "crown.fill", variant: .primary, size: .medium) {
+            VNButton(String(localized: "family.upgrade_cta"), icon: "crown.fill", variant: .primary, size: .medium) {
                 router.present(sheet: .paywall)
             }
             .padding(.top, VNSpacing.xs)
@@ -155,7 +166,7 @@ public struct FamilyHierarchyView: View {
     private func headerSection(vm: FamilyHierarchyViewModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
-                Text("KÍNH TỔ PHỤNG GIA")
+                Text("family.eyebrow")
                     .font(.caption2.weight(.bold))
                     .tracking(0.66)
                     .foregroundColor(.vnAccentGoldText)
@@ -163,7 +174,9 @@ public struct FamilyHierarchyView: View {
                 Spacer()
 
                 if !vm.reminders.isEmpty {
-                    Text("\(vm.reminders.count) tiền nhân")
+                    Text(String(format: String(localized: "family.count_ancestors"), vm.reminders.count))
+                        .contentTransition(.numericText())
+                        .animation(reduceMotion ? nil : .snappy, value: vm.reminders.count)
                         .font(.caption2.weight(.semibold))
                         .foregroundColor(.vnOnGoldContainer)
                         .padding(.horizontal, VNSpacing.sm)
@@ -188,18 +201,18 @@ public struct FamilyHierarchyView: View {
                 .padding(.top, VNSpacing.xl)
                 .accessibilityHidden(true)
 
-            Text("Khởi Tạo Cây Gia Phả")
+            Text("family.empty_title")
                 .font(.system(.title2, design: .serif).weight(.semibold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
 
-            Text("Nhập thông tin người thân và vai vế gia đình để tự động xây dựng sơ đồ phụng thờ & kỵ giỗ dòng tộc trang nghiêm.")
+            Text("family.empty_body")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(VNSpacing.xs)
 
-            VNButton("Thêm Tiền Nhân Gia Tộc", icon: "plus", variant: .primary, size: .medium) {
+            VNButton(String(localized: "family.empty_cta"), icon: "plus", variant: .primary, size: .medium) {
                 createReminder(vm: vm)
             }
             .padding(.top, VNSpacing.xs)
@@ -220,54 +233,99 @@ public struct FamilyHierarchyView: View {
     // MARK: - Genealogy Tree Section
     @ViewBuilder
     private func genealogyTreeSection(vm: FamilyHierarchyViewModel) -> some View {
-        VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
+        let reduceMotion = reduceMotion // capture: scrollTransition closure is Sendable
+        return VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
             ForEach(vm.groupedGenerations) { group in
-                generationBand(group)
+                generationBand(group, vm: vm)
+                    .scrollTransition(.animated(.smooth), axis: .vertical) { content, phase in
+                        content
+                            .opacity(reduceMotion || phase.isIdentity ? 1 : 0.4)
+                            .offset(y: reduceMotion ? 0 : phase.value * 12)
+                    }
             }
         }
     }
 
     // MARK: - Generation Band
     @ViewBuilder
-    private func generationBand(_ group: FamilyMemberGroup) -> some View {
-        HStack(alignment: .top, spacing: VNSpacing.md) {
+    private func generationBand(_ group: FamilyMemberGroup, vm: FamilyHierarchyViewModel) -> some View {
+        HStack(alignment: .top, spacing: VNSpacing.sm) {
             generationRail(rank: group.generationRank)
 
             VStack(alignment: .leading, spacing: VNSpacing.sm) {
-                HStack(spacing: VNSpacing.sm) {
-                    Text(group.generationRank)
-                        .font(.caption2.weight(.bold))
-                        .tracking(0.66)
-                        .foregroundColor(.vnAccentGoldText)
+                generationHeader(group, vm: vm)
 
-                    Text(group.generationTitle)
-                        .font(.system(.headline, design: .serif).weight(.bold))
-                        .foregroundColor(.vnTextPrimary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
-
-                    Spacer()
-
-                    Text("\(group.members.count) vị")
-                        .font(.caption.weight(.medium))
-                        .foregroundColor(.vnTextSecondary)
-                }
-                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-
-                ForEach(group.members) { member in
-                    memberBranch(member)
+                if vm.isExpanded(group.id) {
+                    VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                        ForEach(Array(group.members.enumerated()), id: \.element.id) { index, member in
+                            memberBranch(member)
+                                .vnAppear(delay: Double(min(index, 7)) * 0.05)
+                        }
+                    }
+                    .clipped()
+                    .vnTransition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
         }
         .padding(.horizontal, VNSpacing.screenMargin)
     }
 
+    private func generationHeader(_ group: FamilyMemberGroup, vm: FamilyHierarchyViewModel) -> some View {
+        let expanded = vm.isExpanded(group.id)
+        return Button {
+            withAnimation(reduceMotion ? VNAnimation.reduced : VNAnimation.expand) {
+                vm.toggleGeneration(group.id)
+            }
+        } label: {
+            HStack(spacing: VNSpacing.sm) {
+                Text(group.generationRank)
+                    .font(.caption2.weight(.bold))
+                    .tracking(0.66)
+                    .foregroundColor(.vnAccentGoldText)
+
+                Text(group.generationTitle)
+                    .font(.system(.headline, design: .serif).weight(.bold))
+                    .foregroundColor(.vnTextPrimary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+
+                Spacer()
+
+                Text(String(format: String(localized: "family.group_count"), group.members.count))
+                    .font(.caption.weight(.medium))
+                    .foregroundColor(.vnTextSecondary)
+                    .contentTransition(.numericText())
+                    .vnAnimation(VNAnimation.layout, value: group.members.count)
+
+                Image(systemName: "chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(.vnTextTertiary)
+                    .rotationEffect(.degrees(expanded ? 0 : -90))
+                    .vnAnimation(VNAnimation.expand, value: expanded)
+                    .accessibilityHidden(true)
+            }
+            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+            .frame(minHeight: VNSize.minTapTarget)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.vnPress)
+        .vnSelectionFeedback(trigger: expanded)
+        .accessibilityLabel("\(group.generationRank) \(group.generationTitle)")
+        .accessibilityValue(expanded
+            ? String(localized: "family.generation.expanded")
+            : String(localized: "family.generation.collapsed"))
+        .accessibilityHint(String(localized: "family.generation.toggle_hint"))
+        .accessibilityAddTraits(.isHeader)
+    }
+
     private func generationRail(rank: String) -> some View {
         VStack(spacing: VNSpacing.sm) {
-            Text(rankLetter(from: rank))
+            Text(FamilyMemberGroup.badgeText(fromRank: rank))
                 .font(.system(.footnote, design: .serif).weight(.bold))
                 .foregroundColor(.vnAccentHeritageRed)
-                .frame(width: railBadgeSize, height: railBadgeSize)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .frame(width: railBadgeWidth, height: railBadgeWidth)
                 .background(Color.vnAccentRedSurface)
                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.micro))
                 .overlay(
@@ -282,15 +340,15 @@ public struct FamilyHierarchyView: View {
                 .frame(maxHeight: .infinity)
                 .accessibilityHidden(true)
         }
-        .frame(width: railBadgeSize)
+        .frame(width: railBadgeWidth)
     }
 
     @ViewBuilder
     private func memberBranch(_ member: ReminderEvent) -> some View {
-        HStack(alignment: .top, spacing: VNSpacing.sm) {
+        HStack(alignment: .top, spacing: VNSpacing.xs) {
             Rectangle()
                 .fill(Color.vnAccentImperialGold.opacity(0.45))
-                .frame(width: VNSpacing.sm, height: VNBorderWidth.regular)
+                .frame(width: VNSpacing.xs, height: VNBorderWidth.regular)
                 .padding(.top, VNSpacing.space32)
                 .accessibilityHidden(true)
 
@@ -306,7 +364,7 @@ public struct FamilyHierarchyView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel([member.title, member.relationship ?? ""].filter { !$0.isEmpty }.joined(separator: ", "))
             .accessibilityValue("\(anniversaryText(member)), \(statusText(member))")
-            .accessibilityHint("Chỉnh sửa chi tiết tiền nhân")
+            .accessibilityHint("family.a11y_edit_hint")
         }
     }
 
@@ -315,26 +373,28 @@ public struct FamilyHierarchyView: View {
     }
 
     private func anniversaryText(_ member: ReminderEvent) -> String {
-        "Giỗ \(member.day)/\(member.month) \(member.dateType == .lunar ? "ÂL" : "Dương")"
+        String(format: String(localized: "family.member_date"), member.day, member.month, member.dateType == .lunar ? String(localized: "family.abbrev_lunar") : String(localized: "family.abbrev_solar"))
     }
 
     private func statusText(_ member: ReminderEvent) -> String {
-        isWorshipped(member) ? "Đã thờ" : "Còn sống"
+        isWorshipped(member) ? String(localized: "family.status_deceased") : String(localized: "family.status_living")
     }
 
-    private func rankLetter(from rank: String) -> String {
-        let last = rank.split(separator: " ").last.map(String.init) ?? String(rank.prefix(1))
-        return String(last.prefix(1))
+    private func memberSubtitle(_ member: ReminderEvent) -> String {
+        var parts = [anniversaryText(member)]
+        if let rel = member.relationship, !rel.isEmpty { parts.insert(rel, at: 0) }
+        if let y = member.year { parts.append(String(format: String(localized: "family.member_year"), String(y))) }
+        return parts.joined(separator: " · ")
     }
 
     // MARK: - Member Card
     private func memberCard(member: ReminderEvent) -> some View {
         let isDeath = isWorshipped(member)
-        return HStack(spacing: VNSpacing.md) {
+        return HStack(alignment: .top, spacing: VNSpacing.sm) {
             if member.category == .deathAnniversary {
                 VNSealBadge.gio(size: .small)
             } else {
-                Text("TỘC")
+                Text("family.seal_toc")
                     .font(.system(.footnote, design: .serif).weight(.bold))
                     .foregroundColor(Color.vnAccentGoldText)
                     .lineLimit(1)
@@ -344,41 +404,29 @@ public struct FamilyHierarchyView: View {
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
             }
 
-            VStack(alignment: .leading, spacing: VNSpacing.space2) {
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text(member.title)
                     .font(.system(.subheadline, design: .serif).weight(.semibold))
                     .foregroundColor(.vnTextPrimary)
-                    .minimumScaleFactor(0.8)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                HStack(spacing: VNSpacing.xs) {
-                    if let rel = member.relationship, !rel.isEmpty {
-                        Text(rel)
-                            .font(.caption)
-                            .foregroundColor(.vnTextSecondary)
-                    }
+                Text(memberSubtitle(member))
+                    .font(.caption)
+                    .foregroundColor(.vnTextSecondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                    Text("• \(anniversaryText(member))")
-                        .font(.caption)
-                        .foregroundColor(.vnTextSecondary)
-                }
-
-                if let y = member.year {
-                    Text("Năm \(y)")
-                        .font(.caption)
-                        .foregroundColor(.vnTextSecondary)
-                }
+                Text(statusText(member))
+                    .font(.vnCaption2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(isDeath ? .vnOnAccent : .vnTextSecondary)
+                    .padding(.horizontal, VNSpacing.sm)
+                    .padding(.vertical, VNSpacing.space2)
+                    .background(isDeath ? Color.vnAccentDeepPrimary : Color.vnBackgroundTertiary)
+                    .clipShape(Capsule())
             }
-
-            Spacer()
-
-            Text(statusText(member))
-                .font(.vnCaption2)
-                .fontWeight(.semibold)
-                .foregroundColor(isDeath ? .vnOnAccent : .vnTextSecondary)
-                .padding(.horizontal, VNSpacing.sm)
-                .padding(.vertical, VNSpacing.space2)
-                .background(isDeath ? Color.vnAccentDeepPrimary : Color.vnBackgroundTertiary)
-                .clipShape(Capsule())
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Image(systemName: "chevron.right")
                 .font(.caption2.weight(.semibold))

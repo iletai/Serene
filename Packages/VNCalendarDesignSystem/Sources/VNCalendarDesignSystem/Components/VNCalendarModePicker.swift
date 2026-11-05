@@ -12,13 +12,13 @@ public enum VNCalendarMode: String, CaseIterable, Identifiable, Sendable {
     public var title: String {
         switch self {
         case .block:
-            "Nhật Lịch"
+            String(localized: "ds.calendar.mode.block")
         case .month:
-            "Tháng"
+            String(localized: "ds.calendar.mode.month")
         case .week:
-            "Tuần"
+            String(localized: "ds.calendar.mode.week")
         case .year:
-            "Năm"
+            String(localized: "ds.calendar.mode.year")
         }
     }
 
@@ -53,6 +53,21 @@ public struct VNCalendarModePicker: View {
     }
 
     public var body: some View {
+        // Titles never wrap: when they cannot fit on one line, fall back to icon-only segments.
+        ViewThatFits(in: .horizontal) {
+            segments(showTitles: true)
+            segments(showTitles: false)
+        }
+        .padding(VNSpacing.xs)
+        .background(Color.vnBackgroundSecondary)
+        .overlay(
+            RoundedRectangle(cornerRadius: VNCornerRadius.card)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
+    }
+
+    private func segments(showTitles: Bool) -> some View {
         HStack(spacing: VNSpacing.xs) {
             ForEach(modes) { mode in
                 let isSelected = selectedMode == mode
@@ -61,10 +76,10 @@ public struct VNCalendarModePicker: View {
                         selectedMode = mode
                     }
                 } label: {
-                    Text(mode.title)
+                    segmentLabel(mode, showTitle: showTitles)
                         .font(.system(size: 13, weight: isSelected ? .semibold : .medium, design: .serif))
                         .foregroundColor(isSelected ? .vnBackgroundPrimary : .vnTextSecondary)
-                        .padding(.horizontal, VNSpacing.sm)
+                        .padding(.horizontal, VNSpacing.xs)
                         .padding(.vertical, VNSpacing.sm)
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .background {
@@ -76,17 +91,23 @@ public struct VNCalendarModePicker: View {
                         }
                         .contentShape(Rectangle())
                         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
-                        .accessibilityValue(isSelected ? "Đã chọn" : "")
+                        .accessibilityValue(isSelected ? String(localized: "ds.a11y.selected") : "")
                 }
                 .buttonStyle(.plain)
             }
         }
-        .padding(VNSpacing.xs)
-        .background(Color.vnBackgroundSecondary)
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
+    }
+
+    @ViewBuilder
+    private func segmentLabel(_ mode: VNCalendarMode, showTitle: Bool) -> some View {
+        if showTitle {
+            // Equal-width cells + hidden wrapping: ViewThatFits rejects this variant if the title would need 2 lines.
+            Text(mode.title)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+        } else {
+            Image(systemName: mode.icon)
+                .accessibilityLabel(mode.title)
+        }
     }
 }

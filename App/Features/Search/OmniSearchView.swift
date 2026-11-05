@@ -9,6 +9,7 @@ public struct OmniSearchView: View {
     @ScaledMetric(relativeTo: .callout) private var iconBox: CGFloat = VNSize.iconButton
     @State private var viewModel: OmniSearchViewModel?
     @FocusState private var isSearchFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public init() {}
 
@@ -27,14 +28,18 @@ public struct OmniSearchView: View {
                 VStack(spacing: VNSpacing.xl) {
                     searchField(vm: vm)
 
-                    if let parsed = vm.parsedDate {
-                        parsedDateCard(parsed, vm: vm)
+                    ZStack {
+                        if let parsed = vm.parsedDate {
+                            parsedDateCard(parsed, vm: vm)
+                                .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.96, anchor: .top)))
+                        }
                     }
+                    .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: vm.parsedDate?.label)
 
                     if !vm.searchResults.isEmpty {
                         resultsList(vm: vm)
                     } else if !vm.searchText.isEmpty && vm.parsedDate == nil {
-                        Text("Không tìm thấy kết quả phù hợp cho \"\(vm.searchText)\".")
+                        Text(String(format: String(localized: "search.no_results"), vm.searchText))
                             .font(.vnFootnote)
                             .foregroundColor(.vnTextSecondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -45,7 +50,7 @@ public struct OmniSearchView: View {
                 .padding(.bottom, VNSpacing.xxl)
             }
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-            .vnNavBar(title: "Tra Cứu Thông Minh") {
+            .vnNavBar(title: String(localized: "search.view_title")) {
                 VNDismissButton { router.dismissModals() }
             }
             .task {
@@ -67,7 +72,7 @@ public struct OmniSearchView: View {
                     .foregroundColor(isSearchFocused ? .vnAccentHeritageRed : .vnTextTertiary)
                     .accessibilityHidden(true)
 
-                TextField("", text: $boundVM.searchText, prompt: Text("Tìm giỗ ông, 15/8 âm, rằm tháng 7..."))
+                TextField("", text: $boundVM.searchText, prompt: Text("search.field_prompt"))
                     .font(.subheadline)
                     .foregroundColor(.vnTextPrimary)
                     .focused($isSearchFocused)
@@ -84,7 +89,7 @@ public struct OmniSearchView: View {
                     }
                     .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                     .contentShape(Rectangle())
-                    .accessibilityLabel("Xóa tìm kiếm")
+                    .accessibilityLabel("search.clear_accessibility")
                 }
             }
             .padding(.horizontal, VNSpacing.md)
@@ -96,6 +101,7 @@ public struct OmniSearchView: View {
             Rectangle()
                 .fill(isSearchFocused ? Color.vnAccentHeritageRed : Color.vnBorderSubtle)
                 .frame(height: isSearchFocused ? VNBorderWidth.active : VNBorderWidth.regular)
+                .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: isSearchFocused)
         }
         .onChange(of: vm.searchText) { _, newValue in
             vm.performSearch(query: newValue)
@@ -120,7 +126,7 @@ public struct OmniSearchView: View {
 
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
                     HStack(spacing: VNSpacing.sm) {
-                        Text("Phân Tích Ngày Nhanh")
+                        Text("search.quick_parser_badge")
                             .font(.caption2.weight(.medium))
                             .tracking(0.7)
                             .foregroundColor(.vnOnGoldContainer)
@@ -162,19 +168,20 @@ public struct OmniSearchView: View {
                 }
             }
         } label: {
-            Label("Tạo ngày nhớ cho ngày này", systemImage: "plus.circle.fill")
+            Label("search.create_reminder", systemImage: "plus.circle.fill")
                 .font(.footnote.weight(.semibold))
                 .foregroundColor(.vnAccentDeepPrimary)
                 .frame(minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
         }
+        .buttonStyle(.vnPress(scale: 0.98))
         .disabled(vm.isCheckingGate)
     }
 
     // MARK: - Matched Events & Holidays
     private func resultsList(vm: OmniSearchViewModel) -> some View {
         VStack(spacing: VNSpacing.sm) {
-            Text("Sự Kiện & Ngày Lễ Trùng Khớp")
+            Text("search.results_section_header")
                 .font(.caption2.weight(.medium))
                 .tracking(0.7)
                 .foregroundColor(.vnOnGoldContainer)
@@ -183,23 +190,25 @@ public struct OmniSearchView: View {
                 .accessibilityAddTraits(.isHeader)
 
             ForEach(vm.searchResults) { item in
-                switch item {
-                case .reminder(let r):
-                    resultCard(
-                        icon: "flame.fill",
-                        tint: .vnAccentHeritageRed,
-                        title: r.title,
-                        detail: "\(r.day)/\(r.month) \(r.dateType == .lunar ? "Âm lịch" : "Dương lịch") • \(r.category.title)"
-                    )
-                case .holiday(let h):
-                    resultCard(
-                        icon: "leaf.fill",
-                        tint: .vnAccentGoldText,
-                        title: h.title,
-                        detail: h.summary
-                    )
-                }
+                resultRow(item)
+                    .transition(.opacity)
             }
+        }
+        .animation(reduceMotion ? nil : .smooth(duration: 0.25), value: vm.searchResults.map(\.id))
+    }
+
+    @ViewBuilder
+    private func resultRow(_ item: SearchResultItem) -> some View {
+        switch item {
+        case .reminder(let r):
+            resultCard(
+                icon: "flame.fill",
+                tint: .vnAccentHeritageRed,
+                title: r.title,
+                detail: String(format: String(localized: "search.result_detail"), r.day, r.month, r.dateType == .lunar ? String(localized: "search.date_type_lunar") : String(localized: "search.date_type_solar"), r.category.title)
+            )
+        case .holiday(let h):
+            resultCard(icon: "leaf.fill", tint: .vnAccentGoldText, title: h.title, detail: h.summary)
         }
     }
 

@@ -40,6 +40,7 @@ public struct VNDismissButton: View {
                 .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
         }
+        .buttonStyle(.vnPress(scale: 0.9, haptic: true))
         .accessibilityLabel(accessibilityLabel)
     }
 
@@ -66,7 +67,7 @@ public struct VNDismissButton: View {
                 .foregroundColor(.vnAccentDeepPrimary)
 
         case .done:
-            Text("Xong")
+            Text(String(localized: "settings.action.done"))
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundColor(.vnOnAccent)
                 .padding(.horizontal, VNSpacing.md)
@@ -78,9 +79,9 @@ public struct VNDismissButton: View {
 
     private var accessibilityLabel: String {
         switch style {
-        case .xmark: return "Đóng"
+        case .xmark: return String(localized: "daydetail.action.close")
         case .text(let t): return t
-        case .done: return "Xong"
+        case .done: return String(localized: "settings.action.done")
         }
     }
 }
@@ -131,5 +132,20 @@ public extension View {
         #else
         self
         #endif
+    }
+}
+
+// MARK: - Tab-root header chrome
+
+public extension View {
+    /// Canonical background for custom tab-root headers: translucent rice-paper over material.
+    /// The fill extends under the status bar / Dynamic Island while the content keeps the safe area.
+    func vnTopBarBackground() -> some View {
+        background {
+            Rectangle()
+                .fill(Color.vnBackgroundPrimary.opacity(0.9))
+                .background(.ultraThinMaterial)
+                .ignoresSafeArea(.container, edges: .top)
+        }
     }
 }

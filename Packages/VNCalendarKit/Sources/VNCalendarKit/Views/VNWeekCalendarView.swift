@@ -36,23 +36,7 @@ public struct VNWeekCalendarView: View {
         VStack(spacing: 0) {
             // 7-Day Horizontal Strip (Thanh 7 Ngày Trong Tuần)
             weekStripView
-                .offset(x: dragOffset)
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            dragOffset = value.translation.width * 0.4
-                        }
-                        .onEnded { value in
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                                if value.translation.width < -60 {
-                                    onNextWeek()
-                                } else if value.translation.width > 60 {
-                                    onPreviousWeek()
-                                }
-                                dragOffset = 0
-                            }
-                        }
-                )
+                .axisLockedSwipe(offset: $dragOffset, onPrevious: onPreviousWeek, onNext: onNextWeek)
                 .padding(.horizontal, VNSpacing.md)
                 .padding(.vertical, VNSpacing.xs)
 
@@ -60,28 +44,27 @@ public struct VNWeekCalendarView: View {
                 .background(Color.vnBorderSubtle)
 
             // Agenda / Hourly Schedule of the Selected Day
-            ScrollView {
-                VStack(spacing: VNSpacing.md) {
-                    if let model = selectedDayModel {
-                        // Selected Day Overview Header Card
-                        dayOverviewHeaderCard(for: model)
+            // No ScrollView: the host screen owns the single vertical scroll.
+            VStack(spacing: VNSpacing.md) {
+                if let model = selectedDayModel {
+                    // Selected Day Overview Header Card
+                    dayOverviewHeaderCard(for: model)
 
-                        // 12 Lunar Hours Timeline
-                        lunarHoursTimeline(for: model)
+                    // 12 Lunar Hours Timeline
+                    lunarHoursTimeline(for: model)
 
-                        // Anniversaries & Reminders Section
-                        anniversariesSection(for: model)
-                    } else {
-                        Text("Chọn một ngày trong tuần để xem chi tiết")
-                            .font(.system(size: 14))
-                            .foregroundColor(.vnTextSecondary)
-                            .padding(.top, VNSpacing.space32)
-                    }
+                    // Anniversaries & Reminders Section
+                    anniversariesSection(for: model)
+                } else {
+                    Text("calendar.week.empty_selection")
+                        .font(.system(size: 14))
+                        .foregroundColor(.vnTextSecondary)
+                        .padding(.top, VNSpacing.space32)
                 }
-                .padding(.horizontal, VNSpacing.xl)
-                .padding(.bottom, VNSpacing.xl)
-                .padding(.vertical, VNSpacing.sm)
             }
+            .padding(.horizontal, VNSpacing.xl)
+            .padding(.bottom, VNSpacing.xl)
+            .padding(.vertical, VNSpacing.sm)
         }
     }
 
@@ -156,7 +139,7 @@ public struct VNWeekCalendarView: View {
                             .foregroundColor(.vnTextPrimary)
 
                         if model.isToday {
-                            Text("Hôm nay")
+                            Text("action.today")
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.vnAccentHeritageRed)
                                 .padding(.horizontal, VNSpacing.xs)
@@ -166,11 +149,11 @@ public struct VNWeekCalendarView: View {
                         }
                     }
 
-                    Text("Âm lịch: Ngày \(model.lunarDay) \(model.lunarMonthName) (\(model.lunarDayCanChi))")
+                    Text(String(format: String(localized: "calendar.week.lunar_summary"), model.lunarDay, model.lunarMonthName, model.lunarDayCanChi))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.vnAccentHeritageRed)
 
-                    Text("\(model.zodiacStar.fullTitle) • Trực \(model.lunarOfficer.name)")
+                    Text(String(format: String(localized: "calendar.astro.star_and_officer"), model.zodiacStar.fullTitle, model.lunarOfficer.name))
                         .font(.system(size: 11, weight: .regular))
                         .foregroundColor(.vnTextSecondary)
                 }
@@ -196,7 +179,7 @@ public struct VNWeekCalendarView: View {
 
     private func lunarHoursTimeline(for model: VNCalendarDayModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("12 GIỜ ĐỊA CHI TRONG NGÀY")
+            Text("calendar.week.section.earthly_branches")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.6)
@@ -219,7 +202,7 @@ public struct VNWeekCalendarView: View {
                                     .fill(Color.vnAccentImperialGold)
                                     .frame(width: VNSpacing.xs, height: VNSpacing.xs)
                             }
-                            Text("Giờ \(branch.vietnameseName)")
+                            Text(String(format: String(localized: "calendar.hour.branch_name"), branch.vietnameseName))
                                 .font(.system(size: 11, weight: isAuspicious ? .bold : .medium, design: .serif))
                                 .foregroundColor(isAuspicious ? .vnTextPrimary : .vnTextSecondary)
                         }
@@ -257,7 +240,7 @@ public struct VNWeekCalendarView: View {
     private func anniversariesSection(for model: VNCalendarDayModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             HStack {
-                Text("SỰ KIỆN & LỄ GIỖ TRONG NGÀY")
+                Text("calendar.week.section.events_and_anniversaries")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                     .tracking(0.6)
@@ -265,13 +248,13 @@ public struct VNWeekCalendarView: View {
                 Spacer()
 
                 Button(action: onAddReminder) {
-                    Label("Thêm", systemImage: "plus")
+                    Label("calendar.action.add", systemImage: "plus")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.vnAccentHeritageRed)
                 }
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())
-                .accessibilityLabel("Thêm sự kiện")
+                .accessibilityLabel("calendar.action.add_event_accessibility")
             }
 
             if model.anniversaries.isEmpty {
@@ -280,7 +263,7 @@ public struct VNWeekCalendarView: View {
                         .font(.system(size: 14))
                         .foregroundColor(.vnTextTertiary)
 
-                    Text("Không có ngày giỗ hay sự kiện nào trong ngày này.")
+                    Text("calendar.events.empty_message")
                         .font(.system(size: 12))
                         .foregroundColor(.vnTextSecondary)
                 }
@@ -298,7 +281,7 @@ public struct VNWeekCalendarView: View {
                                     .font(.system(size: 13, weight: .semibold, design: .serif))
                                     .foregroundColor(.vnTextPrimary)
 
-                                Text(item.isAncestorDeath ? "Kỳ Giỗ Gia Tiên" : "Kỷ Niệm Gia Đình")
+                                Text(item.isAncestorDeath ? String(localized: "calendar.event.type.death_anniversary") : String(localized: "calendar.event.type.family_memory"))
                                     .font(.system(size: 11))
                                     .foregroundColor(.vnTextSecondary)
                             }
@@ -329,13 +312,13 @@ public struct VNWeekCalendarView: View {
 
     private func shortWeekday(from full: String) -> String {
         switch full {
-        case "Thứ Hai": return "T2"
-        case "Thứ Ba": return "T3"
-        case "Thứ Tư": return "T4"
-        case "Thứ Năm": return "T5"
-        case "Thứ Sáu": return "T6"
-        case "Thứ Bảy": return "T7"
-        case "Chủ Nhật": return "CN"
+        case "Thứ Hai": return String(localized: "widget.weekday.mon")
+        case "Thứ Ba": return String(localized: "widget.weekday.tue")
+        case "Thứ Tư": return String(localized: "widget.weekday.wed")
+        case "Thứ Năm": return String(localized: "widget.weekday.thu")
+        case "Thứ Sáu": return String(localized: "widget.weekday.fri")
+        case "Thứ Bảy": return String(localized: "widget.weekday.sat")
+        case "Chủ Nhật": return String(localized: "widget.weekday.sun")
         default: return full
         }
     }

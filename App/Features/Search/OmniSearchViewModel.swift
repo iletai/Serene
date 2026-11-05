@@ -55,14 +55,12 @@ final class OmniSearchViewModel {
                     let solar = await engine.convertToSolar(from: lunar)
                     let canChi = await engine.computeCanChi(for: solar)
                     resolvedSolarDate = solar.date
-                    resolvedConvertedDateText = "Tương ứng Dương lịch: \(solar.day)/\(solar.month)/\(solar.year) " +
-                        "(Năm \(canChi.year.description))"
+                    resolvedConvertedDateText = String(format: String(localized: "search.converted_to_solar"), solar.day, solar.month, solar.year, canChi.year.description)
                 } else if let solar = p.solarDate {
                     let lunar = await engine.convertToLunar(from: solar)
                     let canChi = await engine.computeCanChi(for: solar)
                     resolvedSolarDate = solar.date
-                    resolvedConvertedDateText = "Tương ứng Âm lịch: \(lunar.day)/\(lunar.month)/\(lunar.year) ÂL " +
-                        "(Năm \(canChi.year.description))"
+                    resolvedConvertedDateText = String(format: String(localized: "search.converted_to_lunar"), lunar.day, lunar.month, lunar.year, canChi.year.description)
                 }
             } else {
                 resolvedConvertedDateText = nil

@@ -45,7 +45,7 @@ public struct PrayerCategoryCard: View {
                         .font(.vnCaption2)
                         .fontWeight(.bold)
                         .foregroundColor(isSelected ? .vnAccentDeepPrimary : .vnTextTertiary)
-                        .accessibilityLabel("\(count) bài")
+                        .accessibilityLabel(String(format: String(localized: "prayers.a11y_count"), count))
                         .padding(.horizontal, VNSpacing.xs)
                         .padding(.vertical, VNSpacing.space2)
                         .background(isSelected ? Color.vnAccentDeepPrimary.opacity(0.12) : Color.vnBackgroundTertiary)

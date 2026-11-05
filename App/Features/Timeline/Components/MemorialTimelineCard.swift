@@ -73,8 +73,8 @@ struct MemorialTimelineCard: View {
         .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
         .accessibilityElement(children: .combine)
         .accessibilityActions {
-            if isMemorial { Button("Xem Văn Khấn", action: onViewRitual) }
-            Button("Xóa ngày nhớ", role: .destructive, action: onDelete)
+            if isMemorial { Button("action.view_prayer", action: onViewRitual) }
+            Button("timeline.action_delete", role: .destructive, action: onDelete)
         }
         .contextMenu { cardMenu }
     }
@@ -169,7 +169,7 @@ struct MemorialTimelineCard: View {
     }
 
     private var ritualButton: some View {
-        VNButton("Xem Văn Khấn", icon: "book.pages", variant: .secondary, size: .small, action: onViewRitual)
+        VNButton(String(localized: "action.view_prayer"), icon: "book.pages", variant: .secondary, size: .small, action: onViewRitual)
     }
 
     private var trailingChevron: some View {
@@ -182,12 +182,12 @@ struct MemorialTimelineCard: View {
 
     private var cardMenu: some View {
         Group {
-            Button(action: onEdit) { Label("Chỉnh sửa", systemImage: "pencil") }
+            Button(action: onEdit) { Label("timeline.action_edit", systemImage: "pencil") }
             if isMemorial {
-                Button(action: onViewRitual) { Label("Xem Văn Khấn", systemImage: "book.pages") }
+                Button(action: onViewRitual) { Label("action.view_prayer", systemImage: "book.pages") }
             }
             Divider()
-            Button(role: .destructive, action: onDelete) { Label("Xóa ngày nhớ", systemImage: "trash") }
+            Button(role: .destructive, action: onDelete) { Label("timeline.action_delete", systemImage: "trash") }
         }
     }
 
