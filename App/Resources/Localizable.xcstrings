@@ -9486,6 +9486,822 @@
           }
         }
       }
+    },
+    "family.generation.expanded": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "expanded"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "đang mở"
+          }
+        }
+      }
+    },
+    "family.generation.collapsed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "collapsed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "đang đóng"
+          }
+        }
+      }
+    },
+    "family.generation.toggle_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to collapse or expand this generation"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chạm hai lần để đóng hoặc mở danh sách đời này"
+          }
+        }
+      }
+    },
+    "calendar.today_accessibility": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go to today"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xem hôm nay"
+          }
+        }
+      }
+    },
+    "calendar.change_year_accessibility": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change year"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đổi năm"
+          }
+        }
+      }
+    },
+    "search.create_reminder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create a memorial for this date"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tạo ngày nhớ cho ngày này"
+          }
+        }
+      }
+    },
+    "search.result_detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld/%2$lld %3$@ • %4$@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld/%lld %@ • %@"
+          }
+        }
+      }
+    },
+    "timeline.prayer_modal_body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Namo Amitabha Buddha! (3 times)\n\nI bow to the nine directions of Heaven and the ten directions of the Buddhas.\nI bow to the Celestial Sovereign and Earth Mother, and all venerable deities.\nI bow to the local Guardian Deity, the Earth God of this land, and the Kitchen God of this household, together with all venerable deities.\nI bow to our ancestors, great-grandparents, uncles, aunts, brothers and sisters, paternal and maternal kin.\n\nI, the petitioner, am: ....................................................\nResiding at: ................................................................\n\nToday is the death anniversary of: %@\nThe kindness of our elders is as vast as the sea, and their nurturing beyond measure.\nRemembering this day, I sincerely prepare offerings of incense and flowers before the altar.\n\nI respectfully invite the spirits of our ancestors to attend, witness and receive these offerings, and to bless the whole family with health, prosperity and a flourishing home.\n\nRespectfully submitted!\nNamo Amitabha Buddha! (3 times)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nam mô A Di Đà Phật! (3 lần)\n\nCon kính lạy chín phương Trời, mười phương Chư Phật, Chư Phật mười phương.\nCon kính lạy Hoàng thiên Hậu Thổ chư vị Tôn thần.\nCon kính lạy ngài Bản cảnh Thành hoàng, ngài Bản xứ Thổ địa, ngài Bản gia Táo quân cùng chư vị Tôn thần.\nCon kính lạy Cao Tằng Tổ Khảo, Cao Tằng Tổ Tỷ, Thúc Bá Đệ Huynh, Cô Di Tỷ Muội họ nội họ ngoại.\n\nTín chủ con là: ....................................................\nNgụ tại: ................................................................\n\nHôm nay là ngày giỗ chính nhật của: %@\nThiết nghĩ: Ơn trời biển khó đền, công sinh thành dưỡng dục khôn xiết.\nNhớ ngày kỵ nhật, tín chủ con thành tâm sắm sửa phẩm vật hương hoa dâng trước án tọa.\n\nKính cẩn thỉnh mời chân linh tiền nhân quang lâm chứng giám, thụ hưởng lễ vật, độ trì cho toàn thể gia quyến luôn được an khang thịnh vượng, gia đạo hưng long.\n\nCẩn cáo!\nNam mô A Di Đà Phật! (3 lần)"
+          }
+        }
+      }
+    },
+    "timeline.share_default_relationship": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ancestor"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiền nhân"
+          }
+        }
+      }
+    },
+    "timeline.share_note_line": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Note: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Lời dặn: %@"
+          }
+        }
+      }
+    },
+    "timeline.share_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[ANCESTRAL MEMORIAL ANNOUNCEMENT]\nIn remembrance: %1$@ (%2$@)\n• Lunar date: %3$@\n• Solar date this year: %4$@\n%5$@\nWe invite the whole family to gather and honor our ancestors.\n— An Nien app (Vietnamese Calendar & Memorial Days)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[THÔNG BÁO NGÀY GIỖ GIA TIÊN]\nKính nhớ: %1$@ (%2$@)\n• Ngày Âm lịch: %3$@\n• Ngày Dương lịch năm nay: %4$@\n%5$@\nKính mời toàn thể gia tộc tề tựu phụng sự đạo hiếu.\n— Ứng dụng An Niên (Lịch Việt & Ngày Nhớ)"
+          }
+        }
+      }
+    },
+    "tip.add_reminder.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a memorial"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm ngày nhớ"
+          }
+        }
+      }
+    },
+    "tip.add_reminder.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save anniversaries and birthdays by lunar or solar date and get reminders in advance."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lưu ngày giỗ, sinh nhật theo âm hoặc dương lịch và nhận nhắc trước."
+          }
+        }
+      }
+    },
+    "tip.family_tab.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Family tree & anniversaries"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gia phả & ngày giỗ"
+          }
+        }
+      }
+    },
+    "tip.family_tab.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See memorial dates for each family member."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xem các ngày nhớ theo từng thành viên trong gia đình."
+          }
+        }
+      }
+    },
+    "today.canchi_line": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Day %1$@ · Month %2$@ · Year %3$@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ngày %@ · Tháng %@ · Năm %@"
+          }
+        }
+      }
+    },
+    "today.details_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auspicious hours · Do / Avoid"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giờ hoàng đạo · Nên / kiêng"
+          }
+        }
+      }
+    },
+    "today.element.wood": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wood"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mộc"
+          }
+        }
+      }
+    },
+    "today.element.fire": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fire"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hỏa"
+          }
+        }
+      }
+    },
+    "today.element.earth": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earth"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thổ"
+          }
+        }
+      }
+    },
+    "today.element.metal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metal"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kim"
+          }
+        }
+      }
+    },
+    "today.element.water": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Water"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thủy"
+          }
+        }
+      }
+    },
+    "today.element_summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Element: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ngũ hành %@"
+          }
+        }
+      }
+    },
+    "today.solar_day_accessibility": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solar day %lld"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dương lịch ngày %lld"
+          }
+        }
+      }
+    },
+    "today.weekday_date_format": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EEEE, MMM d"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EEEE, d 'Tháng' MM"
+          }
+        }
+      }
+    },
+    "family.locked_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Family Tree Pro"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chế Độ Gia Phả Pro"
+          }
+        }
+      }
+    },
+    "family.locked_body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock the multi-generation family tree, ancestral roles and the clan worship chart."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mở khoá cây gia phả nhiều thế hệ, vai vế tổ tiên và sơ đồ phụng thờ dòng tộc."
+          }
+        }
+      }
+    },
+    "family.upgrade_cta": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Pro"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nâng Cấp Pro"
+          }
+        }
+      }
+    },
+    "reminder.offset.0.chip_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On the day"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đúng ngày"
+          }
+        }
+      }
+    },
+    "reminder.title_required": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the name of the person being remembered first"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập tên người được tưởng nhớ trước"
+          }
+        }
+      }
+    },
+    "reminder.discard_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard changes?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bỏ thay đổi?"
+          }
+        }
+      }
+    },
+    "reminder.discard_confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard Changes"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bỏ thay đổi"
+          }
+        }
+      }
+    },
+    "reminder.discard_keep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Editing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếp tục chỉnh sửa"
+          }
+        }
+      }
+    },
+    "reminder.notes_extra_header": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ADDITIONAL NOTES"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GHI CHÚ THÊM"
+          }
+        }
+      }
+    },
+    "reminder.notes_placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g. Boiled chicken, gac sticky rice, invite paternal relatives..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ví dụ: Cúng gà luộc, xôi gấc, mời họ hàng nội tộc..."
+          }
+        }
+      }
+    },
+    "settings.microcms.sync_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synced the latest 48 prayers and 12 festivals."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã đồng bộ 48 văn khấn & 12 lễ tiết mới nhất."
+          }
+        }
+      }
+    },
+    "settings.microcms.sync_offline": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline local data is ready."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dữ liệu ngoại tuyến bản địa đã sẵn sàng."
+          }
+        }
+      }
+    },
+    "articles.action.copy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sao Chép"
+          }
+        }
+      }
+    },
+    "reminderForm.title.header": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MEMORIAL / EVENT NAME *"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TÊN NGÀY GIỖ / SỰ KIỆN *"
+          }
+        }
+      }
+    },
+    "reminderForm.title.placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g. Great-grandfather's memorial, Mom's birthday..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VD: Giỗ Cụ Cố Nội, Sinh nhật Mẹ..."
+          }
+        }
+      }
+    },
+    "reminderForm.role.label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relation:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vai vế:"
+          }
+        }
+      }
+    },
+    "reminderForm.defaultTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ memorial"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giỗ %@"
+          }
+        }
+      }
+    },
+    "ds.search.placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tìm kiếm…"
+          }
+        }
+      }
+    },
+    "calendar.action.today_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hôm Nay"
+          }
+        }
+      }
+    },
+    "calendar.legend.family_anniversary_or_event": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memorial / Family Event"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giỗ / Sự Kiện Gia Đình"
+          }
+        }
+      }
+    },
+    "calendar.legend.full_moon_or_first_day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Full Moon / New Moon"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rằm / Mùng Một"
+          }
+        }
+      }
+    },
+    "calendar.legend.accessibility_summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legend: gold dot is an auspicious day, red dot is a memorial, moon is the full or new moon day"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chú thích: chấm vàng là ngày Hoàng Đạo, chấm đỏ là Giỗ, mặt trăng là Rằm Mùng Một"
+          }
+        }
+      }
+    },
+    "daydetail.event.type.anniversary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anniversary Event"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sự Kiện Kỷ Niệm"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

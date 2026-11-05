@@ -282,7 +282,7 @@ public struct FamilyHierarchyView: View {
 
                 Spacer()
 
-                Text("\(group.members.count) vị")
+                Text(String(format: String(localized: "family.group_count"), group.members.count))
                     .font(.caption.weight(.medium))
                     .foregroundColor(.vnTextSecondary)
                     .contentTransition(.numericText())
