@@ -145,7 +145,8 @@ public final class AppContainer {
             scheduleReminderUseCase: ScheduleReminderUseCase(
                 reminderRepository: reminderRepository,
                 subscriptionRepository: subscriptionManager,
-                notificationScheduler: SmartNotificationEngine.shared
+                notificationScheduler: SmartNotificationEngine.shared,
+                bonusSlots: { RewardedSlotStore.count }
             ),
             naturalSearchUseCase: NaturalSearchUseCase(
                 reminderRepository: reminderRepository,
@@ -153,7 +154,8 @@ public final class AppContainer {
             ),
             evaluateFeatureGateUseCase: EvaluateFeatureGateUseCase(
                 subscriptionRepository: subscriptionManager,
-                reminderRepository: reminderRepository
+                reminderRepository: reminderRepository,
+                bonusSlots: { RewardedSlotStore.count }
             )
         )
     }

@@ -15,6 +15,7 @@ final class AdsManager {
     @ObservationIgnored private let subscriptionManager: SubscriptionManager
     @ObservationIgnored private var isStarting = false
     @ObservationIgnored private var interstitial: InterstitialAd?
+    @ObservationIgnored private var rewarded: RewardedAd?
     @ObservationIgnored private var saveCount = 0
     @ObservationIgnored private var lastInterstitialAt = Date.distantPast
 
@@ -41,6 +42,7 @@ final class AdsManager {
         _ = await MobileAds.shared.start()
         isStarted = true
         await loadInterstitial()
+        await loadRewarded()
     }
 
     /// Call after a user-initiated success moment (e.g. a saved reminder); paced so it never feels spammy.
@@ -53,11 +55,60 @@ final class AdsManager {
               Date().timeIntervalSince(lastInterstitialAt) > Self.interstitialMinInterval else { return }
         lastInterstitialAt = Date()
         interstitial = nil
-        ad.present(from: nil)
+        ad.present(from: UIApplication.shared.topViewController)
         Task { await loadInterstitial() }
+    }
+
+    /// Shows a rewarded ad; on completion grants one bonus reminder slot. Returns whether the reward was earned.
+    func showRewardedForBonusSlot() async -> Bool {
+        guard canShowAds, !RewardedSlotStore.isAtCap else { return false }
+        if rewarded == nil { await loadRewarded() }
+        guard let ad = rewarded else { return false }
+        rewarded = nil
+        let earned = await RewardedFlow().run(ad)
+        if earned { RewardedSlotStore.add() }
+        await loadRewarded()
+        return earned
     }
 
     private func loadInterstitial() async {
         interstitial = try? await InterstitialAd.load(with: AdUnitIDs.interstitial, request: Request())
+    }
+
+    private func loadRewarded() async {
+        rewarded = try? await RewardedAd.load(with: AdUnitIDs.rewarded, request: Request())
+    }
+}
+
+/// Bridges the rewarded ad's delegate callbacks to async/await; resolves when the ad is closed.
+@MainActor
+private final class RewardedFlow: NSObject, FullScreenContentDelegate {
+    private var continuation: CheckedContinuation<Bool, Never>?
+    private var earned = false
+
+    func run(_ ad: RewardedAd) async -> Bool {
+        ad.fullScreenContentDelegate = self
+        return await withCheckedContinuation { continuation in
+            self.continuation = continuation
+            ad.present(from: UIApplication.shared.topViewController) { [weak self] in self?.earned = true }
+        }
+    }
+
+    func adDidDismissFullScreenContent(_ ad: any FullScreenPresentingAd) { finish() }
+
+    func ad(_ ad: any FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: any Error) { finish() }
+
+    private func finish() {
+        continuation?.resume(returning: earned)
+        continuation = nil
+    }
+}
+
+extension UIApplication {
+    /// Topmost presented view controller, so ads can present over an open sheet.
+    var topViewController: UIViewController? {
+        var top = connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow?.rootViewController }.first
+        while let presented = top?.presentedViewController { top = presented }
+        return top
     }
 }
