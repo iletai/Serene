@@ -6,8 +6,7 @@ import VNCalendarDesignSystem
 public enum MainTab: Int, CaseIterable, Identifiable, Sendable {
     case calendar = 0
     case memorial = 1
-    case rituals = 2
-    case family = 3
+    case family = 2
 
     public var id: Int { rawValue }
 
@@ -17,8 +16,6 @@ public enum MainTab: Int, CaseIterable, Identifiable, Sendable {
             return "Lịch Ngày"
         case .memorial:
             return "Ngày Giỗ"
-        case .rituals:
-            return "Văn Khấn"
         case .family:
             return "Gia Tộc"
         }
@@ -31,8 +28,6 @@ public enum MainTab: Int, CaseIterable, Identifiable, Sendable {
             return "calendar"
         case .memorial:
             return isSelected ? "flame.fill" : "flame"
-        case .rituals:
-            return isSelected ? "book.closed.fill" : "book.closed"
         case .family:
             return isSelected ? "person.3.fill" : "person.3"
         }
@@ -102,7 +97,6 @@ public struct MainTabView: View {
             switch tab {
             case .calendar: CalendarMainView()
             case .memorial: UpcomingTimelineView()
-            case .rituals: CulturalArticlesView()
             case .family: FamilyHierarchyView()
             }
         }

@@ -17,7 +17,7 @@ final class DeepLinkHandlerTests: XCTestCase {
     func testTabHostsSelectTab() {
         XCTAssertEqual(action("annien://calendar"), .select(.calendar))
         XCTAssertEqual(action("annien://memorial"), .select(.memorial))
-        XCTAssertEqual(action("annien://rituals"), .select(.rituals))
+        XCTAssertEqual(action("annien://rituals"), .select(.calendar))  // legacy link
         XCTAssertEqual(action("annien://family"), .select(.family))
     }
 

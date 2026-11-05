@@ -18,7 +18,8 @@ struct DeepLinkHandler: Sendable {
         case "calendar": return .select(.calendar)
         // Notification payloads use `annien://reminder/<uuid>`; minimal routing is the memorial tab.
         case "memorial", "reminder": return .select(.memorial)
-        case "rituals": return .select(.rituals)
+        // Legacy link: the rituals tab was removed; fall back to the calendar tab.
+        case "rituals": return .select(.calendar)
         case "family": return .select(.family)
         case "settings": return .present(tab: .calendar, sheet: .settings)
         case "paywall": return .present(tab: .calendar, sheet: .paywall)
