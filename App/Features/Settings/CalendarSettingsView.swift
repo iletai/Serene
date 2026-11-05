@@ -17,7 +17,7 @@ public struct CalendarSettingsView: View {
     @AppStorage("autoSyncMicroCMS") private var autoSyncMicroCMS = true
     @AppStorage("microCMSWifiOnly") private var microCMSWifiOnly = false
     @AppStorage("cachePrayersOffline") private var cachePrayersOffline = true
-    @AppStorage("microCMSLastSyncDate") private var lastSyncTimestamp = "Hôm nay, 21:00"
+    @AppStorage("microCMSLastSyncDate") private var lastSyncTimestamp = String(format: String(localized: "settings.microcms.last_sync_default"), "21:00")
 
     // Day Customization Preferences
     @AppStorage("showDailyAuspiciousQuote") private var showDailyQuote = true
@@ -428,15 +428,15 @@ public struct CalendarSettingsView: View {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "HH:mm, dd/MM"
                 let nowStr = formatter.string(from: Date())
-                lastSyncTimestamp = "Hôm nay, \(nowStr)"
+                lastSyncTimestamp = String(format: String(localized: "settings.microcms.last_sync_default"), nowStr)
                 withAnimation(reduceMotion ? nil : .smooth) {
-                    syncStatusBanner = "Đã đồng bộ 48 văn khấn & 12 lễ tiết mới nhất."
+                    syncStatusBanner = String(localized: "settings.microcms.sync_done")
                 }
 
                 VNHaptics.impact(.success, enabled: isHapticEnabled)
             } catch {
                 withAnimation(reduceMotion ? nil : .smooth) {
-                    syncStatusBanner = "Dữ liệu ngoại tuyến bản địa đã sẵn sàng."
+                    syncStatusBanner = String(localized: "settings.microcms.sync_offline")
                 }
             }
             isSyncing = false

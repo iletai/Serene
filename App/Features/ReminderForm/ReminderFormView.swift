@@ -17,7 +17,7 @@ public struct ReminderFormView: View {
     @State private var didFinish = false
     @ScaledMetric(relativeTo: .caption2) private var bottomInset: CGFloat = VNSpacing.hero + VNSpacing.sectionGap
 
-    static let titleRequiredMessage = "Nhập tên người được tưởng nhớ trước"
+    static var titleRequiredMessage: String { String(localized: "reminder.title_required") }
 
     public init(
         existingReminder: ReminderEvent? = nil,
@@ -94,9 +94,9 @@ public struct ReminderFormView: View {
             }
         }
         .interactiveDismissDisabled(vm.isDirty)
-        .confirmationDialog("Bỏ thay đổi?", isPresented: $isConfirmingDiscard, titleVisibility: .visible) {
-            Button("Bỏ thay đổi", role: .destructive) { router.dismissModals() }
-            Button("Tiếp tục chỉnh sửa", role: .cancel) {}
+        .confirmationDialog("reminder.discard_title", isPresented: $isConfirmingDiscard, titleVisibility: .visible) {
+            Button("reminder.discard_confirm", role: .destructive) { router.dismissModals() }
+            Button("reminder.discard_keep", role: .cancel) {}
         }
     }
 
@@ -112,13 +112,13 @@ public struct ReminderFormView: View {
     private func notesSection(vm: ReminderFormViewModel) -> some View {
         @Bindable var boundVM = vm
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            Text("GHI CHÚ THÊM")
+            Text("reminder.notes_extra_header")
                 .font(.caption2.weight(.bold))
                 .tracking(0.5)
                 .foregroundColor(.vnTextTertiary)
                 .accessibilityAddTraits(.isHeader)
 
-            TextField("Ví dụ: Cúng gà luộc, xôi gấc, mời họ hàng nội tộc...", text: $boundVM.note, axis: .vertical)
+            TextField("reminder.notes_placeholder", text: $boundVM.note, axis: .vertical)
                 .font(.subheadline)
                 .foregroundColor(.vnTextPrimary)
                 .lineLimit(3...5)
@@ -130,14 +130,14 @@ public struct ReminderFormView: View {
                     RoundedRectangle(cornerRadius: VNCornerRadius.card)
                         .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                 )
-                .accessibilityLabel("Ghi chú / phân công cúng giỗ")
+                .accessibilityLabel("reminder.a11y_notes")
         }
     }
 
     @ViewBuilder
     private func saveActionButton(vm: ReminderFormViewModel) -> some View {
         VNButton(
-            vm.existingReminder != nil ? "Lưu Thay Đổi" : "Lưu Ngày Lễ",
+            vm.existingReminder != nil ? String(localized: "reminder.action.save_edit") : String(localized: "reminder.action.save_new"),
             icon: "checkmark.seal.fill",
             variant: vm.isValid ? .primary : .secondary,
             size: .large,

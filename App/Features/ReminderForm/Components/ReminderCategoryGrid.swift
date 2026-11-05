@@ -8,7 +8,7 @@ struct ReminderCategoryGrid: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("PHÂN LOẠI SỰ KIỆN")
+            Text("reminder.category_header")
                 .font(.caption2.weight(.medium))
                 .tracking(0.66)
                 .foregroundColor(.vnAccentGoldText)
@@ -17,12 +17,12 @@ struct ReminderCategoryGrid: View {
                 .accessibilityAddTraits(.isHeader)
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: VNSpacing.sm) {
-                categoryCard(cat: .deathAnniversary, icon: "flame.fill", subtitle: "Hiếu đạo tổ tiên", isMain: true)
-                categoryCard(cat: .ancestral, icon: "person.3.fill", subtitle: "Họp họ, tôn tạo")
-                categoryCard(cat: .birthday, icon: "gift.fill", subtitle: "Âm hoặc Dương")
-                categoryCard(cat: .worship, icon: "sparkles", subtitle: "Rằm, Mùng một")
-                categoryCard(cat: .wedding, icon: "heart.fill", subtitle: "Gắn kết lứa đôi")
-                categoryCard(cat: .other, icon: "calendar", subtitle: "Ghi nhớ gia đình")
+                categoryCard(cat: .deathAnniversary, icon: "flame.fill", subtitle: String(localized: "reminder.cat.death_anniversary_desc"), isMain: true)
+                categoryCard(cat: .ancestral, icon: "person.3.fill", subtitle: String(localized: "reminder.cat.ancestral_desc"))
+                categoryCard(cat: .birthday, icon: "gift.fill", subtitle: String(localized: "reminder.cat.birthday_desc"))
+                categoryCard(cat: .worship, icon: "sparkles", subtitle: String(localized: "reminder.cat.worship_desc"))
+                categoryCard(cat: .wedding, icon: "heart.fill", subtitle: String(localized: "reminder.cat.wedding_desc"))
+                categoryCard(cat: .other, icon: "calendar", subtitle: String(localized: "reminder.cat.other_desc"))
             }
         }
     }
@@ -60,7 +60,7 @@ struct ReminderCategoryGrid: View {
                     Spacer(minLength: 0)
 
                     if isMain {
-                        Text("Chính")
+                        Text("reminder.cat.main_badge")
                             .font(.system(.caption2, design: .serif, weight: .semibold))
                             .foregroundColor(.vnAccentHeritageRed)
                             .padding(.horizontal, VNSpacing.xs)
