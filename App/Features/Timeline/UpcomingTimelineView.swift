@@ -10,7 +10,6 @@ public struct UpcomingTimelineView: View {
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // The floating tab pill overlays the scroll view without a safe-area inset; it grows with Dynamic Type.
-    @ScaledMetric(relativeTo: .caption2) private var tabBarClearance: CGFloat = VNSpacing.hero + VNSpacing.sectionGap
 
     public init() {}
 
@@ -39,7 +38,6 @@ public struct UpcomingTimelineView: View {
                 .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 contentSection(vm: vm)
             }
-            .padding(.bottom, tabBarClearance)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
         .task {

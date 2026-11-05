@@ -45,6 +45,8 @@ public struct MainTabView: View {
     @Namespace private var pillNamespace
     /// Tabs shown at least once; unvisited tabs stay unbuilt (TabView's lazy behaviour) while visited ones keep state.
     @State private var visitedTabs: Set<MainTab> = [.calendar]
+    /// Measured pill height, published to tab roots and pushed screens via `vnTabBarHeight`.
+    @State private var tabBarHeight: CGFloat = 0
 
     init(pendingDeepLink: Binding<DeepLinkHandler.Action?> = .constant(nil)) {
         _pendingDeepLink = pendingDeepLink
@@ -68,11 +70,13 @@ public struct MainTabView: View {
         .animation(tabAnimation, value: selectedTab)
         .onChange(of: selectedTab, initial: true) { _, tab in visitedTabs.insert(tab) }
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        // safeAreaInset reserves pill height in every tab's scroll content,
-        // so nothing can scroll under the floating pill (ZStack overlay never did).
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+        // Overlay + measured height: safeAreaInset does not reliably reach content hosted inside NavigationStack,
+        // so each tab/pushed screen applies vnTabBarClearance() (contentMargins) from this environment value.
+        .overlay(alignment: .bottom) {
             customBottomTabBar
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { tabBarHeight = $0 }
         }
+        .environment(\.vnTabBarHeight, tabBarHeight)
         .onChange(of: pendingDeepLink, initial: true) { _, action in
             guard let action else { return }
             handle(action)
@@ -107,7 +111,8 @@ public struct MainTabView: View {
         BaseNavigationContainer(
             router: routers[tab.rawValue],
             content: { tabRoot(for: tab) },
-            destination: { AppRouteView(route: $0) },
+            // Pill stays visible on push, so pushed screens keep the clearance; sheets cover the pill and skip it.
+            destination: { AppRouteView(route: $0).vnTabBarClearance() },
             sheet: { AppSheetView(sheet: $0) },
             cover: { _ in EmptyView() }
         )
@@ -124,6 +129,7 @@ public struct MainTabView: View {
             }
         }
         .toolbar(.hidden, for: .navigationBar)
+        .vnTabBarClearance()
     }
 
     // MARK: - Floating Pill Tab Bar
