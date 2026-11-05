@@ -12,7 +12,7 @@ struct ReminderTitleSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("TÊN NGÀY GIỖ / SỰ KIỆN *")
+            Text(String(localized: "reminderForm.title.header"))
                 .font(.caption2.weight(.medium))
                 .tracking(0.66)
                 .foregroundColor(.vnAccentGoldText)
@@ -29,7 +29,7 @@ struct ReminderTitleSection: View {
             ) {
                 VStack(alignment: .leading, spacing: VNSpacing.md) {
                     VStack(alignment: .leading, spacing: 0) {
-                        TextField("VD: Giỗ Cụ Cố Nội, Sinh nhật Mẹ...", text: $title)
+                        TextField(String(localized: "reminderForm.title.placeholder"), text: $title)
                             .font(.callout.weight(.semibold))
                             .foregroundColor(.vnTextPrimary)
                             .focused(focusedField, equals: .title)
@@ -49,7 +49,7 @@ struct ReminderTitleSection: View {
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: VNSpacing.xs) {
-                            Text("Vai vế:")
+                            Text(String(localized: "reminderForm.role.label"))
                                 .font(.caption)
                                 .foregroundColor(.vnTextSecondary)
 
@@ -75,25 +75,32 @@ struct ReminderTitleSection: View {
             action: {
                 relationship = role
                 if title.isEmpty {
-                    title = "Giỗ \(role)"
+                    title = String(format: String(localized: "reminderForm.defaultTitle"), role)
                 }
             },
             label: {
-                Text(role)
-                    .font(.footnote.weight(isSelected ? .semibold : .regular))
-                    .foregroundColor(isSelected ? .vnAccentDeepPrimary : .vnTextSecondary)
-                    .padding(.horizontal, VNSpacing.md)
-                    .padding(.vertical, VNSpacing.xs)
-                    .background(isSelected ? Color.vnAccentRedSurface : Color.clear)
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule().stroke(
-                            isSelected ? Color.vnAccentDeepPrimary : Color.vnBorderSubtle,
-                            lineWidth: VNBorderWidth.regular
-                        )
+                HStack(spacing: VNSpacing.xs) {
+                    if isSelected {
+                        Image(systemName: "checkmark")
+                            .font(.caption.weight(.bold))
+                            .accessibilityHidden(true)
+                    }
+                    Text(role)
+                        .font(.footnote.weight(isSelected ? .semibold : .regular))
+                        .lineLimit(1)
+                }
+                .foregroundColor(isSelected ? .vnAccentDeepPrimary : .vnTextSecondary)
+                .padding(.horizontal, VNSpacing.md)
+                .frame(minHeight: VNSize.buttonSmall)
+                .background(isSelected ? Color.vnAccentRedSurface : Color.clear, in: Capsule())
+                .overlay(
+                    Capsule().stroke(
+                        isSelected ? Color.vnAccentDeepPrimary : Color.vnBorderSubtle,
+                        lineWidth: VNBorderWidth.regular
                     )
-                    .frame(minHeight: VNSize.minTapTarget)
-                    .contentShape(Rectangle())
+                )
+                .frame(minHeight: VNSize.minTapTarget)
+                .contentShape(Rectangle())
             }
         )
         .buttonStyle(.plain)

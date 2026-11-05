@@ -8,8 +8,6 @@ struct AppSheetView: View {
 
     var body: some View {
         content
-            .presentationDragIndicator(.visible)
-            .presentationCornerRadius(28)
     }
 
     @ViewBuilder
@@ -20,7 +18,6 @@ struct AppSheetView: View {
                 // Errors are dropped, matching the tab ViewModels' existing save paths.
                 Task { try? await container.scheduleReminderUseCase.execute(save: reminder) }
             }
-            .presentationDetents([.large])
         case .paywall:
             PaywallView()
         case .search:

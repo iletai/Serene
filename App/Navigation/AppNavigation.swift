@@ -1,5 +1,6 @@
 import BaseNavigationStack
 import Foundation
+import SwiftUI
 import VNCalendarDomain
 
 enum AppRoute: Hashable, Sendable {
@@ -26,6 +27,17 @@ enum AppSheet: Identifiable, Sendable {
         case .ritual(let title): return "ritual-\(title)"
         case .share(let text): return "share-\(text)"
         }
+    }
+}
+
+extension AppSheet: SheetPresentable {
+    var sheetOptions: SheetOptions {
+        let detents: Set<PresentationDetent>
+        switch self {
+        case .holiday: detents = [.medium, .large]
+        default: detents = [.large]
+        }
+        return SheetOptions(detents: detents, dragIndicator: .visible, cornerRadius: 28)
     }
 }
 
