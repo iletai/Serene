@@ -16,7 +16,7 @@ struct MemorialHeroCard: View {
                 HStack(spacing: VNSpacing.xs) {
                     VNSealBadge.gio(size: .medium)
 
-                    Text(reminder.relationship ?? "Gia Tiên")
+                    Text(reminder.relationship ?? String(localized: "timeline.default_relationship"))
                         .font(.caption2.weight(.bold))
                         .tracking(0.8)
                         .foregroundColor(.vnAccentHeritageRed)
@@ -90,8 +90,8 @@ struct MemorialHeroCard: View {
 
             // Bottom Actions
             HStack(spacing: VNSpacing.sm) {
-                VNButton("Xem Văn Khấn", icon: "book.pages.fill", variant: .primary, size: .small, isFullWidth: true, action: onQuickRitual)
-                VNButton("Chi Tiết", icon: "slider.horizontal.3", variant: .secondary, size: .small, isFullWidth: true, action: onEdit)
+                VNButton(String(localized: "action.view_prayer"), icon: "book.pages.fill", variant: .primary, size: .small, isFullWidth: true, action: onQuickRitual)
+                VNButton(String(localized: "timeline.details_button"), icon: "slider.horizontal.3", variant: .secondary, size: .small, isFullWidth: true, action: onEdit)
             }
             .padding(VNSpacing.cardPadding)
         }

@@ -16,27 +16,27 @@ public enum DeterministicDateParser {
         // 1. Keyword shortcuts: "mùng 1 tết", "rằm tháng giêng", "rằm tháng 7", "rằm tháng 8", "tết đoan ngọ"
         if q.contains("mùng 1 tết") || q.contains("mung 1 tet") || q == "tết" || q == "tet" {
             let lunar = LunarDate(day: 1, month: 1, year: referenceYear)
-            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: "Mùng 1 Tết Nguyên Đán")
+            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: String(localized: "search.parsed_tet"))
         }
 
         if q.contains("rằm tháng giêng") || q.contains("ram thang gieng") || q == "15/1 am" {
             let lunar = LunarDate(day: 15, month: 1, year: referenceYear)
-            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: "Rằm Tháng Giêng (Tết Nguyên Tiêu)")
+            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: String(localized: "search.parsed_ram_thang_gieng"))
         }
 
         if q.contains("rằm tháng 7") || q.contains("ram thang 7") || q.contains("vu lan") {
             let lunar = LunarDate(day: 15, month: 7, year: referenceYear)
-            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: "Rằm Tháng 7 (Lễ Vu Lan Báo Hiếu)")
+            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: String(localized: "search.parsed_ram_thang_7"))
         }
 
         if q.contains("trung thu") || q.contains("rằm tháng 8") || q.contains("ram thang 8") {
             let lunar = LunarDate(day: 15, month: 8, year: referenceYear)
-            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: "Rằm Tháng 8 (Tết Trung Thu)")
+            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: String(localized: "search.parsed_trung_thu"))
         }
 
         if q.contains("ông táo") || q.contains("ong tao") || q.contains("23 tháng chạp") {
             let lunar = LunarDate(day: 23, month: 12, year: referenceYear)
-            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: "23 Tháng Chạp (Tết Ông Công Ông Táo)")
+            return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: String(localized: "search.parsed_ong_tao"))
         }
 
         // 2. Regex: "DD/MM am" or "DD/MM al" (Lunar)
@@ -47,7 +47,7 @@ public enum DeterministicDateParser {
                let d = Int(q[dayRange]), let m = Int(q[monthRange]),
                (1...31).contains(d), (1...12).contains(m) {
                 let lunar = LunarDate(day: d, month: m, year: referenceYear)
-                return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: "Ngày \(d) Tháng \(m) Âm Lịch")
+                return ParsedDateResult(originalQuery: query, solarDate: nil, lunarDate: lunar, label: String(format: String(localized: "search.parsed_lunar"), d, m))
             }
         }
 
@@ -65,7 +65,7 @@ public enum DeterministicDateParser {
                     y = customY
                 }
                 let solar = SolarDate(day: d, month: m, year: y)
-                let label = "Ngày \(d) Tháng \(m) Năm \(y) Dương Lịch"
+                let label = String(format: String(localized: "search.parsed_solar"), d, m, y)
                 return ParsedDateResult(originalQuery: query, solarDate: solar, lunarDate: nil, label: label)
             }
         }

@@ -62,23 +62,32 @@ public struct TodayDashboardCard: View {
     // ponytail: day-stem element only; full Na Yin table when engine provides it.
     private var dayElementName: String {
         switch currentCanChi.day.stem {
-        case .giap, .at: "Mộc"
-        case .binh, .dinh: "Hỏa"
-        case .mau, .ky: "Thổ"
-        case .canh, .tan: "Kim"
-        case .nham, .quy: "Thủy"
+        case .giap, .at: String(localized: "today.element.wood")
+        case .binh, .dinh: String(localized: "today.element.fire")
+        case .mau, .ky: String(localized: "today.element.earth")
+        case .canh, .tan: String(localized: "today.element.metal")
+        case .nham, .quy: String(localized: "today.element.water")
         }
     }
 
     private var lunarMonthName: String {
-        let names = [
-            "Tháng Giêng", "Tháng Hai", "Tháng Ba", "Tháng Tư",
-            "Tháng Năm", "Tháng Sáu", "Tháng Bảy", "Tháng Tám",
-            "Tháng Chín", "Tháng Mười", "Tháng Một", "Tháng Chạp"
+        let names: [LocalizedStringResource] = [
+            "today.lunar_month_1",
+            "today.lunar_month_2",
+            "today.lunar_month_3",
+            "today.lunar_month_4",
+            "today.lunar_month_5",
+            "today.lunar_month_6",
+            "today.lunar_month_7",
+            "today.lunar_month_8",
+            "today.lunar_month_9",
+            "today.lunar_month_10",
+            "today.lunar_month_11",
+            "today.lunar_month_12"
         ]
         let month = currentLunarDate.month
-        guard month >= 1, month <= 12 else { return "Tháng \(month)" }
-        return names[month - 1]
+        guard month >= 1, month <= 12 else { return String(format: String(localized: "calendar.month_name_number"), month) }
+        return String(localized: names[month - 1])
     }
 
     private var gmt7Date: Date? {
@@ -94,9 +103,9 @@ public struct TodayDashboardCard: View {
     private var weekdayTitle: String? {
         guard let date = gmt7Date else { return nil }
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "vi_VN")
+        formatter.locale = Locale.current
         formatter.timeZone = VNTime.vietnam
-        formatter.dateFormat = "EEEE, d 'Tháng' MM"
+        formatter.dateFormat = String(localized: "today.weekday_date_format")
         return formatter.string(from: date).capitalized
     }
 
@@ -104,7 +113,7 @@ public struct TodayDashboardCard: View {
         guard let date = gmt7Date else { return nil }
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = VNTime.vietnam
-        return "Tuần thứ \(calendar.component(.weekOfYear, from: date))"
+        return String(format: String(localized: "today.week_of_year"), calendar.component(.weekOfYear, from: date))
     }
 
     private var suitableText: String {
@@ -168,7 +177,7 @@ public struct TodayDashboardCard: View {
             Image(systemName: "sun.max")
                 .font(.caption2.weight(.semibold))
                 .accessibilityHidden(true)
-            Text(dayStar.isAuspicious ? "HOÀNG ĐẠO" : "HẮC ĐẠO")
+            Text(dayStar.isAuspicious ? LocalizedStringKey("today.auspicious") : LocalizedStringKey("today.inauspicious"))
                 .font(.caption2.weight(.semibold))
                 .lineLimit(1)
                 .fixedSize()
@@ -191,15 +200,15 @@ public struct TodayDashboardCard: View {
                 .foregroundColor(.vnTextPrimary)
                 .contentTransition(.numericText())
                 .animation(dateAnimation, value: currentSolarDate.day)
-                .accessibilityLabel("Dương lịch ngày \(currentSolarDate.day)")
+                .accessibilityLabel(String(format: String(localized: "today.solar_day_accessibility"), currentSolarDate.day))
 
             Spacer(minLength: 0)
 
             VStack(alignment: .trailing, spacing: VNSpacing.space2) {
-                Text("Âm lịch")
+                Text("common.date_type_lunar")
                     .font(.caption2.weight(.medium))
                     .foregroundColor(.vnAccentGoldText)
-                Text("Ngày \(currentLunarDate.day)")
+                Text(String(format: String(localized: "today.lunar_day"), currentLunarDate.day))
                     .font(.system(size: lunarNumeralSize, weight: .semibold, design: .serif))
                     .foregroundColor(.vnAccentHeritageRed)
                     .lineLimit(1)
@@ -223,7 +232,7 @@ public struct TodayDashboardCard: View {
     }
 
     private var canChiLine: some View {
-        Text("Ngày \(currentCanChi.day.description) · Tháng \(currentCanChi.month.description) · Năm \(currentCanChi.year.description)")
+        Text(String(format: String(localized: "today.canchi_line"), currentCanChi.day.description, currentCanChi.month.description, currentCanChi.year.description))
             .font(.footnote.weight(.medium))
             .foregroundColor(.vnTextSecondary)
             .lineLimit(2)
@@ -274,7 +283,7 @@ public struct TodayDashboardCard: View {
             }
             .padding(.top, VNSpacing.sm)
         } label: {
-            Text("Giờ hoàng đạo · Nên / kiêng")
+            Text("today.details_title")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.vnTextPrimary)
         }
@@ -284,7 +293,7 @@ public struct TodayDashboardCard: View {
     }
 
     private var detailsSummary: String {
-        [weekOfYearText, "Sao \(dayStar.vietnameseName)", "Ngũ hành \(dayElementName)"]
+        [weekOfYearText, String(format: String(localized: "today.star_name"), dayStar.vietnameseName), String(format: String(localized: "today.element_summary"), dayElementName)]
             .compactMap { $0 }
             .joined(separator: " · ")
     }
@@ -308,14 +317,14 @@ private struct TodayHeroGuidance: View {
     private var hoursStrip: some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack(spacing: VNSpacing.sm) {
-                Text("GIỜ HOÀNG ĐẠO")
+                Text("hero.auspicious_hours")
                     .font(.caption2.weight(.semibold))
                     .tracking(0.66)
                     .foregroundColor(.vnTextSecondary)
 
                 Spacer(minLength: 0)
 
-                Text("\(hours.count) giờ lành")
+                Text(String(format: String(localized: "today.auspicious_hours_count"), hours.count))
                     .font(.caption2.weight(.medium))
                     .foregroundColor(.vnAccentGoldText)
             }
@@ -361,7 +370,7 @@ private struct TodayHeroGuidance: View {
     private var guidancePanels: some View {
         HStack(alignment: .top, spacing: VNSpacing.sm) {
             guidancePanel(
-                title: "Việc Nên Làm",
+                title: String(localized: "today.suitable_activities"),
                 icon: "checkmark.circle.fill",
                 tint: .vnAccentGoldText,
                 background: .vnAccentGoldSurface,
@@ -369,7 +378,7 @@ private struct TodayHeroGuidance: View {
             )
 
             guidancePanel(
-                title: "Việc Kiêng Cữ",
+                title: String(localized: "today.taboo_activities"),
                 icon: "xmark.circle.fill",
                 tint: .vnAccentHeritageRed,
                 background: .vnAccentRedSurface,
@@ -418,9 +427,9 @@ private struct TodayCardActions: View {
 
     var body: some View {
         HStack(spacing: VNSpacing.sm) {
-            VNButton("Thêm Ngày Nhớ", icon: "plus", variant: .primary, size: .small, isFullWidth: true, action: onAddReminder)
+            VNButton(String(localized: "action.add_reminder"), icon: "plus", variant: .primary, size: .small, isFullWidth: true, action: onAddReminder)
                 .popoverTip(AddReminderTip())
-            VNButton("Tra Cứu", icon: "magnifyingglass", variant: .secondary, size: .small, isFullWidth: true, action: onQuickSearch)
+            VNButton(String(localized: "action.search"), icon: "magnifyingglass", variant: .secondary, size: .small, isFullWidth: true, action: onQuickSearch)
         }
     }
 }

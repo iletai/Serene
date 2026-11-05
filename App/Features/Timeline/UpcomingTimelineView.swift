@@ -79,7 +79,7 @@ public struct UpcomingTimelineView: View {
                         .font(.caption2)
                         .accessibilityHidden(true)
                         .foregroundColor(.vnAccentHeritageRed)
-                    Text("KÍNH NHỚ TỔ TIÊN")
+                    Text("timeline.ancestor_eyebrow")
                         .font(.caption2.weight(.bold))
                         .tracking(1.0)
                         .foregroundColor(.vnAccentHeritageRed)
@@ -91,20 +91,20 @@ public struct UpcomingTimelineView: View {
 
                 Spacer()
 
-                VNButton("Thêm Mới", icon: "plus", variant: .primary, size: .small) {
+                VNButton(String(localized: "timeline.add_new"), icon: "plus", variant: .primary, size: .small) {
                     createReminder(vm: vm)
                 }
             }
 
             HStack(alignment: .lastTextBaseline) {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                    Text("Ngày Giỗ & Sự Kiện")
+                    Text("timeline.title")
                         .font(.system(.title, design: .serif).weight(.bold))
                         .foregroundColor(.vnTextPrimary)
                         .lineLimit(2)
                         .minimumScaleFactor(0.8)
 
-                    Text("Lưu truyền phụng sự đạo hiếu dòng họ gia tộc")
+                    Text("timeline.subtitle")
                         .font(.system(.footnote, design: .serif))
                         .italic()
                         .foregroundColor(.vnTextSecondary)
@@ -113,7 +113,7 @@ public struct UpcomingTimelineView: View {
                 Spacer()
 
                 if !vm.reminders.isEmpty {
-                    Text("\(vm.reminders.count) sự kiện")
+                    Text(String(format: String(localized: "timeline.events_count"), vm.reminders.count))
                         .font(.caption2.weight(.semibold))
                         .foregroundColor(.vnAccentHeritageRed)
                         .padding(.horizontal, VNSpacing.sm)
@@ -142,7 +142,7 @@ public struct UpcomingTimelineView: View {
                 .font(.subheadline)
                 .accessibilityHidden(true)
 
-            TextField("Tìm tên tiền nhân, ngày cúng, dòng họ...", text: $boundVM.searchQuery)
+            TextField("timeline.search_placeholder", text: $boundVM.searchQuery)
                 .font(.footnote)
 
             if !vm.searchQuery.isEmpty {
@@ -156,7 +156,7 @@ public struct UpcomingTimelineView: View {
                 .buttonStyle(.plain)
                 .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
-                .accessibilityLabel("Xóa tìm kiếm")
+                .accessibilityLabel("timeline.clear_search_accessibility")
             }
         }
         .padding(.horizontal, VNSpacing.md)
@@ -178,9 +178,9 @@ public struct UpcomingTimelineView: View {
         if vm.filteredReminders.isEmpty {
             VNEmptyState(
                 icon: "flame.fill",
-                title: "Gìn Giữ Đạo Hiếu Gia Tiên",
-                quote: "“Cây có cội mới trổ cành xanh lá\nNước có nguồn mới bủa khắp rạch sông”",
-                ctaLabel: "Thêm Ngày Giỗ Đầu Tiên",
+                title: String(localized: "timeline.empty_title"),
+                quote: String(localized: "timeline.empty_quote"),
+                ctaLabel: String(localized: "timeline.empty_cta_add"),
                 ctaIcon: "plus.circle.fill",
                 onCTA: { createReminder(vm: vm) }
             )
@@ -189,7 +189,7 @@ public struct UpcomingTimelineView: View {
             VStack(alignment: .leading, spacing: VNSpacing.md) {
                 if vm.searchQuery.isEmpty && vm.selectedFilter == .all, let hero = vm.urgentMemorial {
                     let monthStr = String(format: "%02d", hero.month)
-                    let calTypeStr = hero.dateType == .lunar ? "Âm Lịch" : "Dương Lịch"
+                    let calTypeStr = hero.dateType == .lunar ? String(localized: "timeline.calendar_type_lunar") : String(localized: "timeline.calendar_type_solar")
                     let dateText = "\(hero.day)/\(monthStr) \(calTypeStr)"
 
                     MemorialHeroCard(
@@ -200,12 +200,12 @@ public struct UpcomingTimelineView: View {
                         onEdit: { edit(hero) }
                     )
 
-                    MemorialTimelineDivider(title: "DANH SÁCH TIẾP THEO")
+                    MemorialTimelineDivider(title: String(localized: "timeline.upcoming_section_divider"))
                 }
 
                 ForEach(Array(vm.filteredReminders.enumerated()), id: \.element.id) { index, reminder in
                     let monthStr = String(format: "%02d", reminder.month)
-                    let calTypeStr = reminder.dateType == .lunar ? "Âm Lịch" : "Dương Lịch"
+                    let calTypeStr = reminder.dateType == .lunar ? String(localized: "timeline.calendar_type_lunar") : String(localized: "timeline.calendar_type_solar")
                     let dateText = "\(reminder.day)/\(monthStr) \(calTypeStr)"
                     let countdown = vm.countdownText(for: reminder)
 

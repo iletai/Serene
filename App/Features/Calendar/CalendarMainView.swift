@@ -89,14 +89,14 @@ public struct CalendarMainView: View {
         HStack(alignment: .center, spacing: VNSpacing.sm) {
             headerButton(
                 icon: "calendar.badge.clock",
-                accessibilityLabel: "Xem hôm nay"
+                accessibilityLabel: String(localized: "calendar.today_accessibility")
             ) {
                 VNHaptics.impact(enabled: hapticFeedbackEnabled)
                 vm.adapterViewModel.selectToday()
             }
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                Text("AN NIÊN")
+                Text("calendar.brand_title")
                     .font(.system(.headline, design: .serif).weight(.semibold))
                     .foregroundColor(.vnAccentDeepPrimary)
 
@@ -117,7 +117,7 @@ public struct CalendarMainView: View {
 
             headerButton(
                 icon: "gearshape",
-                accessibilityLabel: "Cài đặt ứng dụng"
+                accessibilityLabel: String(localized: "calendar.settings_accessibility")
             ) {
                 VNHaptics.impact(enabled: hapticFeedbackEnabled)
                 router.present(sheet: .settings)
@@ -160,7 +160,7 @@ public struct CalendarMainView: View {
             .background(Color.vnBackgroundTertiary, in: RoundedRectangle(cornerRadius: VNCornerRadius.small))
         }
         .frame(minHeight: VNSize.minTapTarget)
-        .accessibilityLabel("Đổi năm")
+        .accessibilityLabel("calendar.change_year_accessibility")
         .accessibilityValue(String(currentYear))
     }
 
@@ -203,6 +203,6 @@ public struct CalendarMainView: View {
         cal.timeZone = VNTime.vietnam
         let year = cal.component(.year, from: vm.adapterViewModel.displayMonthDate)
         let yearPair = CanChiPair.year(for: year)
-        return "Năm \(yearPair.description) • Âm Dương Hợp Lịch"
+        return String(format: String(localized: "calendar.lunar_subtitle"), yearPair.description)
     }
 }
