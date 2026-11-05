@@ -7,6 +7,8 @@ import VNCalendarData
 @MainActor
 final class FamilyHierarchyViewModel {
     var reminders: [ReminderEvent] = []
+    /// Generation ids the user has collapsed; all generations start expanded.
+    private(set) var collapsedGenerations: Set<String> = []
 
     private let reminderRepository: ReminderRepositoryProtocol
     private let subscriptionManager: SubscriptionManager
@@ -80,6 +82,18 @@ final class FamilyHierarchyViewModel {
             ))
         }
         return groups
+    }
+
+    func isExpanded(_ generationID: String) -> Bool {
+        !collapsedGenerations.contains(generationID)
+    }
+
+    func toggleGeneration(_ generationID: String) {
+        if collapsedGenerations.contains(generationID) {
+            collapsedGenerations.remove(generationID)
+        } else {
+            collapsedGenerations.insert(generationID)
+        }
     }
 
     func load() async {

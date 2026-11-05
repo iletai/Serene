@@ -218,6 +218,7 @@ public struct DataBackupSettingsView: View {
                                 if vm.isSyncingContent { ProgressView().scaleEffect(0.8) }
                             }
                         }
+                        .buttonStyle(.vnRowPress)
 
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
@@ -226,6 +227,7 @@ public struct DataBackupSettingsView: View {
                         } label: {
                             actionRow(String(localized: "settings.data.export_json"), icon: "square.and.arrow.up") { EmptyView() }
                         }
+                        .buttonStyle(.vnRowPress)
 
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
@@ -234,6 +236,7 @@ public struct DataBackupSettingsView: View {
                         } label: {
                             actionRow(String(localized: "settings.data.export_ics"), icon: "calendar.badge.plus") { EmptyView() }
                         }
+                        .buttonStyle(.vnRowPress)
 
                         if let msg = vm.backupStatusMessage {
                             VNRowDivider()

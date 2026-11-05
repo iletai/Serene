@@ -174,6 +174,7 @@ public struct OmniSearchView: View {
                 .frame(minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
         }
+        .buttonStyle(.vnPress(scale: 0.98))
         .disabled(vm.isCheckingGate)
     }
 

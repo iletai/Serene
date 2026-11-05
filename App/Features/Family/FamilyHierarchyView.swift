@@ -227,7 +227,7 @@ public struct FamilyHierarchyView: View {
     private func genealogyTreeSection(vm: FamilyHierarchyViewModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
             ForEach(vm.groupedGenerations) { group in
-                generationBand(group)
+                generationBand(group, vm: vm)
                     .scrollTransition(.animated(.smooth), axis: .vertical) { content, phase in
                         content
                             .opacity(reduceMotion || phase.isIdentity ? 1 : 0.4)
@@ -239,39 +239,74 @@ public struct FamilyHierarchyView: View {
 
     // MARK: - Generation Band
     @ViewBuilder
-    private func generationBand(_ group: FamilyMemberGroup) -> some View {
+    private func generationBand(_ group: FamilyMemberGroup, vm: FamilyHierarchyViewModel) -> some View {
         HStack(alignment: .top, spacing: VNSpacing.md) {
             generationRail(rank: group.generationRank)
 
             VStack(alignment: .leading, spacing: VNSpacing.sm) {
-                HStack(spacing: VNSpacing.sm) {
-                    Text(group.generationRank)
-                        .font(.caption2.weight(.bold))
-                        .tracking(0.66)
-                        .foregroundColor(.vnAccentGoldText)
+                generationHeader(group, vm: vm)
 
-                    Text(group.generationTitle)
-                        .font(.system(.headline, design: .serif).weight(.bold))
-                        .foregroundColor(.vnTextPrimary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
-
-                    Spacer()
-
-                    Text("\(group.members.count) vị")
-                        .font(.caption.weight(.medium))
-                        .foregroundColor(.vnTextSecondary)
-                        .contentTransition(.numericText())
-                        .animation(reduceMotion ? nil : .snappy, value: group.members.count)
-                }
-                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-
-                ForEach(group.members) { member in
-                    memberBranch(member)
+                if vm.isExpanded(group.id) {
+                    VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                        ForEach(Array(group.members.enumerated()), id: \.element.id) { index, member in
+                            memberBranch(member)
+                                .vnAppear(delay: Double(min(index, 7)) * 0.05)
+                        }
+                    }
+                    .clipped()
+                    .vnTransition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
         }
         .padding(.horizontal, VNSpacing.screenMargin)
+    }
+
+    private func generationHeader(_ group: FamilyMemberGroup, vm: FamilyHierarchyViewModel) -> some View {
+        let expanded = vm.isExpanded(group.id)
+        return Button {
+            withAnimation(reduceMotion ? VNAnimation.reduced : VNAnimation.expand) {
+                vm.toggleGeneration(group.id)
+            }
+        } label: {
+            HStack(spacing: VNSpacing.sm) {
+                Text(group.generationRank)
+                    .font(.caption2.weight(.bold))
+                    .tracking(0.66)
+                    .foregroundColor(.vnAccentGoldText)
+
+                Text(group.generationTitle)
+                    .font(.system(.headline, design: .serif).weight(.bold))
+                    .foregroundColor(.vnTextPrimary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+
+                Spacer()
+
+                Text("\(group.members.count) vị")
+                    .font(.caption.weight(.medium))
+                    .foregroundColor(.vnTextSecondary)
+                    .contentTransition(.numericText())
+                    .vnAnimation(VNAnimation.layout, value: group.members.count)
+
+                Image(systemName: "chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(.vnTextTertiary)
+                    .rotationEffect(.degrees(expanded ? 0 : -90))
+                    .vnAnimation(VNAnimation.expand, value: expanded)
+                    .accessibilityHidden(true)
+            }
+            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+            .frame(minHeight: VNSize.minTapTarget)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.vnPress)
+        .vnSelectionFeedback(trigger: expanded)
+        .accessibilityLabel("\(group.generationRank) \(group.generationTitle)")
+        .accessibilityValue(expanded
+            ? String(localized: "family.generation.expanded")
+            : String(localized: "family.generation.collapsed"))
+        .accessibilityHint(String(localized: "family.generation.toggle_hint"))
+        .accessibilityAddTraits(.isHeader)
     }
 
     private func generationRail(rank: String) -> some View {
