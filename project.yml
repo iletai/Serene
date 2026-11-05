@@ -22,13 +22,13 @@ configFiles:
 packages:
   CalendarView:
     url: https://github.com/iletai/SwiftUICalendarView.git
-    from: 3.1.1
+    from: 3.1.2
   AppUpdateKit:
     url: https://github.com/iletai/AppUpdateKit.git
     from: 1.1.0
   BaseNavigationStack:
     url: https://github.com/iletai/BaseNavigationStack.git
-    from: 2.0.0
+    from: 2.1.0
   VNCalendarLunar:
     path: Packages/VNCalendarLunar
   VNCalendarDomain:
