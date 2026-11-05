@@ -30,21 +30,20 @@ public struct VNYearCalendarView: View {
     }
 
     public var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: VNSpacing.md) {
-                ForEach(months) { monthModel in
-                    Button {
-                        onSelectMonth(monthModel.month)
-                    } label: {
-                        miniMonthCard(monthModel)
-                    }
-                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.97))
+        // No ScrollView: the host screen owns the single vertical scroll.
+        LazyVGrid(columns: columns, spacing: VNSpacing.md) {
+            ForEach(months) { monthModel in
+                Button {
+                    onSelectMonth(monthModel.month)
+                } label: {
+                    miniMonthCard(monthModel)
                 }
+                .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.97))
             }
-            .padding(.horizontal, VNSpacing.xl)
-            .padding(.vertical, VNSpacing.sm)
-            .padding(.bottom, VNSpacing.xl)
         }
+        .padding(.horizontal, VNSpacing.xl)
+        .padding(.vertical, VNSpacing.sm)
+        .padding(.bottom, VNSpacing.xl)
     }
 
     private func miniMonthCard(_ monthModel: VNYearMonthModel) -> some View {

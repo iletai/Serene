@@ -36,23 +36,7 @@ public struct VNWeekCalendarView: View {
         VStack(spacing: 0) {
             // 7-Day Horizontal Strip (Thanh 7 Ngày Trong Tuần)
             weekStripView
-                .offset(x: dragOffset)
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            dragOffset = value.translation.width * 0.4
-                        }
-                        .onEnded { value in
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                                if value.translation.width < -60 {
-                                    onNextWeek()
-                                } else if value.translation.width > 60 {
-                                    onPreviousWeek()
-                                }
-                                dragOffset = 0
-                            }
-                        }
-                )
+                .axisLockedSwipe(offset: $dragOffset, onPrevious: onPreviousWeek, onNext: onNextWeek)
                 .padding(.horizontal, VNSpacing.md)
                 .padding(.vertical, VNSpacing.xs)
 
@@ -60,28 +44,27 @@ public struct VNWeekCalendarView: View {
                 .background(Color.vnBorderSubtle)
 
             // Agenda / Hourly Schedule of the Selected Day
-            ScrollView {
-                VStack(spacing: VNSpacing.md) {
-                    if let model = selectedDayModel {
-                        // Selected Day Overview Header Card
-                        dayOverviewHeaderCard(for: model)
+            // No ScrollView: the host screen owns the single vertical scroll.
+            VStack(spacing: VNSpacing.md) {
+                if let model = selectedDayModel {
+                    // Selected Day Overview Header Card
+                    dayOverviewHeaderCard(for: model)
 
-                        // 12 Lunar Hours Timeline
-                        lunarHoursTimeline(for: model)
+                    // 12 Lunar Hours Timeline
+                    lunarHoursTimeline(for: model)
 
-                        // Anniversaries & Reminders Section
-                        anniversariesSection(for: model)
-                    } else {
-                        Text("Chọn một ngày trong tuần để xem chi tiết")
-                            .font(.system(size: 14))
-                            .foregroundColor(.vnTextSecondary)
-                            .padding(.top, VNSpacing.space32)
-                    }
+                    // Anniversaries & Reminders Section
+                    anniversariesSection(for: model)
+                } else {
+                    Text("Chọn một ngày trong tuần để xem chi tiết")
+                        .font(.system(size: 14))
+                        .foregroundColor(.vnTextSecondary)
+                        .padding(.top, VNSpacing.space32)
                 }
-                .padding(.horizontal, VNSpacing.xl)
-                .padding(.bottom, VNSpacing.xl)
-                .padding(.vertical, VNSpacing.sm)
             }
+            .padding(.horizontal, VNSpacing.xl)
+            .padding(.bottom, VNSpacing.xl)
+            .padding(.vertical, VNSpacing.sm)
         }
     }
 

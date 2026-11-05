@@ -11,6 +11,9 @@ public struct VNCalendarContainerView: View {
         return cal
     }()
 
+    /// Mode change: cross-fade with a slight scale; vnTransition degrades to opacity under Reduce Motion.
+    private static let modeTransition = AnyTransition.opacity.combined(with: .scale(scale: 0.97))
+
     @Bindable var viewModel: VNCalendarAdapterViewModel
     /// Fired directly from inline views, or only after the day-detail sheet has fully dismissed,
     /// so the host can present its own sheet without colliding with this one.
@@ -52,11 +55,11 @@ public struct VNCalendarContainerView: View {
                     onSelectToday: { viewModel.selectToday() },
                     onTapDetails: { viewModel.isDetailSheetPresented = true }
                 )
-                .transition(.opacity)
+                .vnTransition(Self.modeTransition)
 
             case .month:
                 monthGridView
-                    .transition(.opacity)
+                    .vnTransition(Self.modeTransition)
 
             case .week:
                 VNWeekCalendarView(
@@ -74,7 +77,7 @@ public struct VNCalendarContainerView: View {
                         viewModel.isDetailSheetPresented = true
                     }
                 )
-                .transition(.opacity)
+                .vnTransition(Self.modeTransition)
 
             case .year:
                 VNYearCalendarView(
@@ -87,14 +90,14 @@ public struct VNCalendarContainerView: View {
                         viewModel.selectDateKey(key, date: date)
                     }
                 )
-                .transition(.opacity)
+                .vnTransition(Self.modeTransition)
             }
 
             if viewModel.displayMode == .month {
                 legendRow
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: viewModel.displayMode)
+        .vnAnimation(VNAnimation.layout, value: viewModel.displayMode)
         .sheet(isPresented: $viewModel.isDetailSheetPresented, onDismiss: {
             guard addReminderAfterDismiss else { return }
             addReminderAfterDismiss = false

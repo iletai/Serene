@@ -27,45 +27,28 @@ public struct VNBlockCalendarView: View {
     }
 
     public var body: some View {
-        ScrollView {
-            VStack(spacing: VNSpacing.md) {
-                if let model = dayModel {
-                    // Physical Block Calendar Card (Tờ Lịch Xé)
-                    blocCard(for: model)
-                        .offset(x: dragOffset)
-                        .gesture(
-                            DragGesture()
-                                .onChanged { value in
-                                    dragOffset = value.translation.width * 0.4
-                                }
-                                .onEnded { value in
-                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                                        if value.translation.width < -60 {
-                                            onNextDay()
-                                        } else if value.translation.width > 60 {
-                                            onPreviousDay()
-                                        }
-                                        dragOffset = 0
-                                    }
-                                }
-                        )
+        // No ScrollView: the host screen owns the single vertical scroll.
+        VStack(spacing: VNSpacing.md) {
+            if let model = dayModel {
+                // Physical Block Calendar Card (Tờ Lịch Xé)
+                blocCard(for: model)
+                    .axisLockedSwipe(offset: $dragOffset, onPrevious: onPreviousDay, onNext: onNextDay)
 
-                    // Cultural Quote / Ca Dao Tục Ngữ Card
-                    quoteCard(for: model)
+                // Cultural Quote / Ca Dao Tục Ngữ Card
+                quoteCard(for: model)
 
-                    // Auspicious Details & Directions Card
-                    astrologyDetailsCard(for: model)
+                // Auspicious Details & Directions Card
+                astrologyDetailsCard(for: model)
 
-                    // Quick Day Navigation Toolbar
-                    quickNavToolbar
-                } else {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, minHeight: 200)
-                }
+                // Quick Day Navigation Toolbar
+                quickNavToolbar
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, minHeight: 200)
             }
-            .padding(.horizontal, VNSpacing.xl)
-            .padding(.vertical, VNSpacing.xs)
         }
+        .padding(.horizontal, VNSpacing.xl)
+        .padding(.vertical, VNSpacing.xs)
     }
 
     // MARK: - Bloc Calendar Card (Tờ Lịch Xé Truyền Thống)
