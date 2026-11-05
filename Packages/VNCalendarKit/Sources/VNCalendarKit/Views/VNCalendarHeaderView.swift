@@ -41,26 +41,30 @@ public struct VNCalendarHeaderView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("calendar.header.accessibility.prev_month")
 
-            Spacer()
-
             VStack(spacing: VNSpacing.space2) {
                 Text(headerTitle)
                     .font(.system(size: 19, weight: .bold, design: .serif))
                     .foregroundColor(.vnTextPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
 
                 if let subtitle = headerSubtitle {
                     Text(subtitle)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.vnTextSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
             }
-
-            Spacer()
+            .frame(maxWidth: .infinity)
+            .layoutPriority(1)
 
             HStack(spacing: VNSpacing.xs) {
                 Button(action: onToday) {
                     Text("action.today")
                         .font(.system(size: 12, weight: .semibold, design: .serif))
+                        .lineLimit(1)
+                        .fixedSize()
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.xs)
                         .background(Color.vnGoldContainer)
@@ -93,8 +97,10 @@ public struct VNCalendarHeaderView: View {
                 .accessibilityLabel("calendar.header.accessibility.next_month")
             }
         }
-        .padding(.horizontal, VNSpacing.xl)
+        .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.vertical, VNSpacing.xs)
+        // Header chrome caps its growth so title/subtitle stay on single lines at xxxl.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 
     private var headerTitle: String {

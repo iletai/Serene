@@ -12,32 +12,17 @@ struct MemorialHeroCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Top Ribbon & Status Row
-            HStack(alignment: .center) {
-                HStack(spacing: VNSpacing.xs) {
-                    VNSealBadge.gio(size: .medium)
-
-                    Text(reminder.relationship ?? String(localized: "timeline.default_relationship"))
-                        .font(.caption2.weight(.bold))
-                        .tracking(0.8)
-                        .foregroundColor(.vnAccentHeritageRed)
-                        .padding(.horizontal, VNSpacing.sm)
-                        .padding(.vertical, VNSpacing.xs)
-                        .background(Color.vnAccentRedSurface)
-                        .clipShape(Capsule())
+            // Falls back to a stacked layout at large Dynamic Type instead of squeezing the pills.
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .center) {
+                    relationshipRow
+                    Spacer()
+                    countdownBadge
                 }
-
-                Spacer()
-
-                // Countdown Badge
-                Text(countdownText)
-                    .font(.caption.weight(.bold))
-                    .foregroundColor(.vnOnAccent)
-                    .padding(.horizontal, VNSpacing.sm)
-                    .padding(.vertical, VNSpacing.xs)
-                    .background(Color.vnAccentHeritageRed)
-                    .clipShape(Capsule())
-                    .shadow(color: VNShadow.floating.color, radius: VNShadow.floating.radius,
-                            x: VNShadow.floating.x, y: VNShadow.floating.y)
+                VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                    relationshipRow
+                    countdownBadge
+                }
             }
             .padding(.horizontal, VNSpacing.cardPadding)
             .padding(.top, VNSpacing.md)
@@ -103,5 +88,36 @@ struct MemorialHeroCard: View {
         )
         .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius,
                 x: VNShadow.folio.x, y: VNShadow.folio.y)
+    }
+
+    private var relationshipRow: some View {
+        HStack(spacing: VNSpacing.xs) {
+            VNSealBadge.gio(size: .medium)
+
+            Text(reminder.relationship ?? String(localized: "timeline.default_relationship"))
+                .font(.caption2.weight(.bold))
+                .tracking(0.8)
+                .foregroundColor(.vnAccentHeritageRed)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .padding(.horizontal, VNSpacing.sm)
+                .padding(.vertical, VNSpacing.xs)
+                .background(Color.vnAccentRedSurface)
+                .clipShape(Capsule())
+        }
+    }
+
+    private var countdownBadge: some View {
+        Text(countdownText)
+            .font(.caption.weight(.bold))
+            .foregroundColor(.vnOnAccent)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.horizontal, VNSpacing.sm)
+            .padding(.vertical, VNSpacing.xs)
+            .background(Color.vnAccentHeritageRed)
+            .clipShape(Capsule())
+            .shadow(color: VNShadow.floating.color, radius: VNShadow.floating.radius,
+                    x: VNShadow.floating.x, y: VNShadow.floating.y)
     }
 }

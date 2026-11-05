@@ -99,19 +99,17 @@ public struct CalendarMainView: View {
                 Text("calendar.brand_title")
                     .font(.system(.headline, design: .serif).weight(.semibold))
                     .foregroundColor(.vnAccentDeepPrimary)
+                    .lineLimit(1)
 
                 Text(lunarSubtitle(vm: vm))
                     .font(.caption2.weight(.medium))
-                    .tracking(0.66)
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.8)
                     .contentTransition(.opacity)
             }
             .accessibilityElement(children: .combine)
             .animation(reduceMotion ? nil : .smooth, value: lunarSubtitle(vm: vm))
-
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             yearSwitcherPill(vm: vm)
 

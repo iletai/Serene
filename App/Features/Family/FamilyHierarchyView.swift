@@ -8,6 +8,11 @@ public struct FamilyMemberGroup: Identifiable {
     public let generationTitle: String
     public let generationRank: String
     public let members: [ReminderEvent]
+
+    /// Rail badge text: the numeral of a rank like "ĐỜI II" ("II"); works for any length (I...X+).
+    public static func badgeText(fromRank rank: String) -> String {
+        rank.split(separator: " ").last.map(String.init) ?? rank
+    }
 }
 
 public struct FamilyHierarchyView: View {
@@ -17,10 +22,13 @@ public struct FamilyHierarchyView: View {
     @State private var viewModel: FamilyHierarchyViewModel?
     @State private var isCheckingGate = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @ScaledMetric(relativeTo: .footnote) private var railBadgeSize: CGFloat = 32
+    @ScaledMetric(relativeTo: .footnote) private var railBadgeScaled: CGFloat = 32
     @ScaledMetric(relativeTo: .footnote) private var memberBadgeSize: CGFloat = VNSize.iconButton
 
     public init() {}
+
+    /// Capped so the rail never steals card width at large Dynamic Type.
+    private var railBadgeWidth: CGFloat { min(railBadgeScaled, VNSize.iconButton + VNSpacing.sm) }
 
     private var activeViewModel: FamilyHierarchyViewModel {
         if let existing = viewModel { return existing }
@@ -225,7 +233,8 @@ public struct FamilyHierarchyView: View {
     // MARK: - Genealogy Tree Section
     @ViewBuilder
     private func genealogyTreeSection(vm: FamilyHierarchyViewModel) -> some View {
-        VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
+        let reduceMotion = reduceMotion // capture: scrollTransition closure is Sendable
+        return VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
             ForEach(vm.groupedGenerations) { group in
                 generationBand(group, vm: vm)
                     .scrollTransition(.animated(.smooth), axis: .vertical) { content, phase in
@@ -240,7 +249,7 @@ public struct FamilyHierarchyView: View {
     // MARK: - Generation Band
     @ViewBuilder
     private func generationBand(_ group: FamilyMemberGroup, vm: FamilyHierarchyViewModel) -> some View {
-        HStack(alignment: .top, spacing: VNSpacing.md) {
+        HStack(alignment: .top, spacing: VNSpacing.sm) {
             generationRail(rank: group.generationRank)
 
             VStack(alignment: .leading, spacing: VNSpacing.sm) {
@@ -311,10 +320,12 @@ public struct FamilyHierarchyView: View {
 
     private func generationRail(rank: String) -> some View {
         VStack(spacing: VNSpacing.sm) {
-            Text(rankLetter(from: rank))
+            Text(FamilyMemberGroup.badgeText(fromRank: rank))
                 .font(.system(.footnote, design: .serif).weight(.bold))
                 .foregroundColor(.vnAccentHeritageRed)
-                .frame(width: railBadgeSize, height: railBadgeSize)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .frame(width: railBadgeWidth, height: railBadgeWidth)
                 .background(Color.vnAccentRedSurface)
                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.micro))
                 .overlay(
@@ -329,15 +340,15 @@ public struct FamilyHierarchyView: View {
                 .frame(maxHeight: .infinity)
                 .accessibilityHidden(true)
         }
-        .frame(width: railBadgeSize)
+        .frame(width: railBadgeWidth)
     }
 
     @ViewBuilder
     private func memberBranch(_ member: ReminderEvent) -> some View {
-        HStack(alignment: .top, spacing: VNSpacing.sm) {
+        HStack(alignment: .top, spacing: VNSpacing.xs) {
             Rectangle()
                 .fill(Color.vnAccentImperialGold.opacity(0.45))
-                .frame(width: VNSpacing.sm, height: VNBorderWidth.regular)
+                .frame(width: VNSpacing.xs, height: VNBorderWidth.regular)
                 .padding(.top, VNSpacing.space32)
                 .accessibilityHidden(true)
 
@@ -369,15 +380,17 @@ public struct FamilyHierarchyView: View {
         isWorshipped(member) ? String(localized: "family.status_deceased") : String(localized: "family.status_living")
     }
 
-    private func rankLetter(from rank: String) -> String {
-        let last = rank.split(separator: " ").last.map(String.init) ?? String(rank.prefix(1))
-        return String(last.prefix(1))
+    private func memberSubtitle(_ member: ReminderEvent) -> String {
+        var parts = [anniversaryText(member)]
+        if let rel = member.relationship, !rel.isEmpty { parts.insert(rel, at: 0) }
+        if let y = member.year { parts.append(String(format: String(localized: "family.member_year"), String(y))) }
+        return parts.joined(separator: " · ")
     }
 
     // MARK: - Member Card
     private func memberCard(member: ReminderEvent) -> some View {
         let isDeath = isWorshipped(member)
-        return HStack(spacing: VNSpacing.md) {
+        return HStack(alignment: .top, spacing: VNSpacing.sm) {
             if member.category == .deathAnniversary {
                 VNSealBadge.gio(size: .small)
             } else {
@@ -391,41 +404,29 @@ public struct FamilyHierarchyView: View {
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
             }
 
-            VStack(alignment: .leading, spacing: VNSpacing.space2) {
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text(member.title)
                     .font(.system(.subheadline, design: .serif).weight(.semibold))
                     .foregroundColor(.vnTextPrimary)
-                    .minimumScaleFactor(0.8)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                HStack(spacing: VNSpacing.xs) {
-                    if let rel = member.relationship, !rel.isEmpty {
-                        Text(rel)
-                            .font(.caption)
-                            .foregroundColor(.vnTextSecondary)
-                    }
+                Text(memberSubtitle(member))
+                    .font(.caption)
+                    .foregroundColor(.vnTextSecondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                    Text("• \(anniversaryText(member))")
-                        .font(.caption)
-                        .foregroundColor(.vnTextSecondary)
-                }
-
-                if let y = member.year {
-                    Text(String(format: String(localized: "family.member_year"), String(y)))
-                        .font(.caption)
-                        .foregroundColor(.vnTextSecondary)
-                }
+                Text(statusText(member))
+                    .font(.vnCaption2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(isDeath ? .vnOnAccent : .vnTextSecondary)
+                    .padding(.horizontal, VNSpacing.sm)
+                    .padding(.vertical, VNSpacing.space2)
+                    .background(isDeath ? Color.vnAccentDeepPrimary : Color.vnBackgroundTertiary)
+                    .clipShape(Capsule())
             }
-
-            Spacer()
-
-            Text(statusText(member))
-                .font(.vnCaption2)
-                .fontWeight(.semibold)
-                .foregroundColor(isDeath ? .vnOnAccent : .vnTextSecondary)
-                .padding(.horizontal, VNSpacing.sm)
-                .padding(.vertical, VNSpacing.space2)
-                .background(isDeath ? Color.vnAccentDeepPrimary : Color.vnBackgroundTertiary)
-                .clipShape(Capsule())
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Image(systemName: "chevron.right")
                 .font(.caption2.weight(.semibold))
