@@ -3,6 +3,7 @@ import SwiftData
 import TipKit
 import UserNotifications
 import AppUpdateKit
+import GoogleMobileAds
 import VNCalendarDesignSystem
 import VNCalendarDomain
 import VNCalendarData
@@ -21,6 +22,7 @@ struct AnNienApp: App {
         // Must be set before launch finishes so a cold-start notification tap is delivered.
         UNUserNotificationCenter.current().delegate = DeepLinkCenter.shared
         try? Tips.configure()
+        MobileAds.shared.start { _ in }
         // Register local notification categories at startup
         Task { @MainActor in
             await SmartNotificationEngine.shared.registerCategories()

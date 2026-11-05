@@ -29,6 +29,9 @@ packages:
   BaseNavigationStack:
     url: https://github.com/iletai/BaseNavigationStack.git
     from: 2.1.0
+  GoogleMobileAds:
+    url: https://github.com/googleads/swift-package-manager-google-mobile-ads.git
+    from: 13.12.0
   VNCalendarLunar:
     path: Packages/VNCalendarLunar
   VNCalendarDomain:
@@ -57,6 +60,7 @@ targets:
       - package: CalendarView
       - package: AppUpdateKit
       - package: BaseNavigationStack
+      - package: GoogleMobileAds
       - package: VNCalendarLunar
       - package: VNCalendarDomain
       - package: VNCalendarData

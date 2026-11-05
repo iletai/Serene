@@ -10,3 +10,11 @@ WIDGET_CODE_SIGN_ENTITLEMENTS = Config/Entitlements/AnNienWidget-Dev.entitlement
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) DEV
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 OTHER_SWIFT_FLAGS = $(inherited) -D DEV
+
+// Google test App ID; replace with the real AdMob App ID (iOS) before release.
+ADMOB_APP_ID = ca-app-pub-3940256099942544~1458002511
+// Google sample ad units (always fill, never count as real traffic).
+ADMOB_BANNER_UNIT_ID = ca-app-pub-3940256099942544/2435281174
+ADMOB_INTERSTITIAL_UNIT_ID = ca-app-pub-3940256099942544/4411468910
+ADMOB_REWARDED_UNIT_ID = ca-app-pub-3940256099942544/1712485313
+ADMOB_NATIVE_UNIT_ID = ca-app-pub-3940256099942544/3986624511
