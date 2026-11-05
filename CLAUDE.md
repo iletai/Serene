@@ -152,6 +152,13 @@ Configuration files are in `Config/`:
 5. **StoreKit 2 Monetization & Feature Gating**:
    - Products: Monthly (`com.iletai.annien.sub.monthly`), Yearly (`com.iletai.annien.sub.yearly`), Lifetime (`com.iletai.annien.nonconsumable.lifetime`).
    - Free tier: Up to 5 memorial dates, small widget.
+   - Free tier can earn up to 5 extra memorial slots by watching rewarded ads (`RewardedSlotStore`, passed to the gate use cases as `bonusSlots`).
+
+6. **Google AdMob (free tier only)**:
+   - Code lives in `App/Infrastructure/Ads/` (`AdsManager`, `BannerAdView`, `NativeAdCard`, `AdUnitIDs`, `RewardedSlotStore`); `GoogleMobileAds` is an app-target-only dependency.
+   - Flow: UMP consent -> ATT -> `MobileAds.start`; banner above the tab bar, interstitial every 3rd save (min 3 min apart), native card in the timeline, rewarded on the Paywall. Pro users never see ads.
+   - IDs come from `Config/*.xcconfig` (`ADMOB_*`) via `App/Info.plist`; Dev uses Google sample IDs, Prod uses real IDs. Never hardcode ad unit IDs.
+   - Privacy/support pages and `app-ads.txt` live in the private repo `iletai/apps-site` (Vercel); legal URLs are also served from the microCMS `app-config` object.
    - Pro tier: Unlimited dates, CloudKit sync, family heritage mode, medium & lock screen widgets.
 
 ---
