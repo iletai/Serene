@@ -2,7 +2,7 @@
   "identifier": "AnNien_Subscriptions",
   "nonConsumableProducts": [
     {
-      "displayPrice": "29.99",
+      "displayPrice": "9.99",
       "familyShareable": true,
       "internalID": "com.iletai.annien.nonconsumable.lifetime",
       "localizations": [
