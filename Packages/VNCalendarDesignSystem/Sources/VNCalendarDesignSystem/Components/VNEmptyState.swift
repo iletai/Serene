@@ -72,12 +72,14 @@ public struct VNEmptyState: View {
                     .foregroundColor(iconForeground)
             }
             .padding(.top, VNSpacing.xl)
+            .vnAppear()
             .accessibilityHidden(true)
 
             Text(title)
                 .font(.system(size: 18, weight: .bold, design: .serif))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
+                .vnAppear(delay: 0.05)
 
             if let quote {
                 Text(quote)
@@ -87,6 +89,7 @@ public struct VNEmptyState: View {
                     .foregroundColor(.vnTextSecondary)
                     .lineSpacing(VNSpacing.xs)
                     .padding(.horizontal, VNSpacing.xl)
+                    .vnAppear(delay: 0.1)
             }
 
             if let ctaLabel, let onCTA {
@@ -113,7 +116,9 @@ public struct VNEmptyState: View {
                         y: VNShadow.card.y
                     )
                 }
+                .buttonStyle(.vnPress(scale: 0.96, haptic: true))
                 .padding(.top, VNSpacing.sm)
+                .vnAppear(delay: 0.15)
             }
         }
         .frame(maxWidth: .infinity)

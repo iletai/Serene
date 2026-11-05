@@ -44,6 +44,7 @@ public enum VNButtonSize: Sendable {
 }
 
 public struct VNButtonStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     public let variant: VNButtonVariant
     public let size: VNButtonSize
     public let isFullWidth: Bool
@@ -78,8 +79,11 @@ public struct VNButtonStyle: ButtonStyle {
                 x: VNShadow.folio.x,
                 y: VNShadow.folio.y
             )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .animation(VNAnimation.cellSelection, value: configuration.isPressed)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.97 : 1.0)
+            .animation(
+                reduceMotion ? VNAnimation.reduced : (configuration.isPressed ? VNAnimation.pressDown : VNAnimation.press),
+                value: configuration.isPressed
+            )
     }
 
     private var foregroundColor: Color {
@@ -167,10 +171,12 @@ public struct VNButton: View {
         self.action = action
     }
 
+    @State private var tapCount = 0
+
     public var body: some View {
         Button(
             action: {
-                triggerHaptic()
+                tapCount += 1
                 action()
             },
             label: {
@@ -186,12 +192,6 @@ public struct VNButton: View {
             }
         )
         .buttonStyle(VNButtonStyle(variant: variant, size: size, isFullWidth: isFullWidth))
-    }
-
-    private func triggerHaptic() {
-        #if canImport(UIKit)
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        #endif
+        .vnImpactFeedback(trigger: tapCount)
     }
 }
