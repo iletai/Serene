@@ -35,10 +35,6 @@ final class UIGalleryTests: XCTestCase {
         gallery("family", route: "family", anchor: "Nguyễn Văn Phúc", scrollsToBottom: true)
     }
 
-    func testArticles() {
-        gallery("articles", route: "rituals", anchor: "Văn Khấn & Phong Tục", scrollsToBottom: true)
-    }
-
     func testHolidaySheet() {
         gallery("holiday", route: "holiday", anchor: "Tết Nguyên Đán")
     }

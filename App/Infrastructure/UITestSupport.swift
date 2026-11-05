@@ -11,7 +11,7 @@ import VNCalendarDomain
 /// - `-UITestSeed 1`: in-memory store (the on-disk/App Group store is never opened),
 ///   deterministic sample reminders, Pro pinned, TipKit popovers hidden.
 /// - `-UITestRoute <name>`: tab or sheet opened at launch through `DeepLinkCenter`.
-///   Names: the `annien://` hosts (calendar, memorial, rituals, family, settings, paywall, search)
+///   Names: the `annien://` hosts (calendar, memorial, family, settings, paywall, search)
 ///   plus `reminderForm`, `holiday`, `ritual`.
 @MainActor
 enum UITestSupport {
@@ -35,7 +35,7 @@ enum UITestSupport {
     static func action(for route: String) -> DeepLinkHandler.Action? {
         switch route {
         case "reminderForm": return .present(tab: .calendar, sheet: .reminderForm(editing: nil, initialDate: nil))
-        case "holiday": return .present(tab: .rituals, sheet: .holiday(sampleHoliday))
+        case "holiday": return .present(tab: .calendar, sheet: .holiday(sampleHoliday))
         case "ritual": return .present(tab: .memorial, sheet: .ritual(title: "Giỗ Cụ Ông Nguyễn Văn Phúc"))
         default: return URL(string: "annien://\(route)").flatMap(DeepLinkHandler().action(for:))
         }
