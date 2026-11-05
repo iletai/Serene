@@ -5,6 +5,7 @@ import SwiftUI
 struct AppSheetView: View {
     let sheet: AppSheet
     @Environment(AppContainer.self) private var container
+    @Environment(AdsManager.self) private var ads: AdsManager?
 
     var body: some View {
         content
@@ -16,7 +17,10 @@ struct AppSheetView: View {
         case .reminderForm(let editing, let initialDate):
             ReminderFormView(existingReminder: editing, initialDate: initialDate) { reminder in
                 // Errors are dropped, matching the tab ViewModels' existing save paths.
-                Task { try? await container.scheduleReminderUseCase.execute(save: reminder) }
+                Task {
+                    try? await container.scheduleReminderUseCase.execute(save: reminder)
+                    await ads?.noteSaveAndShowInterstitialIfDue()
+                }
             }
         case .paywall:
             PaywallView()
