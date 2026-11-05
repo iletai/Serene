@@ -22,7 +22,7 @@ configFiles:
 packages:
   CalendarView:
     url: https://github.com/iletai/SwiftUICalendarView.git
-    from: 3.1.0
+    from: 3.1.1
   AppUpdateKit:
     url: https://github.com/iletai/AppUpdateKit.git
     from: 1.1.0

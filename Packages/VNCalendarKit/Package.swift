@@ -17,7 +17,7 @@ let package = Package(
         .package(path: "../VNCalendarDomain"),
         .package(path: "../VNCalendarDesignSystem"),
         .package(path: "../VNCalendarLunar"),
-        .package(url: "https://github.com/iletai/SwiftUICalendarView.git", from: "3.1.0")
+        .package(url: "https://github.com/iletai/SwiftUICalendarView.git", from: "3.1.1")
     ],
     targets: [
         .target(
