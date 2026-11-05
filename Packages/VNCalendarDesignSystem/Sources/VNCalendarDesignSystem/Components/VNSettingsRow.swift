@@ -99,6 +99,6 @@ public struct VNSettingsRow<Trailing: View>: View {
         .padding(.horizontal, VNSpacing.lg)
         .padding(.vertical, VNSpacing.md)
         .contentShape(Rectangle())
-        .frame(minHeight: 44)
+        .frame(minHeight: VNSize.minTapTarget)
     }
 }

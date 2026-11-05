@@ -153,11 +153,10 @@ public struct PaywallView: View {
                             .fontWeight(.bold)
                     }
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, VNSpacing.lg)
+                .frame(maxWidth: .infinity, minHeight: VNSize.buttonLarge)
                 .background(Color.vnAccentHeritageRed)
                 .foregroundColor(.vnOnAccent)
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
             }
         )
         .disabled(vm.isPurchasing || vm.products.isEmpty)

@@ -236,9 +236,10 @@ public struct PrayerDetailView: View {
                         .font(.vnCaption1)
                         .fontWeight(.bold)
                         .foregroundColor(.vnTextPrimary)
-                        .frame(width: 44, height: 44)
+                        .frame(width: VNSize.buttonSmall, height: VNSize.buttonSmall)
                         .background(Color.vnBackgroundSecondary)
                         .clipShape(Circle())
+                        .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 }
                 .buttonStyle(.plain)
                 .contentShape(Circle())
@@ -257,9 +258,10 @@ public struct PrayerDetailView: View {
                         .font(.vnCaption1)
                         .fontWeight(.bold)
                         .foregroundColor(.vnTextPrimary)
-                        .frame(width: 44, height: 44)
+                        .frame(width: VNSize.buttonSmall, height: VNSize.buttonSmall)
                         .background(Color.vnBackgroundSecondary)
                         .clipShape(Circle())
+                        .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 }
                 .buttonStyle(.plain)
                 .contentShape(Circle())
