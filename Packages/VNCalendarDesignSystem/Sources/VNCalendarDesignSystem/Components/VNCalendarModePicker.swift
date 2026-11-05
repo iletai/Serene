@@ -12,13 +12,13 @@ public enum VNCalendarMode: String, CaseIterable, Identifiable, Sendable {
     public var title: String {
         switch self {
         case .block:
-            "Nhật Lịch"
+            String(localized: "ds.calendar.mode.block")
         case .month:
-            "Tháng"
+            String(localized: "ds.calendar.mode.month")
         case .week:
-            "Tuần"
+            String(localized: "ds.calendar.mode.week")
         case .year:
-            "Năm"
+            String(localized: "ds.calendar.mode.year")
         }
     }
 
@@ -76,7 +76,7 @@ public struct VNCalendarModePicker: View {
                         }
                         .contentShape(Rectangle())
                         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
-                        .accessibilityValue(isSelected ? "Đã chọn" : "")
+                        .accessibilityValue(isSelected ? String(localized: "ds.a11y.selected") : "")
                 }
                 .buttonStyle(.plain)
             }

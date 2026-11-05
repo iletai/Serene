@@ -79,9 +79,9 @@ public struct VNDismissButton: View {
 
     private var accessibilityLabel: String {
         switch style {
-        case .xmark: return "Đóng"
+        case .xmark: return String(localized: "daydetail.action.close")
         case .text(let t): return t
-        case .done: return "Xong"
+        case .done: return String(localized: "settings.action.done")
         }
     }
 }

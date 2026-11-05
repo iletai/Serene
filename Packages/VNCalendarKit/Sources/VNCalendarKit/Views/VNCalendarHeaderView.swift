@@ -39,7 +39,7 @@ public struct VNCalendarHeaderView: View {
             .frame(minWidth: 44, minHeight: 44)
             .contentShape(Rectangle())
             .buttonStyle(.plain)
-            .accessibilityLabel("Tháng trước")
+            .accessibilityLabel("calendar.header.accessibility.prev_month")
 
             Spacer()
 
@@ -59,7 +59,7 @@ public struct VNCalendarHeaderView: View {
 
             HStack(spacing: VNSpacing.xs) {
                 Button(action: onToday) {
-                    Text("Hôm nay")
+                    Text("action.today")
                         .font(.system(size: 12, weight: .semibold, design: .serif))
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.xs)
@@ -74,7 +74,7 @@ public struct VNCalendarHeaderView: View {
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())
                 .buttonStyle(.plain)
-                .accessibilityLabel("Hôm nay")
+                .accessibilityLabel("action.today")
 
                 Button(action: onNext) {
                     Image(systemName: "chevron.right")
@@ -90,7 +90,7 @@ public struct VNCalendarHeaderView: View {
                 .frame(minWidth: 44, minHeight: 44)
                 .contentShape(Rectangle())
                 .buttonStyle(.plain)
-                .accessibilityLabel("Tháng sau")
+                .accessibilityLabel("calendar.header.accessibility.next_month")
             }
         }
         .padding(.horizontal, VNSpacing.xl)
@@ -106,14 +106,14 @@ public struct VNCalendarHeaderView: View {
         switch displayMode {
         case .block:
             let day = cal.component(.day, from: monthDate)
-            return "Ngày \(day) Tháng \(month), \(year)"
+            return String(format: String(localized: "calendar.header.title.block"), day, month, year)
         case .month:
-            return "Tháng \(month), \(year)"
+            return String(format: String(localized: "calendar.header.title.month"), month, year)
         case .week:
             let week = cal.component(.weekOfYear, from: monthDate)
-            return "Tuần \(week) • Tháng \(month), \(year)"
+            return String(format: String(localized: "calendar.header.title.week"), week, month, year)
         case .year:
-            return "Năm \(year)"
+            return String(format: String(localized: "calendar.header.title.year"), year)
         }
     }
 
@@ -125,9 +125,9 @@ public struct VNCalendarHeaderView: View {
 
         switch displayMode {
         case .year:
-            return "Năm \(fullCanChi.year.description)"
+            return String(format: String(localized: "calendar.header.subtitle.year_canchi"), fullCanChi.year.description)
         case .block, .month, .week:
-            return "Năm \(fullCanChi.year.description) • Tháng \(fullCanChi.month.description)"
+            return String(format: String(localized: "calendar.header.subtitle.year_month_canchi"), fullCanChi.year.description, fullCanChi.month.description)
         }
     }
 }

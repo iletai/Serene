@@ -35,7 +35,7 @@ public struct VN12HourTimelineView: View {
                     .font(.system(size: 11, weight: .bold))
                     .foregroundColor(.vnAccentImperialGold)
 
-                Text("12 CANH GIỜ HOÀNG / HẮC ĐẠO")
+                Text("ds.hour.timeline_header")
                     .font(.vnCaption2)
                     .fontWeight(.bold)
                     .foregroundColor(.vnTextSecondary)
@@ -43,7 +43,7 @@ public struct VN12HourTimelineView: View {
 
                 Spacer()
 
-                Text("Vàng: Hoàng Đạo")
+                Text("ds.hour.legend_auspicious")
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(.vnAccentImperialGold)
             }
@@ -94,6 +94,11 @@ public struct VN12HourTimelineView: View {
     }
 
     private func hourAccessibilityLabel(_ item: VNHourBranchItem) -> String {
-        "Giờ \(item.name), \(item.timeRange) giờ, \(item.isAuspicious ? "Hoàng đạo" : "Hắc đạo")"
+        String(
+            format: String(localized: "ds.hour.a11y_label"),
+            item.name,
+            item.timeRange,
+            item.isAuspicious ? String(localized: "ds.hour.auspicious") : String(localized: "ds.hour.inauspicious")
+        )
     }
 }

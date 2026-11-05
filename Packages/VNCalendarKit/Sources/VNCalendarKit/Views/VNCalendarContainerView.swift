@@ -121,14 +121,14 @@ public struct VNCalendarContainerView: View {
 
     private var legendRow: some View {
         HStack(spacing: VNSpacing.md) {
-            legendItem(dot: .vnAccentImperialGold, label: "Ngày Hoàng Đạo")
-            legendItem(dot: .vnAccentHeritageRed, label: "Giỗ / Sự Kiện Gia Đình")
-            legendItem(symbol: "🌕", label: "Rằm / Mùng Một")
+            legendItem(dot: .vnAccentImperialGold, label: String(localized: "calendar.legend.auspicious_day"))
+            legendItem(dot: .vnAccentHeritageRed, label: String(localized: "calendar.legend.family_anniversary_or_event"))
+            legendItem(symbol: "🌕", label: String(localized: "calendar.legend.full_moon_or_first_day"))
         }
         .padding(.top, VNSpacing.xs)
         .padding(.bottom, VNSpacing.sm)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Chú thích: chấm vàng là ngày Hoàng Đạo, chấm đỏ là Giỗ, mặt trăng là Rằm Mùng Một")
+        .accessibilityLabel("calendar.legend.accessibility_summary")
     }
 
     private func legendItem(symbol: String, label: String) -> some View {

@@ -35,7 +35,7 @@ public struct VNIndicatorDotsView: View {
         }
         .frame(height: 5)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Có giỗ, lễ hội")
+        .accessibilityLabel("ds.indicator.a11y_label")
         .accessibilityHidden(!hasAncestorDeath && !hasFestival && !hasPersonalEvent)
     }
 }

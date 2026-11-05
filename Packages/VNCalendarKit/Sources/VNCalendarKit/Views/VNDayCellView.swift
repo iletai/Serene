@@ -144,7 +144,7 @@ public struct VNDayCellView: View, Equatable {
     }
 
     private var accessibilityText: String {
-        guard let model = dayModel else { return "Ô ngoài tháng" }
+        guard let model = dayModel else { return String(localized: "calendar.cell.out_of_month_accessibility") }
         var text = "\(model.weekdayName), ngày \(model.solarDay) tháng \(model.solarMonth) Dương lịch. "
         text += "Âm lịch ngày \(model.lunarDay) \(model.lunarMonthName) năm \(model.lunarYearCanChi). "
         if model.isFirstDayOfLunarMonth { text += "Mùng một đầu tháng. " }

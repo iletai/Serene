@@ -65,8 +65,8 @@ public struct LunarTimelineProvider: TimelineProvider {
             lunarDayText: "19/8",
             lunarMonthText: "Tháng Tám",
             lunarYearCanChi: "Bính Ngọ",
-            solarTermName: "Thu Phân",
-            nextMemorialTitle: "Giỗ Cụ Cố",
+            solarTermName: String(localized: "widget.placeholder.festival"),
+            nextMemorialTitle: String(localized: "widget.placeholder.title"),
             nextMemorialDaysLeft: 5
         )
     }
@@ -103,7 +103,12 @@ public struct LunarTimelineProvider: TimelineProvider {
         let lunar = LunarAstronomicalEngine.shared.convertToLunar(from: solar)
         let canChi = LunarAstronomicalEngine.shared.computeCanChi(for: solar)
 
-        let weekdaySymbols = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
+        let weekdaySymbols = [
+            String(localized: "widget.weekday.sun"), String(localized: "widget.weekday.mon"),
+            String(localized: "widget.weekday.tue"), String(localized: "widget.weekday.wed"),
+            String(localized: "widget.weekday.thu"), String(localized: "widget.weekday.fri"),
+            String(localized: "widget.weekday.sat")
+        ]
         let weekday = cal.component(.weekday, from: date)
         let weekdayName = weekdaySymbols[(weekday - 1) % 7]
 
