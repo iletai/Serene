@@ -10,6 +10,20 @@ public enum VNMoonPhaseType: String, Sendable, Codable, CaseIterable {
     case lastQuarter = "Trăng Hạ Huyền"         // Ngày 22 - 24 ÂL
     case waningCrescent = "Trăng Tàn Cuối Tháng" // Ngày 25 - 30 ÂL
 
+    /// Localized display name (rawValue stays the stable Codable value).
+    public var localizedName: String {
+        switch self {
+        case .newMoon: String(localized: "ds.moon.phase.1")
+        case .waxingCrescent: String(localized: "ds.moon.phase.2")
+        case .firstQuarter: String(localized: "ds.moon.phase.3")
+        case .waxingGibbous: String(localized: "ds.moon.phase.4")
+        case .fullMoon: String(localized: "ds.moon.phase.5")
+        case .waningGibbous: String(localized: "ds.moon.phase.6")
+        case .lastQuarter: String(localized: "ds.moon.phase.7")
+        case .waningCrescent: String(localized: "ds.moon.phase.8")
+        }
+    }
+
     public static func from(lunarDay: Int) -> VNMoonPhaseType {
         switch lunarDay {
         case 1:
@@ -80,18 +94,18 @@ public struct VNMoonPhaseView: View {
 
             if showTitle {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                    Text(phaseType.rawValue)
+                    Text(phaseType.localizedName)
                         .font(.system(size: 11, weight: .semibold, design: .serif))
                         .foregroundColor(isFullMoon ? .vnAccentHeritageRed : .vnTextPrimary)
 
-                    Text("\(illuminationPercent)% sáng")
+                    Text(String(format: String(localized: "ds.moon.illumination"), illuminationPercent))
                         .font(.system(size: 9, weight: .regular))
                         .foregroundColor(.vnTextSecondary)
                 }
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(phaseType.rawValue), \(illuminationPercent)% sáng")
+        .accessibilityLabel(String(format: String(localized: "ds.moon.a11y_label"), phaseType.localizedName, illuminationPercent))
     }
 
     private var isFullMoon: Bool {

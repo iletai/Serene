@@ -74,22 +74,22 @@ public struct VNSealBadge: View {
 
     /// Ấn Triện MÙNG 1 (Sơn son thiếp trắng)
     public static func mungMot(size: Size = .medium) -> VNSealBadge {
-        VNSealBadge(text: "MÙNG 1", shape: .rounded(), color: .cinnabarWhite, size: size)
+        VNSealBadge(text: String(localized: "ds.seal.mung_mot"), shape: .rounded(), color: .cinnabarWhite, size: size)
     }
 
     /// Ấn Triện RẰM (Sơn son thếp vàng)
     public static func ram(size: Size = .medium) -> VNSealBadge {
-        VNSealBadge(text: "RẰM", shape: .rounded(), color: .cinnabarGold, size: size)
+        VNSealBadge(text: String(localized: "ds.seal.ram"), shape: .rounded(), color: .cinnabarGold, size: size)
     }
 
     /// Ấn Triện GIỖ (Son sẫm trang nghiêm)
     public static func gio(size: Size = .medium) -> VNSealBadge {
-        VNSealBadge(text: "GIỖ", shape: .square, color: .vermilionDarkGold, size: size)
+        VNSealBadge(text: String(localized: "ds.seal.gio"), shape: .square, color: .vermilionDarkGold, size: size)
     }
 
     /// Ấn Triện TẾT (Viên mãn hình khuyên)
     public static func tet(size: Size = .medium) -> VNSealBadge {
-        VNSealBadge(text: "TẾT", shape: .pill, color: .cinnabarGold, size: size)
+        VNSealBadge(text: String(localized: "ds.seal.tet"), shape: .pill, color: .cinnabarGold, size: size)
     }
 
     private var backgroundColor: Color {
@@ -147,7 +147,7 @@ public struct VNSealBadge: View {
             y: VNShadow.card.y
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Ấn triện \(text)")
+        .accessibilityLabel(String(format: String(localized: "ds.seal.a11y_label"), text))
     }
 
     /// Canonical seal: 2pt outer border on the medium square, 1pt elsewhere (DESIGN §4).

@@ -36,10 +36,10 @@ public struct LunarWidgetEntryView: View {
             Image(systemName: "lock.fill")
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundColor(Color.vnAccentImperialGold)
-            Text("Nâng cấp Pro")
+            Text("widget.upgrade_title")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(Color.vnTextPrimary)
-            Text("Mở khoá widget Vừa & Màn hình khoá")
+            Text("widget.upgrade_subtitle")
                 .font(.system(size: 10))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color.vnTextSecondary)
@@ -69,7 +69,7 @@ public struct LunarWidgetEntryView: View {
 
             HStack {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                    Text("\(entry.lunarDayText) ÂL")
+                    Text(String(format: String(localized: "widget.lunar_day_text"), entry.lunarDayText))
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(Color.vnAccentHeritageRed)
                     Text(entry.lunarYearCanChi)
@@ -104,16 +104,16 @@ public struct LunarWidgetEntryView: View {
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(Color.vnTextSecondary)
 
-                Text("\(entry.lunarDayText) ÂL")
+                Text(String(format: String(localized: "widget.lunar_day_text"), entry.lunarDayText))
                     .font(.system(size: 24, weight: .bold, design: .serif))
                     .foregroundColor(Color.vnAccentHeritageRed)
 
-                Text("Năm \(entry.lunarYearCanChi)")
+                Text(String(format: String(localized: "widget.year_can_chi"), entry.lunarYearCanChi))
                     .font(.system(size: 11))
                     .foregroundColor(Color.vnTextSecondary)
 
                 if let term = entry.solarTermName {
-                    Text("Tiết \(term)")
+                    Text(String(format: String(localized: "widget.solar_term_prefix"), term))
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color.vnAccentImperialGold)
                 }
@@ -124,7 +124,7 @@ public struct LunarWidgetEntryView: View {
 
             // Right: Upcoming Reminders / Info
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                Text("NGÀY NHỚ SẮP TỚI")
+                Text("widget.upcoming_header")
                     .font(.system(size: 9, weight: .bold))
                     .foregroundColor(Color.vnTextSecondary)
 
@@ -137,12 +137,12 @@ public struct LunarWidgetEntryView: View {
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(Color.vnTextPrimary)
                         Spacer()
-                        Text("Còn \(days) ngày")
+                        Text(String(format: String(localized: "widget.days_left"), days))
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(Color.vnAccentHeritageRed)
                     }
                 } else {
-                    Text("Không có ngày giỗ trong 7 ngày tới.")
+                    Text("widget.no_memorial")
                         .font(.system(size: 11))
                         .foregroundColor(Color.vnTextTertiary)
                 }
@@ -157,14 +157,14 @@ public struct LunarWidgetEntryView: View {
     }
 
     private var inlineLockScreenView: some View {
-        Text("\(entry.lunarDay)/\(entry.lunarMonth) ÂL • \(entry.lunarYearCanChi)")
+        Text(String(format: String(localized: "widget.inline_format"), entry.lunarDay, entry.lunarMonth, entry.lunarYearCanChi))
     }
 
     private var circularLockScreenView: some View {
         VStack(spacing: VNSpacing.space2) {
             Text("\(entry.lunarDay)")
                 .font(.system(size: 16, weight: .bold))
-            Text("ÂL")
+            Text("widget.lunar_abbrev")
                 .font(.system(size: 9, weight: .semibold))
         }
     }
@@ -173,10 +173,10 @@ public struct LunarWidgetEntryView: View {
         VStack(alignment: .leading, spacing: VNSpacing.space2) {
             Text("\(entry.weekdayName), \(entry.solarDay)/\(entry.solarMonth)")
                 .font(.system(size: 11, weight: .bold))
-            Text("Âm Lịch: \(entry.lunarDayText) • \(entry.lunarYearCanChi)")
+            Text(String(format: String(localized: "widget.rectangular_lunar_format"), entry.lunarDayText, entry.lunarYearCanChi))
                 .font(.system(size: 11))
             if let term = entry.solarTermName {
-                Text("Tiết \(term)")
+                Text(String(format: String(localized: "widget.solar_term_prefix"), term))
                     .font(.system(size: 10))
             }
         }
@@ -203,8 +203,8 @@ public struct LunarDateWidget: Widget {
             LunarWidgetEntryView(entry: entry)
                 .containerBackground(Color.vnBackgroundPrimary, for: .widget)
         }
-        .configurationDisplayName("Lịch Âm An Niên")
-        .description("Xem ngày Âm lịch, Can Chi, Tiết khí và ngày giỗ gia đình.")
+        .configurationDisplayName("widget.display_name")
+        .description("widget.description")
         // Every family is declared so an expiring subscription never leaves a
         // widget the OS can no longer render. Pro gating happens in the view.
         .supportedFamilies([

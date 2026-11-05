@@ -14,7 +14,7 @@ public struct VNSearchField: View {
 
     @FocusState private var isFocused: Bool
 
-    public init(text: Binding<String>, placeholder: String = "Tìm kiếm…") {
+    public init(text: Binding<String>, placeholder: String = String(localized: "ds.search.placeholder")) {
         self._text = text
         self.placeholder = placeholder
     }

@@ -86,8 +86,8 @@ public struct VNBlockCalendarView: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isButton)
-        .accessibilityHint("Xem chi tiết ngày")
-        .accessibilityAction(named: "Xem chi tiết") { onTapDetails() }
+        .accessibilityHint("calendar.block.accessibility_hint_details")
+        .accessibilityAction(named: "calendar.block.accessibility_action_details") { onTapDetails() }
     }
 
     private var blocHeaderClamp: some View {
@@ -99,7 +99,7 @@ public struct VNBlockCalendarView: View {
 
             Spacer()
 
-            Text("LỊCH VẠN NIÊN")
+            Text("calendar.block.header_title")
                 .font(.system(size: 11, weight: .bold, design: .serif))
                 .foregroundColor(.vnOnAccent)
                 .tracking(2.0)
@@ -129,7 +129,7 @@ public struct VNBlockCalendarView: View {
                 .foregroundColor(isWeekend(model.weekdayName) ? .vnAccentHeritageRed : .vnTextPrimary)
                 .frame(height: 76)
 
-            Text("Tháng \(model.solarMonth) năm \(String(model.solarYear))")
+            Text(String(format: String(localized: "calendar.block.solar_month_year"), model.solarMonth, model.solarYear))
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.vnTextSecondary)
         }
@@ -151,11 +151,11 @@ public struct VNBlockCalendarView: View {
                 }
             }
 
-            Text("Tháng \(model.lunarMonthName) • Năm \(model.lunarYearCanChi)")
+            Text(String(format: String(localized: "calendar.block.lunar_month_year"), model.lunarMonthName, model.lunarYearCanChi))
                 .font(.system(size: 14, weight: .semibold, design: .serif))
                 .foregroundColor(.vnTextPrimary)
 
-            Text("Ngày \(model.lunarDayCanChi) • Tháng \(model.lunarMonthCanChi)")
+            Text(String(format: String(localized: "calendar.block.lunar_day_month_canchi"), model.lunarDayCanChi, model.lunarMonthCanChi))
                 .font(.system(size: 12, weight: .regular))
                 .foregroundColor(.vnTextSecondary)
         }
@@ -164,7 +164,7 @@ public struct VNBlockCalendarView: View {
     private func blocAuspiciousPills(for model: VNCalendarDayModel) -> some View {
         HStack(spacing: VNSpacing.xs) {
             if let term = model.solarTermName {
-                Text("Tiết \(term)")
+                Text(String(format: String(localized: "calendar.solar_term"), term))
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.vnAccentGoldText)
                     .padding(.horizontal, VNSpacing.sm)
@@ -200,7 +200,7 @@ public struct VNBlockCalendarView: View {
                     .font(.system(size: 12))
                     .foregroundColor(.vnAccentHeritageRed)
 
-                Text("CA DAO • TỤC NGỮ TRUYỀN THỐNG")
+                Text("calendar.section.folk_quote")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                     .tracking(0.6)
@@ -259,7 +259,7 @@ public struct VNBlockCalendarView: View {
     private func directionsRow(for model: VNCalendarDayModel) -> some View {
         HStack(spacing: VNSpacing.md) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                Text("HỶ THẦN")
+                Text("calendar.direction.joy_god")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                 Text(model.joyGodDirection)
@@ -271,7 +271,7 @@ public struct VNBlockCalendarView: View {
                 .frame(height: VNSpacing.xxl)
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                Text("TÀI THẦN")
+                Text("calendar.direction.wealth_god")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                 Text(model.wealthGodDirection)
@@ -283,7 +283,7 @@ public struct VNBlockCalendarView: View {
 
             Button(action: onTapDetails) {
                 HStack(spacing: VNSpacing.xs) {
-                    Text("Chi tiết")
+                    Text("calendar.action.view_details")
                         .font(.system(size: 12, weight: .medium))
                     Image(systemName: "chevron.right")
                         .font(.system(size: 10, weight: .bold))
@@ -296,7 +296,7 @@ public struct VNBlockCalendarView: View {
 
     private func auspiciousHoursSection(for model: VNCalendarDayModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            Text("GIỜ HOÀNG ĐẠO")
+            Text("calendar.section.auspicious_hours")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
@@ -312,7 +312,7 @@ public struct VNBlockCalendarView: View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             if !model.suitableActivities.isEmpty {
                 HStack(alignment: .top, spacing: VNSpacing.xs) {
-                    Text("Nên:")
+                    Text("calendar.activities.suitable_prefix")
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(.vnStatusSuccess)
                     Text(model.suitableActivities.prefix(3).joined(separator: ", "))
@@ -323,7 +323,7 @@ public struct VNBlockCalendarView: View {
 
             if !model.tabooActivities.isEmpty {
                 HStack(alignment: .top, spacing: VNSpacing.xs) {
-                    Text("Kiêng:")
+                    Text("calendar.activities.taboo_prefix")
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(.vnStatusError)
                     Text(model.tabooActivities.prefix(3).joined(separator: ", "))
@@ -339,7 +339,7 @@ public struct VNBlockCalendarView: View {
     private var quickNavToolbar: some View {
         HStack(spacing: VNSpacing.md) {
             Button(action: onPreviousDay) {
-                Label("Ngày Trước", systemImage: "chevron.left")
+                Label("calendar.action.prev_day", systemImage: "chevron.left")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.vnTextPrimary)
                     .padding(.horizontal, VNSpacing.md)
@@ -351,12 +351,12 @@ public struct VNBlockCalendarView: View {
             .frame(minHeight: 44)
             .contentShape(Rectangle())
             .buttonStyle(.plain)
-            .accessibilityLabel("Ngày trước")
+            .accessibilityLabel("calendar.accessibility.prev_day")
 
             Spacer()
 
             Button(action: onSelectToday) {
-                Text("Hôm Nay")
+                Text("calendar.action.today_title")
                     .font(.system(size: 12, weight: .semibold, design: .serif))
                     .foregroundColor(.vnAccentHeritageRed)
                     .padding(.horizontal, VNSpacing.lg)
@@ -368,13 +368,13 @@ public struct VNBlockCalendarView: View {
             .frame(minHeight: 44)
             .contentShape(Rectangle())
             .buttonStyle(.plain)
-            .accessibilityLabel("Hôm nay")
+            .accessibilityLabel("action.today")
 
             Spacer()
 
             Button(action: onNextDay) {
                 HStack(spacing: VNSpacing.xs) {
-                    Text("Ngày Sau")
+                    Text("calendar.action.next_day")
                     Image(systemName: "chevron.right")
                 }
                 .font(.system(size: 12, weight: .medium))
@@ -388,7 +388,7 @@ public struct VNBlockCalendarView: View {
             .frame(minHeight: 44)
             .contentShape(Rectangle())
             .buttonStyle(.plain)
-            .accessibilityLabel("Ngày sau")
+            .accessibilityLabel("calendar.accessibility.next_day")
         }
         .padding(.vertical, VNSpacing.xs)
     }
@@ -401,12 +401,12 @@ public struct VNBlockCalendarView: View {
 
     private func lunarDayDisplay(for model: VNCalendarDayModel) -> String {
         if model.isFirstDayOfLunarMonth {
-            return "MÙNG 1"
+            return String(localized: "calendar.lunar.first_day_label")
         }
         if model.isFullMoonDay {
-            return "RẰM 15"
+            return String(localized: "calendar.lunar.full_moon_label")
         }
-        return "NGÀY \(model.lunarDay)"
+        return String(format: String(localized: "calendar.lunar.day_label"), model.lunarDay)
     }
 
     private func auspiciousHoursText(for model: VNCalendarDayModel) -> String {

@@ -67,7 +67,7 @@ public struct VNDayDetailBottomSheet: View {
                 }
             }
 
-            Text("Năm \(dayModel.lunarYearCanChi) • Tháng \(dayModel.lunarMonthCanChi) • Ngày \(dayModel.lunarDayCanChi)")
+            Text(String(format: String(localized: "daydetail.header.canchi_summary"), dayModel.lunarYearCanChi, dayModel.lunarMonthCanChi, dayModel.lunarDayCanChi))
                 .font(.footnote)
                 .foregroundColor(.vnTextSecondary)
 
@@ -79,23 +79,23 @@ public struct VNDayDetailBottomSheet: View {
 
     private var solarDateText: String {
         let yearString = String(dayModel.solarYear)
-        return "\(dayModel.weekdayName), ngày \(dayModel.solarDay) tháng \(dayModel.solarMonth) năm \(yearString)"
+        return String(format: String(localized: "daydetail.header.solar_full_date"), dayModel.weekdayName, dayModel.solarDay, dayModel.solarMonth, yearString)
     }
 
     private var lunarHeroText: String {
         if dayModel.isFirstDayOfLunarMonth {
-            return "Mùng 1 \(dayModel.lunarMonthName)"
+            return String(format: String(localized: "daydetail.header.mung_mot"), dayModel.lunarMonthName)
         }
         if dayModel.isFullMoonDay {
-            return "Rằm 15 \(dayModel.lunarMonthName)"
+            return String(format: String(localized: "daydetail.header.ram_15"), dayModel.lunarMonthName)
         }
-        return "Ngày \(dayModel.lunarDay) \(dayModel.lunarMonthName)"
+        return String(format: String(localized: "daydetail.header.lunar_day"), dayModel.lunarDay, dayModel.lunarMonthName)
     }
 
     private var culturalBadgesRow: some View {
         HStack(spacing: VNSpacing.xs) {
             if let term = dayModel.solarTermName {
-                Text("Tiết \(term)")
+                Text(String(format: String(localized: "daydetail.badge.solar_term"), term))
                     .font(.caption2.weight(.semibold))
                     .foregroundColor(.vnAccentGoldText)
                     .padding(.horizontal, VNSpacing.sm)
@@ -105,7 +105,7 @@ public struct VNDayDetailBottomSheet: View {
             }
 
             if dayModel.isToday {
-                Text("Hôm nay")
+                Text("action.today")
                     .font(.caption2.weight(.semibold))
                     .foregroundColor(.vnAccentHeritageRed)
                     .padding(.horizontal, VNSpacing.sm)
@@ -115,7 +115,7 @@ public struct VNDayDetailBottomSheet: View {
             }
 
             if dayModel.isAuspiciousDay {
-                Text("Hoàng Đạo")
+                Text("daydetail.badge.auspicious_day")
                     .font(.caption2.weight(.semibold))
                     .foregroundColor(.vnStatusSuccess)
                     .padding(.horizontal, VNSpacing.sm)
@@ -129,7 +129,7 @@ public struct VNDayDetailBottomSheet: View {
     // MARK: - Auspicious Hours Grid
     private var auspiciousHoursSection: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("KHUNG GIỜ HOÀNG ĐẠO")
+            Text("daydetail.section.auspicious_hours")
                 .font(.caption2.weight(.bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
@@ -176,7 +176,7 @@ public struct VNDayDetailBottomSheet: View {
                     .accessibilityHidden(true)
                     .foregroundColor(.vnAccentHeritageRed)
 
-                Text("CA DAO • TỤC NGỮ TRUYỀN THỐNG")
+                Text("daydetail.section.folk_quote")
                     .font(.caption2.weight(.bold))
                     .foregroundColor(.vnTextSecondary)
                     .tracking(0.6)
@@ -209,7 +209,7 @@ public struct VNDayDetailBottomSheet: View {
     // MARK: - Family Events
     private var familyEventsSection: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("SỰ KIỆN & GIA ĐÌNH")
+            Text("daydetail.section.family_events")
                 .font(.caption2.weight(.bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
@@ -221,7 +221,7 @@ public struct VNDayDetailBottomSheet: View {
                         .foregroundColor(.vnTextTertiary)
                         .accessibilityHidden(true)
 
-                    Text("Không có sự kiện hoặc ngày giỗ nào cho ngày này.")
+                    Text("daydetail.family_events.empty")
                         .font(.vnFootnote)
                         .foregroundColor(.vnTextSecondary)
                 }
@@ -242,7 +242,7 @@ public struct VNDayDetailBottomSheet: View {
                                     .font(.system(.subheadline, design: .serif).weight(.semibold))
                                     .foregroundColor(.vnTextPrimary)
 
-                                Text(item.isAncestorDeath ? "Kỳ Giỗ Gia Tiên" : "Sự Kiện Kỷ Niệm")
+                                Text(item.isAncestorDeath ? String(localized: "calendar.event.type.death_anniversary") : String(localized: "daydetail.event.type.anniversary"))
                                     .font(.vnCaption2)
                                     .foregroundColor(.vnTextSecondary)
                             }
@@ -269,7 +269,7 @@ public struct VNDayDetailBottomSheet: View {
         Button(
             action: onAddReminder,
             label: {
-                Label("Thêm Ngày Nhớ Cho Ngày Này", systemImage: "plus")
+                Label("daydetail.action.add_anniversary", systemImage: "plus")
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: VNSize.minTapTarget)
