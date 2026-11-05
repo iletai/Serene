@@ -52,7 +52,7 @@ public struct PrayerLibraryView: View {
                         .font(.vnCaption2)
                         .foregroundColor(.vnAccentDeepPrimary)
                         .accessibilityHidden(true)
-                    Text("NGHI LỄ TRUYỀN THỐNG")
+                    Text("prayers.eyebrow")
                         .font(.vnCaption2)
                         .fontWeight(.bold)
                         .tracking(1.0)
@@ -66,7 +66,7 @@ public struct PrayerLibraryView: View {
                 Spacer()
 
                 if !vm.prayers.isEmpty {
-                    Text("\(vm.prayers.count) bài khấn")
+                    Text(String(format: String(localized: "prayers.count_badge"), vm.prayers.count))
                         .font(.vnCaption2)
                         .fontWeight(.semibold)
                         .foregroundColor(.vnAccentDeepPrimary)
@@ -77,12 +77,12 @@ public struct PrayerLibraryView: View {
                 }
             }
 
-            Text("Văn Khấn Cổ Truyền")
+            Text("prayers.header_title")
                 .font(.vnTitleHero)
                 .foregroundColor(.vnAccentDeepPrimary)
                 .padding(.top, VNSpacing.space2)
 
-            Text("Nghi thức cúng bái & phụng thờ linh thiêng chuẩn phong tục Việt")
+            Text("prayers.header_desc")
                 .font(.system(.footnote, design: .serif))
                 .italic()
                 .foregroundColor(.vnTextSecondary)
@@ -101,7 +101,7 @@ public struct PrayerLibraryView: View {
                 .font(.vnFootnote)
                 .accessibilityHidden(true)
 
-            TextField("Tìm văn khấn Mùng 1, Rằm, Giỗ, Táo Quân...", text: $boundVM.searchQuery)
+            TextField("prayers.search_placeholder", text: $boundVM.searchQuery)
                 .font(.vnFootnote)
 
             if !vm.searchQuery.isEmpty {
@@ -115,7 +115,7 @@ public struct PrayerLibraryView: View {
                 .buttonStyle(.plain)
                 .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
-                .accessibilityLabel("Xóa tìm kiếm")
+                .accessibilityLabel("prayers.a11y_clear_search")
             }
         }
         .padding(.horizontal, VNSpacing.md)
@@ -139,7 +139,7 @@ public struct PrayerLibraryView: View {
                     triggerHaptic()
                     vm.selectedCategory = nil
                 } label: {
-                    Text("Tất cả")
+                    Text("prayers.category_all")
                         .font(.system(.caption, design: .serif, weight: .semibold))
                         .foregroundColor(vm.selectedCategory == nil ? .vnAccentDeepPrimary : .vnTextSecondary)
                         .frame(minHeight: VNSize.minTapTarget)
@@ -187,7 +187,7 @@ public struct PrayerLibraryView: View {
                             vm.selectedPrayer = prayer
                         }
                         .accessibilityAddTraits(.isButton)
-                        .accessibilityHint("Xem chi tiết bài văn khấn")
+                        .accessibilityHint("prayers.a11y_view_hint")
                 }
             }
         }
@@ -247,7 +247,7 @@ public struct PrayerLibraryView: View {
                 .accessibilityHidden(true)
                 .padding(.top, VNSpacing.lg)
 
-            Text("Không tìm thấy bài văn khấn phù hợp")
+            Text("prayers.empty_title")
                 .font(.subheadline.weight(.medium))
                 .foregroundColor(.vnTextSecondary)
         }

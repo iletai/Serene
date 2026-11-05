@@ -73,10 +73,10 @@ public struct FamilyHierarchyView: View {
     private func topBar(vm: FamilyHierarchyViewModel) -> some View {
         HStack(spacing: VNSpacing.sm) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                Text("Gia Phả")
+                Text("family.title")
                     .font(.system(.headline, design: .serif).weight(.bold))
                     .foregroundColor(Color.vnAccentDeepPrimary)
-                Text("Kính tổ phụng gia")
+                Text("family.subtitle")
                     .font(.caption2)
                     .foregroundColor(.vnTextSecondary)
             }
@@ -93,7 +93,7 @@ public struct FamilyHierarchyView: View {
                     .background(Color.vnAccentHeritageRed, in: RoundedRectangle(cornerRadius: VNCornerRadius.card))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Thêm tiền nhân")
+            .accessibilityLabel("family.a11y_add")
         }
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .padding(.horizontal, VNSpacing.screenMargin)
@@ -131,19 +131,19 @@ public struct FamilyHierarchyView: View {
                 .padding(.top, VNSpacing.xxl)
                 .accessibilityHidden(true)
 
-            Text("Chế Độ Gia Phả Pro")
+            Text("family.locked_title")
                 .font(.system(.title2, design: .serif).weight(.semibold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
 
-            Text("Mở khoá cây gia phả nhiều thế hệ, vai vế tổ tiên và sơ đồ phụng thờ dòng tộc.")
+            Text("family.locked_body")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(VNSpacing.xs)
                 .padding(.horizontal, VNSpacing.screenMargin)
 
-            VNButton("Nâng Cấp Pro", icon: "crown.fill", variant: .primary, size: .medium) {
+            VNButton(String(localized: "family.upgrade_cta"), icon: "crown.fill", variant: .primary, size: .medium) {
                 router.present(sheet: .paywall)
             }
             .padding(.top, VNSpacing.xs)
@@ -158,7 +158,7 @@ public struct FamilyHierarchyView: View {
     private func headerSection(vm: FamilyHierarchyViewModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
-                Text("KÍNH TỔ PHỤNG GIA")
+                Text("family.eyebrow")
                     .font(.caption2.weight(.bold))
                     .tracking(0.66)
                     .foregroundColor(.vnAccentGoldText)
@@ -166,7 +166,7 @@ public struct FamilyHierarchyView: View {
                 Spacer()
 
                 if !vm.reminders.isEmpty {
-                    Text("\(vm.reminders.count) tiền nhân")
+                    Text(String(format: String(localized: "family.count_ancestors"), vm.reminders.count))
                         .contentTransition(.numericText())
                         .animation(reduceMotion ? nil : .snappy, value: vm.reminders.count)
                         .font(.caption2.weight(.semibold))
@@ -193,18 +193,18 @@ public struct FamilyHierarchyView: View {
                 .padding(.top, VNSpacing.xl)
                 .accessibilityHidden(true)
 
-            Text("Khởi Tạo Cây Gia Phả")
+            Text("family.empty_title")
                 .font(.system(.title2, design: .serif).weight(.semibold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
 
-            Text("Nhập thông tin người thân và vai vế gia đình để tự động xây dựng sơ đồ phụng thờ & kỵ giỗ dòng tộc trang nghiêm.")
+            Text("family.empty_body")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(VNSpacing.xs)
 
-            VNButton("Thêm Tiền Nhân Gia Tộc", icon: "plus", variant: .primary, size: .medium) {
+            VNButton(String(localized: "family.empty_cta"), icon: "plus", variant: .primary, size: .medium) {
                 createReminder(vm: vm)
             }
             .padding(.top, VNSpacing.xs)
@@ -353,7 +353,7 @@ public struct FamilyHierarchyView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel([member.title, member.relationship ?? ""].filter { !$0.isEmpty }.joined(separator: ", "))
             .accessibilityValue("\(anniversaryText(member)), \(statusText(member))")
-            .accessibilityHint("Chỉnh sửa chi tiết tiền nhân")
+            .accessibilityHint("family.a11y_edit_hint")
         }
     }
 
@@ -362,11 +362,11 @@ public struct FamilyHierarchyView: View {
     }
 
     private func anniversaryText(_ member: ReminderEvent) -> String {
-        "Giỗ \(member.day)/\(member.month) \(member.dateType == .lunar ? "ÂL" : "Dương")"
+        String(format: String(localized: "family.member_date"), member.day, member.month, member.dateType == .lunar ? String(localized: "family.abbrev_lunar") : String(localized: "family.abbrev_solar"))
     }
 
     private func statusText(_ member: ReminderEvent) -> String {
-        isWorshipped(member) ? "Đã thờ" : "Còn sống"
+        isWorshipped(member) ? String(localized: "family.status_deceased") : String(localized: "family.status_living")
     }
 
     private func rankLetter(from rank: String) -> String {
@@ -381,7 +381,7 @@ public struct FamilyHierarchyView: View {
             if member.category == .deathAnniversary {
                 VNSealBadge.gio(size: .small)
             } else {
-                Text("TỘC")
+                Text("family.seal_toc")
                     .font(.system(.footnote, design: .serif).weight(.bold))
                     .foregroundColor(Color.vnAccentGoldText)
                     .lineLimit(1)
@@ -410,7 +410,7 @@ public struct FamilyHierarchyView: View {
                 }
 
                 if let y = member.year {
-                    Text("Năm \(y)")
+                    Text(String(format: String(localized: "family.member_year"), String(y)))
                         .font(.caption)
                         .foregroundColor(.vnTextSecondary)
                 }

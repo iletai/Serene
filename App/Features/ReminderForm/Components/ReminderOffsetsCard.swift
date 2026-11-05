@@ -12,7 +12,7 @@ struct ReminderOffsetsCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("NHẮC NHỞ CHUẨN BỊ LỄ NGHI (08:00 SÁNG)")
+            Text("reminder.offsets_header")
                 .font(.caption2.weight(.medium))
                 .tracking(0.66)
                 .foregroundColor(.vnAccentGoldText)
@@ -28,12 +28,36 @@ struct ReminderOffsetsCard: View {
                 shadow: nil
             ) {
                 OffsetFlowLayout(spacing: VNSpacing.xs) {
-                    offsetChip(title: "Đúng ngày", subtitle: "Lễ chính", isOn: $notifyOnDay)
-                    offsetChip(title: "Trước 1 ngày", subtitle: "Chuẩn bị nấu cỗ", isOn: $notify1DayBefore)
-                    offsetChip(title: "Trước 3 ngày", subtitle: "Đi chợ, sắm lễ vật", isOn: $notify3DaysBefore)
-                    offsetChip(title: "Trước 7 ngày", subtitle: "Họp gia đình, phân công", isOn: $notify7DaysBefore)
-                    offsetChip(title: "Trước 14 ngày", subtitle: "Bàn bạc đại gia tộc", isOn: $notify14DaysBefore)
-                    offsetChip(title: "Trước 30 ngày", subtitle: "Lên kế hoạch cúng giỗ", isOn: $notify30DaysBefore)
+                    offsetChip(
+                        title: String(localized: "reminder.offset.0.chip_title"),
+                        subtitle: String(localized: "reminder.offset.0.subtitle"),
+                        isOn: $notifyOnDay
+                    )
+                    offsetChip(
+                        title: String(localized: "reminder.offset.1.title"),
+                        subtitle: String(localized: "reminder.offset.1.subtitle"),
+                        isOn: $notify1DayBefore
+                    )
+                    offsetChip(
+                        title: String(localized: "reminder.offset.3.title"),
+                        subtitle: String(localized: "reminder.offset.3.subtitle"),
+                        isOn: $notify3DaysBefore
+                    )
+                    offsetChip(
+                        title: String(localized: "reminder.offset.7.title"),
+                        subtitle: String(localized: "reminder.offset.7.subtitle"),
+                        isOn: $notify7DaysBefore
+                    )
+                    offsetChip(
+                        title: String(localized: "reminder.offset.14.title"),
+                        subtitle: String(localized: "reminder.offset.14.subtitle"),
+                        isOn: $notify14DaysBefore
+                    )
+                    offsetChip(
+                        title: String(localized: "reminder.offset.30.title"),
+                        subtitle: String(localized: "reminder.offset.30.subtitle"),
+                        isOn: $notify30DaysBefore
+                    )
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }

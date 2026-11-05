@@ -12,6 +12,16 @@ public struct CulturalArticlesView: View {
 
     private let categories = ["Tất cả", "Cúng Giỗ", "Lễ Tiết & Tết", "Rằm & Mùng 1"]
 
+    /// Category ids stay Vietnamese (the view model filters on them); only the chip label is localized.
+    private func categoryTitle(_ id: String) -> String {
+        switch id {
+        case "Cúng Giỗ": return String(localized: "articles.category_gio")
+        case "Lễ Tiết & Tết": return String(localized: "articles.category_les_tet")
+        case "Rằm & Mùng 1": return String(localized: "articles.category_ram_new_moon")
+        default: return String(localized: "articles.category_all")
+        }
+    }
+
     public init() {}
 
     private var activeViewModel: CulturalArticlesViewModel {
@@ -43,7 +53,7 @@ public struct CulturalArticlesView: View {
                                 }
                                 .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                                 .accessibilityElement(children: .combine)
-                                .accessibilityHint("Xem chi tiết")
+                                .accessibilityHint("articles.a11y_view_detail")
                             }
                         }
                         .padding(.horizontal, VNSpacing.screenMargin)
@@ -66,11 +76,11 @@ public struct CulturalArticlesView: View {
     private func topBar(vm: CulturalArticlesViewModel) -> some View {
         HStack(spacing: VNSpacing.sm) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                Text("Văn Hoá")
+                Text("articles.title")
                     .font(.vnHeadline)
                     .fontWeight(.bold)
                     .foregroundColor(Color.vnAccentDeepPrimary)
-                Text("Văn khấn & phong tục")
+                Text("articles.subtitle")
                     .font(.vnCaption2)
                     .foregroundColor(.vnTextSecondary)
             }
@@ -89,7 +99,7 @@ public struct CulturalArticlesView: View {
                     .background(Color.vnBackgroundTertiary, in: RoundedRectangle(cornerRadius: VNCornerRadius.card))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Đặt lại tìm kiếm")
+            .accessibilityLabel("articles.a11y_reset_search")
         }
         .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.vertical, VNSpacing.sm)
@@ -108,7 +118,7 @@ public struct CulturalArticlesView: View {
                     .font(.vnCaption2)
                     .foregroundColor(.vnAccentGoldText)
                     .accessibilityHidden(true)
-                Text("VĂN HOÁ & LỄ TIẾT")
+                Text("articles.eyebrow")
                     .font(.vnCaption2)
                     .fontWeight(.bold)
                     .tracking(1.0)
@@ -119,11 +129,11 @@ public struct CulturalArticlesView: View {
             .background(Color.vnAccentGoldSurface)
             .clipShape(Capsule())
 
-            Text("Văn Khấn & Phong Tục")
+            Text("articles.header_title")
                 .font(.vnTitleHero)
                 .foregroundColor(.vnTextPrimary)
 
-            Text("Tri thức ngàn năm về lễ nghi, văn khấn và phong tục truyền thống Việt Nam")
+            Text("articles.header_desc")
                 .font(.system(.footnote, design: .serif))
                 .italic()
                 .foregroundColor(.vnTextSecondary)
@@ -143,7 +153,7 @@ public struct CulturalArticlesView: View {
                 .font(.vnFootnote)
                 .accessibilityHidden(true)
 
-            TextField("Tìm văn khấn, ngày lễ, phong tục tập quán...", text: $boundVM.searchQuery)
+            TextField("articles.search_placeholder", text: $boundVM.searchQuery)
                 .font(.vnFootnote)
 
             if !vm.searchQuery.isEmpty {
@@ -157,7 +167,7 @@ public struct CulturalArticlesView: View {
                 .buttonStyle(.plain)
                 .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
-                .accessibilityLabel("Xóa tìm kiếm")
+                .accessibilityLabel("articles.a11y_clear_search")
             }
         }
         .padding(.horizontal, VNSpacing.md)
@@ -185,7 +195,7 @@ public struct CulturalArticlesView: View {
                             vm.selectedCategory = cat
                         }
                     } label: {
-                        Text(cat)
+                        Text(categoryTitle(cat))
                             .font(.vnCaption1)
                             .fontWeight(isSelected ? .semibold : .regular)
                             .frame(minHeight: VNSize.minTapTarget)
@@ -215,17 +225,17 @@ public struct CulturalArticlesView: View {
     @ViewBuilder
     private func emptyStateSection(vm: CulturalArticlesViewModel) -> some View {
         VStack(spacing: VNSpacing.md) {
-            Text("Không Tìm Thấy Bài Viết")
+            Text("articles.empty_title")
                 .font(.system(.title2, design: .serif).weight(.semibold))
                 .foregroundColor(.vnTextPrimary)
 
-            Text("Thử từ khoá hoặc bộ lọc khác để khám phá tri thức lễ nghi truyền thống.")
+            Text("articles.empty_body")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .padding(.horizontal, VNSpacing.screenMargin)
 
-            VNButton("Xem Tất Cả", variant: .primary, size: .medium) {
+            VNButton(String(localized: "articles.empty_cta"), variant: .primary, size: .medium) {
                 vm.resetFilters()
             }
             .padding(.top, VNSpacing.xs)
@@ -249,7 +259,11 @@ public struct CulturalArticlesView: View {
 
                     Spacer()
 
-                    Text(isLunar ? "\(holiday.day)/\(holiday.month) ÂL" : "\(holiday.day)/\(holiday.month) DL")
+                    Text(String(
+                        format: isLunar ? String(localized: "articles.date_lunar") : String(localized: "articles.date_solar"),
+                        holiday.day,
+                        holiday.month
+                    ))
                         .font(.vnCaption2)
                         .fontWeight(.semibold)
                         .foregroundColor(Color.vnAccentDeepPrimary)
@@ -267,11 +281,11 @@ public struct CulturalArticlesView: View {
 
                 HStack(spacing: VNSpacing.xs) {
                     if holiday.rituals != nil {
-                        Label("Có Bài Văn Khấn", systemImage: "book.pages.fill")
+                        Label("articles.has_prayer", systemImage: "book.pages.fill")
                             .font(.caption2.weight(.semibold))
                             .foregroundColor(Color.vnAccentDeepPrimary)
                     } else {
-                        Text(isLunar ? "Âm lịch" : "Dương lịch")
+                        Text(isLunar ? String(localized: "articles.calendar_lunar") : String(localized: "articles.calendar_solar"))
                             .font(.caption2)
                             .foregroundColor(.vnTextSecondary)
                     }
@@ -308,8 +322,8 @@ public struct HolidayDetailSheet: View {
                 VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
                     // Header
                     VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                        let calendarName = holiday.calendarType == .lunar ? "Âm Lịch" : "Dương Lịch"
-                        Text("Ngày \(holiday.day) Tháng \(holiday.month) \(calendarName)")
+                        let calendarName = holiday.calendarType == .lunar ? String(localized: "articles.calendar_lunar_title") : String(localized: "articles.calendar_solar_title")
+                        Text(String(format: String(localized: "articles.detail_date"), holiday.day, holiday.month, calendarName))
                             .font(.subheadline.bold())
                             .foregroundColor(.vnAccentHeritageRed)
 
@@ -324,7 +338,7 @@ public struct HolidayDetailSheet: View {
 
                     // Summary / Meaning
                     VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                        Text("Ý NGHĨA & NGUỒN GỐC")
+                        Text("articles.section_meaning")
                             .font(.caption2.bold())
                             .foregroundColor(.vnTextSecondary)
                             .tracking(0.8)
@@ -337,7 +351,7 @@ public struct HolidayDetailSheet: View {
 
                     if let customs = holiday.customs {
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                            Text("PHONG TỤC NÊN LÀM")
+                            Text("articles.section_customs")
                                 .font(.caption2.bold())
                                 .foregroundColor(.vnStatusSuccess)
                                 .tracking(0.8)
@@ -359,7 +373,7 @@ public struct HolidayDetailSheet: View {
 
                     if let taboos = holiday.taboos {
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                            Text("ĐIỀU KIÊNG KỴ")
+                            Text("articles.section_taboos")
                                 .font(.caption2.bold())
                                 .foregroundColor(.vnStatusError)
                                 .tracking(0.8)
@@ -382,7 +396,7 @@ public struct HolidayDetailSheet: View {
                     if let rituals = holiday.rituals {
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             HStack {
-                                Text("BÀI VĂN KHẤN TRUYỀN THỐNG")
+                                Text("articles.section_ritual")
                                     .font(.caption2.bold())
                                     .foregroundColor(.vnAccentGoldText)
                                     .tracking(0.8)
@@ -395,7 +409,7 @@ public struct HolidayDetailSheet: View {
                                     #endif
                                     VNHaptics.impact(.success, enabled: hapticFeedbackEnabled)
                                 } label: {
-                                    Label("Sao Chép", systemImage: "doc.on.doc")
+                                    Label("articles.action.copy", systemImage: "doc.on.doc")
                                         .font(.caption2.weight(.semibold))
                                         .foregroundColor(.vnAccentHeritageRed)
                                         .frame(minHeight: VNSize.minTapTarget)
@@ -425,7 +439,7 @@ public struct HolidayDetailSheet: View {
             .background(Color.vnBackgroundPrimary.ignoresSafeArea())
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    VNDismissButton(style: .text("Đóng")) { router.dismissModals() }
+                    VNDismissButton(style: .text(String(localized: "action.close"))) { router.dismissModals() }
                 }
             }
         }

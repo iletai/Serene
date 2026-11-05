@@ -52,32 +52,32 @@ final class FamilyHierarchyViewModel {
         if !gen1.isEmpty {
             groups.append(FamilyMemberGroup(
                 id: "gen1",
-                generationTitle: "Thế Hệ Tiên Tổ",
-                generationRank: "ĐỜI I",
+                generationTitle: String(localized: "family.gen1_title"),
+                generationRank: String(localized: "family.gen1_rank"),
                 members: gen1
             ))
         }
         if !gen2.isEmpty {
             groups.append(FamilyMemberGroup(
                 id: "gen2",
-                generationTitle: "Thế Hệ Ông Bà",
-                generationRank: "ĐỜI II",
+                generationTitle: String(localized: "family.gen2_title"),
+                generationRank: String(localized: "family.gen2_rank"),
                 members: gen2
             ))
         }
         if !gen3.isEmpty {
             groups.append(FamilyMemberGroup(
                 id: "gen3",
-                generationTitle: "Thế Hệ Cha Mẹ & Cô Chú",
-                generationRank: "ĐỜI III",
+                generationTitle: String(localized: "family.gen3_title"),
+                generationRank: String(localized: "family.gen3_rank"),
                 members: gen3
             ))
         }
         if !others.isEmpty {
             groups.append(FamilyMemberGroup(
                 id: "others",
-                generationTitle: "Họ Hàng & Kỷ Niệm Khác",
-                generationRank: "HẬU DUỆ",
+                generationTitle: String(localized: "family.others_title"),
+                generationRank: String(localized: "family.others_rank"),
                 members: others
             ))
         }

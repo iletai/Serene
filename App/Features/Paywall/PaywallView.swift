@@ -160,7 +160,7 @@ public struct PaywallView: View {
                     if vm.isPurchasing {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .vnOnAccent))
-                            .accessibilityLabel("Đang xử lý thanh toán")
+                            .accessibilityLabel("paywall.a11y_purchasing")
                     } else {
                         Text(ctaButtonTitle(vm: vm))
                             .font(.vnHeadline)
