@@ -22,12 +22,16 @@ public enum VNSize {
     public static let minTapTarget: CGFloat = 44
     public static let iconButton: CGFloat = 40
     public static let iconBadge: CGFloat = 24
+    /// Visual button heights. Hit area stays >= `minTapTarget` via contentShape, so compact buttons do not look "fat".
+    public static let buttonSmall: CGFloat = 36
+    public static let buttonMedium: CGFloat = 44
+    public static let buttonLarge: CGFloat = 50
 }
 
 public enum VNLayout {
     public static let tabBarMaxWidth: CGFloat = 520
     public static let tabBarBottomInset: CGFloat = 12
-    public static let tabBarItemHeight: CGFloat = 48
+    public static let tabBarItemHeight: CGFloat = 44
 }
 
 public enum VNCornerRadius {

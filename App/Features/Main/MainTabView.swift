@@ -115,7 +115,7 @@ public struct MainTabView: View {
             }
         }
         .padding(.horizontal, VNSpacing.lg)
-        .padding(.vertical, VNSpacing.md)
+        .padding(.vertical, VNSpacing.sm)
         .frame(maxWidth: VNLayout.tabBarMaxWidth)
         // Bar chrome caps its growth like the system tab bar so labels never truncate.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
