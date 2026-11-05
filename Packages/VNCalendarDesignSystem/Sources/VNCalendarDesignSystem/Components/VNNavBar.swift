@@ -40,6 +40,7 @@ public struct VNDismissButton: View {
                 .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
         }
+        .buttonStyle(.vnPress(scale: 0.9, haptic: true))
         .accessibilityLabel(accessibilityLabel)
     }
 
