@@ -27,9 +27,9 @@ public final class LegalLinksService {
     public static let shared = LegalLinksService()
 
     // Always-live fallbacks bundled with the build (Guideline 3.1.2 minimum).
-    public private(set) var privacyPolicyURL = URL(string: "https://github.com/iletai/Serene/blob/develop/PRIVACY.md")
+    public private(set) var privacyPolicyURL = URL(string: "https://apps-site-six.vercel.app/apps/annien/privacy")
     public private(set) var termsOfUseURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")
-    public private(set) var supportURL = URL(string: "https://github.com/iletai/Serene/issues")
+    public private(set) var supportURL = URL(string: "https://apps-site-six.vercel.app/apps/annien/support")
 
     /// Fetch once per session; call from `.task` on screens that show legal links.
     public func refresh() async {

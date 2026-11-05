@@ -10,6 +10,7 @@ import VNCalendarData
 @main
 struct AnNienApp: App {
     @State private var container = AppContainer.shared
+    @State private var ads = AdsManager(subscriptionManager: AppContainer.shared.subscriptionManager)
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("appThemeAppearance") private var appThemeAppearance: Int = 0
     @AppStorage("appLanguage") private var appLanguage: String = "system"
@@ -47,6 +48,7 @@ struct AnNienApp: App {
         WindowGroup {
             MainTabView(pendingDeepLink: $deepLinks.pendingAction)
                 .environment(container)
+                .environment(ads)
                 .onOpenURL { deepLinks.open($0) }
                 .preferredColorScheme(preferredScheme)
                 .environment(\.locale, selectedLocale)
@@ -67,6 +69,7 @@ struct AnNienApp: App {
                 )
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
+                        Task { await ads.start() }
                         // Serialize schedule runs so reconcile-then-add does not interleave.
                         scheduleTask?.cancel()
                         scheduleTask = Task {

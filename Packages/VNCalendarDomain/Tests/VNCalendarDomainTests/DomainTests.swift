@@ -105,6 +105,24 @@ final class DomainTests: XCTestCase {
         XCTAssertTrue(canAddPro)
     }
 
+    func testFeatureGateBonusSlots() async throws {
+        let reminderRepo = MockReminderRepository()
+        let subRepo = MockSubscriptionRepository()
+        let useCase = EvaluateFeatureGateUseCase(
+            subscriptionRepository: subRepo,
+            reminderRepository: reminderRepo,
+            bonusSlots: { 2 }
+        )
+        for i in 1...6 {
+            try await reminderRepo.saveReminder(ReminderEvent(title: "Giỗ \(i)", day: i, month: 1))
+        }
+        let canAdd6 = try await useCase.canAddReminder()
+        XCTAssertTrue(canAdd6)
+        try await reminderRepo.saveReminder(ReminderEvent(title: "Giỗ 7", day: 7, month: 1))
+        let canAdd7 = try await useCase.canAddReminder()
+        XCTAssertFalse(canAdd7)
+    }
+
     func testGetMonthCalendarUseCase() async throws {
         let reminderRepo = MockReminderRepository()
         let holidayRepo = MockHolidayRepository()

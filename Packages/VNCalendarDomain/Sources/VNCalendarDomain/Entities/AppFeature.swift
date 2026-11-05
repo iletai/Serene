@@ -12,9 +12,10 @@ public enum AppFeature: String, Sendable, Codable, CaseIterable {
 public struct FeatureGateRule: Sendable {
     public static let freeMaxReminders = 5
 
-    public static func canCreateReminder(currentCount: Int, isPro: Bool) -> Bool {
+    /// `bonusSlots` are extra free slots earned outside a subscription (e.g. rewarded ads).
+    public static func canCreateReminder(currentCount: Int, isPro: Bool, bonusSlots: Int = 0) -> Bool {
         if isPro { return true }
-        return currentCount < freeMaxReminders
+        return currentCount < freeMaxReminders + bonusSlots
     }
 
     /// All current features are Pro-only per the paywall copy.

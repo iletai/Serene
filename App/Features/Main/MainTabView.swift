@@ -42,6 +42,7 @@ public struct MainTabView: View {
     @State private var routers: [AppRouter]
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(AdsManager.self) private var ads: AdsManager?
     @Namespace private var pillNamespace
     /// Tabs shown at least once; unvisited tabs stay unbuilt (TabView's lazy behaviour) while visited ones keep state.
     @State private var visitedTabs: Set<MainTab> = [.calendar]
@@ -73,7 +74,12 @@ public struct MainTabView: View {
         // Overlay + measured height: safeAreaInset does not reliably reach content hosted inside NavigationStack,
         // so each tab/pushed screen applies vnTabBarClearance() (contentMargins) from this environment value.
         .overlay(alignment: .bottom) {
-            customBottomTabBar
+            VStack(spacing: 0) {
+                if ads?.canShowAds == true {
+                    BannerAdView().frame(width: 320, height: BannerAdView.height)
+                }
+                customBottomTabBar
+            }
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { tabBarHeight = $0 }
         }
         .environment(\.vnTabBarHeight, tabBarHeight)

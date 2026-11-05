@@ -613,6 +613,40 @@
         }
       }
     },
+    "paywall.watch_ad": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Watch an ad to add 1 more memorial slot"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xem quảng cáo để thêm 1 ngày nhớ"
+          }
+        }
+      }
+    },
+    "paywall.watch_ad_unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No ad available right now. Please try again later."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện chưa có quảng cáo. Vui lòng thử lại sau."
+          }
+        }
+      }
+    },
     "paywall.pending": {
       "extractionState": "manual",
       "localizations": {

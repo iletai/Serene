@@ -9,6 +9,9 @@ public struct PaywallView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(AppContainer.self) private var container
+    @Environment(AdsManager.self) private var ads: AdsManager?
+    @State private var isWatchingAd = false
+    @State private var adUnavailable = false
     @State private var viewModel: PaywallViewModel?
     @State private var legalLinksService = LegalLinksService.shared
     @ScaledMetric(relativeTo: .caption2) private var badgeSize: CGFloat = VNSize.iconBadge
@@ -51,6 +54,7 @@ public struct PaywallView: View {
                     .animation(reduceMotion ? nil : .smooth, value: vm.pendingNotice)
 
                     purchaseCTA(vm: vm)
+                    watchAdButton
                     restoreButton(vm: vm)
                     legalLinks
                 }
@@ -177,6 +181,34 @@ public struct PaywallView: View {
         .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
         .disabled(vm.isPurchasing || vm.products.isEmpty)
         .padding(.horizontal, VNSpacing.screenMargin)
+    }
+
+    @ViewBuilder
+    private var watchAdButton: some View {
+        if let ads, ads.canShowAds, !RewardedSlotStore.isAtCap {
+            VStack(spacing: VNSpacing.xs) {
+                Button("paywall.watch_ad") {
+                    isWatchingAd = true
+                    adUnavailable = false
+                    Task {
+                        let earned = await ads.showRewardedForBonusSlot()
+                        isWatchingAd = false
+                        if earned { router.dismissModals() } else { adUnavailable = true }
+                    }
+                }
+                .font(.vnFootnote)
+                .foregroundColor(.vnAccentImperialGold)
+                .frame(minHeight: VNSize.minTapTarget)
+                .contentShape(Rectangle())
+                .disabled(isWatchingAd)
+
+                if adUnavailable {
+                    Text("paywall.watch_ad_unavailable")
+                        .font(.vnCaption1)
+                        .foregroundColor(.vnTextSecondary)
+                }
+            }
+        }
     }
 
     private func restoreButton(vm: PaywallViewModel) -> some View {

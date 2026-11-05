@@ -6,6 +6,7 @@ import VNCalendarLunar
 public struct UpcomingTimelineView: View {
     @Environment(AppContainer.self) private var container
     @Environment(AppRouter.self) private var router
+    @Environment(AdsManager.self) private var ads: AdsManager?
     @State private var viewModel: UpcomingTimelineViewModel?
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -204,6 +205,7 @@ public struct UpcomingTimelineView: View {
                 }
 
                 ForEach(Array(vm.filteredReminders.enumerated()), id: \.element.id) { index, reminder in
+                    if index == 2, ads?.canShowAds == true { NativeAdCard() }
                     let monthStr = String(format: "%02d", reminder.month)
                     let calTypeStr = reminder.dateType == .lunar ? String(localized: "timeline.calendar_type_lunar") : String(localized: "timeline.calendar_type_solar")
                     let dateText = "\(reminder.day)/\(monthStr) \(calTypeStr)"

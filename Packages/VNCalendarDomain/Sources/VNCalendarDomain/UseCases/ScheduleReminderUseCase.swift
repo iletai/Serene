@@ -8,15 +8,18 @@ public final class ScheduleReminderUseCase: Sendable {
     private let reminderRepository: ReminderRepositoryProtocol
     private let subscriptionRepository: SubscriptionRepositoryProtocol
     private let notificationScheduler: NotificationScheduling?
+    private let bonusSlots: @Sendable () -> Int
 
     public init(
         reminderRepository: ReminderRepositoryProtocol,
         subscriptionRepository: SubscriptionRepositoryProtocol,
-        notificationScheduler: NotificationScheduling? = nil
+        notificationScheduler: NotificationScheduling? = nil,
+        bonusSlots: @escaping @Sendable () -> Int = { 0 }
     ) {
         self.reminderRepository = reminderRepository
         self.subscriptionRepository = subscriptionRepository
         self.notificationScheduler = notificationScheduler
+        self.bonusSlots = bonusSlots
     }
 
     public func execute(save reminder: ReminderEvent) async throws {
@@ -25,7 +28,7 @@ public final class ScheduleReminderUseCase: Sendable {
             let isPro = await subscriptionRepository.isFeatureUnlocked(.unlimitedReminders)
             if !isPro {
                 let count = try await reminderRepository.fetchAllReminders().count
-                guard count < FeatureGateRule.freeMaxReminders else {
+                guard FeatureGateRule.canCreateReminder(currentCount: count, isPro: false, bonusSlots: bonusSlots()) else {
                     throw ScheduleReminderError.freeTierLimitReached
                 }
             }
