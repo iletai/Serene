@@ -7,7 +7,9 @@ struct AppSheetView: View {
     @Environment(AppContainer.self) private var container
 
     var body: some View {
-        content.presentationDragIndicator(.visible)
+        content
+            .presentationDragIndicator(.visible)
+            .presentationCornerRadius(28)
     }
 
     @ViewBuilder
