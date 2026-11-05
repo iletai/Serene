@@ -43,6 +43,8 @@
 	<string>$(ADMOB_NATIVE_UNIT_ID)</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Cho phép theo dõi để quảng cáo phù hợp hơn với bạn. Bạn vẫn dùng đầy đủ tính năng nếu từ chối.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>GADApplicationIdentifier</key>
 	<string>$(ADMOB_APP_ID)</string>
 	<key>SKAdNetworkItems</key>

@@ -1,3 +1,4 @@
-- Cập nhật và tối ưu thuật toán Lịch Âm Dương GMT+7.
-- Cải thiện độ chính xác thông báo nhắc nhở ngày giỗ, ngày lễ truyền thống.
-- Tối ưu hiệu năng và sửa các lỗi nhỏ khi đồng bộ dữ liệu.
+- Bản miễn phí hiển thị quảng cáo; gói Pro tắt hoàn toàn quảng cáo.
+- Xem quảng cáo có tặng thưởng để thêm tối đa 5 ngày nhớ ngoài 5 ngày miễn phí.
+- Cập nhật chính sách bảo mật và trang hỗ trợ.
+- Cải thiện hiệu năng và độ ổn định.

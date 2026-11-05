@@ -61,7 +61,9 @@ Git-Flow variant for release-grade mobile software:
 
 **Versioning Rules**:
 - `MARKETING_VERSION` (x.y.z): single source of truth in `Config/Shared.xcconfig`.
-- `CURRENT_PROJECT_VERSION`: monotonic integer supplied by CI via `GITHUB_RUN_NUMBER`. Never reset.
+- `CURRENT_PROJECT_VERSION`: supplied by CI as `max(latest TestFlight build + 1, GITHUB_RUN_NUMBER)` so TestFlight and App Store workflows never collide. Never reset.
+- Tag builds (`vX.Y.Z`, `release-X.Y.Z`) override `MARKETING_VERSION` from the tag name (`RELEASE_VERSION`); the `Shared.xcconfig` value is only the fallback for manual dispatch/local builds, so keep it in sync via the `chore(release)` bump.
+- App Store metadata (what's new, URLs, description) is uploaded from `fastlane/metadata/vi`; update `release_notes.txt` for every release.
 
 ---
 

@@ -60,13 +60,17 @@ platform :ios do
     end
   end
 
-  # Next build number = GITHUB_RUN_NUMBER on CI, else latest TestFlight + 1
+  # Next build number: max(latest TestFlight + 1, GITHUB_RUN_NUMBER). TestFlight and App Store run as
+  # separate workflows with separate run counters, so the TestFlight lookup keeps the number unique and monotonic.
   def resolve_build_number(api_key)
-    if ENV["GITHUB_RUN_NUMBER"] && !ENV["GITHUB_RUN_NUMBER"].empty?
-      ENV["GITHUB_RUN_NUMBER"].to_i
-    else
-      next_build_number(api_key)
-    end
+    [next_build_number(api_key), ENV["GITHUB_RUN_NUMBER"].to_i].max
+  end
+
+  # Marketing version comes from the release tag (v1.0.1 / release-1.0.1) so no manual bump is needed;
+  # without a tag (e.g. workflow_dispatch) the value in Config/Shared.xcconfig is used.
+  def marketing_version_xcarg
+    version = ENV["RELEASE_VERSION"].to_s.sub(/\A(v|release-)/, "")
+    version.match?(/\A\d+\.\d+\.\d+\z/) ? " MARKETING_VERSION=#{version}" : ""
   end
 
   def next_build_number(api_key)
@@ -146,7 +150,7 @@ platform :ios do
       clean: true,
       output_directory: "./build",
       output_name: "AnNien-Beta.ipa",
-      xcargs: "CURRENT_PROJECT_VERSION=#{next_build}"
+      xcargs: "CURRENT_PROJECT_VERSION=#{next_build}#{marketing_version_xcarg}"
     )
 
     # Distribute to TestFlight
@@ -194,7 +198,7 @@ platform :ios do
       clean: true,
       output_directory: "./build",
       output_name: "AnNien-Release.ipa",
-      xcargs: "CURRENT_PROJECT_VERSION=#{resolve_build_number(api_key)}"
+      xcargs: "CURRENT_PROJECT_VERSION=#{resolve_build_number(api_key)}#{marketing_version_xcarg}"
     )
 
     app_review_info = {

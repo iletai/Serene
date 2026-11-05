@@ -101,6 +101,7 @@ jobs:
           FASTLANE_KEYCHAIN_PASSWORD: ${{ secrets.FASTLANE_KEYCHAIN_PASSWORD }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          RELEASE_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
           SKIP_METADATA: ${{ inputs.skip_metadata != null && inputs.skip_metadata || 'false' }}
           APP_REVIEW_FIRST_NAME: ${{ secrets.APP_REVIEW_FIRST_NAME }}
           APP_REVIEW_LAST_NAME: ${{ secrets.APP_REVIEW_LAST_NAME }}
