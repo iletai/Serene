@@ -9,6 +9,7 @@ public struct CalendarMainView: View {
     @Environment(AppRouter.self) private var router
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
     @State private var viewModel: CalendarMainViewModel?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public init() {}
 
@@ -105,8 +106,10 @@ public struct CalendarMainView: View {
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
+                    .contentTransition(.opacity)
             }
             .accessibilityElement(children: .combine)
+            .animation(reduceMotion ? nil : .smooth, value: lunarSubtitle(vm: vm))
 
             Spacer()
 
@@ -146,6 +149,8 @@ public struct CalendarMainView: View {
                     .font(.caption2.weight(.medium))
                     .lineLimit(1)
                     .fixedSize()
+                    .contentTransition(.numericText())
+                    .animation(reduceMotion ? nil : .smooth, value: currentYear)
                 Image(systemName: "chevron.down")
                     .font(.caption2.weight(.semibold))
             }

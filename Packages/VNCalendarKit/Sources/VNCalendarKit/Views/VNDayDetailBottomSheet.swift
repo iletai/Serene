@@ -17,13 +17,13 @@ public struct VNDayDetailBottomSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: VNSpacing.md) {
                     headerDateCluster
-                    VNDayEvaluationView(dayModel: dayModel)
-                    VNDayDirectionsView(dayModel: dayModel)
-                    auspiciousHoursSection
-                    VNDayActivitiesView(dayModel: dayModel)
-                    folkQuoteCard
-                    familyEventsSection
-                    actionButton
+                    VNDayEvaluationView(dayModel: dayModel).vnSheetSectionAppear(1)
+                    VNDayDirectionsView(dayModel: dayModel).vnSheetSectionAppear(2)
+                    auspiciousHoursSection.vnSheetSectionAppear(3)
+                    VNDayActivitiesView(dayModel: dayModel).vnSheetSectionAppear(4)
+                    folkQuoteCard.vnSheetSectionAppear(5)
+                    familyEventsSection.vnSheetSectionAppear(6)
+                    actionButton.vnSheetSectionAppear(7)
                 }
                 .padding(.horizontal, VNSpacing.xl)
                 .padding(.vertical, VNSpacing.xl)

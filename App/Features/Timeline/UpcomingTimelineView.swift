@@ -8,6 +8,7 @@ public struct UpcomingTimelineView: View {
     @Environment(AppRouter.self) private var router
     @State private var viewModel: UpcomingTimelineViewModel?
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // The floating tab pill overlays the scroll view without a safe-area inset; it grows with Dynamic Type.
     @ScaledMetric(relativeTo: .caption2) private var tabBarClearance: CGFloat = VNSpacing.hero + VNSpacing.sectionGap
 
@@ -30,7 +31,7 @@ public struct UpcomingTimelineView: View {
                 headerSection(vm: vm)
                 searchBarSection(vm: vm)
                 MemorialFilterPills(
-                    selectedTab: $vm.selectedFilter,
+                    selectedTab: $vm.selectedFilter.animation(reduceMotion ? nil : .smooth(duration: 0.3)),
                     countForTab: { tab in
                         vm.reminders.filter { tab.matches(category: $0.category) }.count
                     }
@@ -121,6 +122,8 @@ public struct UpcomingTimelineView: View {
                         .padding(.vertical, VNSpacing.xs)
                         .background(Color.vnAccentRedSurface)
                         .clipShape(Capsule())
+                    .contentTransition(.numericText())
+                    .animation(reduceMotion ? nil : .snappy, value: vm.reminders.count)
                 }
             }
             .padding(.top, VNSpacing.space2)
@@ -202,7 +205,7 @@ public struct UpcomingTimelineView: View {
                     MemorialTimelineDivider(title: "DANH SÁCH TIẾP THEO")
                 }
 
-                ForEach(vm.filteredReminders) { reminder in
+                ForEach(Array(vm.filteredReminders.enumerated()), id: \.element.id) { index, reminder in
                     let monthStr = String(format: "%02d", reminder.month)
                     let calTypeStr = reminder.dateType == .lunar ? "Âm Lịch" : "Dương Lịch"
                     let dateText = "\(reminder.day)/\(monthStr) \(calTypeStr)"
@@ -216,9 +219,34 @@ public struct UpcomingTimelineView: View {
                         onEdit: { edit(reminder) },
                         onDelete: { vm.delete(reminder) }
                     )
+                    .modifier(TimelineCardAppear(index: index, reduceMotion: reduceMotion))
                 }
             }
             .padding(.horizontal, VNSpacing.screenMargin)
         }
+    }
+}
+
+// MARK: - Card appear
+
+/// Staggered fade-up for the first few cards only; later cards just fade in as they scroll into view.
+private struct TimelineCardAppear: ViewModifier {
+    private static let staggeredCount = 8
+    let index: Int
+    let reduceMotion: Bool
+    @State private var appeared = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(appeared || reduceMotion ? 1 : 0)
+            .offset(y: appeared || reduceMotion ? 0 : 12)
+            .onAppear {
+                guard !appeared else { return }
+                guard index < Self.staggeredCount else {
+                    appeared = true
+                    return
+                }
+                withAnimation(.smooth(duration: 0.4).delay(Double(index) * 0.05)) { appeared = true }
+            }
     }
 }

@@ -9,6 +9,7 @@ public struct OmniSearchView: View {
     @ScaledMetric(relativeTo: .callout) private var iconBox: CGFloat = VNSize.iconButton
     @State private var viewModel: OmniSearchViewModel?
     @FocusState private var isSearchFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public init() {}
 
@@ -27,9 +28,13 @@ public struct OmniSearchView: View {
                 VStack(spacing: VNSpacing.xl) {
                     searchField(vm: vm)
 
-                    if let parsed = vm.parsedDate {
-                        parsedDateCard(parsed, vm: vm)
+                    ZStack {
+                        if let parsed = vm.parsedDate {
+                            parsedDateCard(parsed, vm: vm)
+                                .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.96, anchor: .top)))
+                        }
                     }
+                    .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: vm.parsedDate?.label)
 
                     if !vm.searchResults.isEmpty {
                         resultsList(vm: vm)
@@ -96,6 +101,7 @@ public struct OmniSearchView: View {
             Rectangle()
                 .fill(isSearchFocused ? Color.vnAccentHeritageRed : Color.vnBorderSubtle)
                 .frame(height: isSearchFocused ? VNBorderWidth.active : VNBorderWidth.regular)
+                .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: isSearchFocused)
         }
         .onChange(of: vm.searchText) { _, newValue in
             vm.performSearch(query: newValue)
@@ -183,23 +189,25 @@ public struct OmniSearchView: View {
                 .accessibilityAddTraits(.isHeader)
 
             ForEach(vm.searchResults) { item in
-                switch item {
-                case .reminder(let r):
-                    resultCard(
-                        icon: "flame.fill",
-                        tint: .vnAccentHeritageRed,
-                        title: r.title,
-                        detail: "\(r.day)/\(r.month) \(r.dateType == .lunar ? "Âm lịch" : "Dương lịch") • \(r.category.title)"
-                    )
-                case .holiday(let h):
-                    resultCard(
-                        icon: "leaf.fill",
-                        tint: .vnAccentGoldText,
-                        title: h.title,
-                        detail: h.summary
-                    )
-                }
+                resultRow(item)
+                    .transition(.opacity)
             }
+        }
+        .animation(reduceMotion ? nil : .smooth(duration: 0.25), value: vm.searchResults.map(\.id))
+    }
+
+    @ViewBuilder
+    private func resultRow(_ item: SearchResultItem) -> some View {
+        switch item {
+        case .reminder(let r):
+            resultCard(
+                icon: "flame.fill",
+                tint: .vnAccentHeritageRed,
+                title: r.title,
+                detail: "\(r.day)/\(r.month) \(r.dateType == .lunar ? "Âm lịch" : "Dương lịch") • \(r.category.title)"
+            )
+        case .holiday(let h):
+            resultCard(icon: "leaf.fill", tint: .vnAccentGoldText, title: h.title, detail: h.summary)
         }
     }
 

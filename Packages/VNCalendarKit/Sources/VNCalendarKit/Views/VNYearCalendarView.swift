@@ -38,7 +38,7 @@ public struct VNYearCalendarView: View {
                     } label: {
                         miniMonthCard(monthModel)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.97))
                 }
             }
             .padding(.horizontal, VNSpacing.xl)

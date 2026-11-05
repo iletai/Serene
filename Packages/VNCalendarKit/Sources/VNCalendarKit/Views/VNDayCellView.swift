@@ -7,6 +7,7 @@ public struct VNDayCellView: View, Equatable {
     public let isCurrentMonth: Bool
     public let onSelect: () -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .body) private var solarFontSize: CGFloat = 14
     @ScaledMetric(relativeTo: .caption2) private var lunarFontSize: CGFloat = 10
 
@@ -56,6 +57,7 @@ public struct VNDayCellView: View, Equatable {
                     .strokeBorder(borderColor, lineWidth: borderWidth)
             )
             .opacity(isCurrentMonth ? 1.0 : 0.35)
+            .animation(reduceMotion ? nil : VNAnimation.cellSelection, value: isSelected)
             .contentShape(Rectangle())
         }
         .buttonStyle(VNCellPressButtonStyle())
