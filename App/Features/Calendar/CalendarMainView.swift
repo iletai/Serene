@@ -8,7 +8,6 @@ public struct CalendarMainView: View {
     @Environment(AppContainer.self) private var container
     @Environment(AppRouter.self) private var router
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
-    @ScaledMetric(relativeTo: .caption2) private var sealSize = VNSize.iconButton
     @State private var viewModel: CalendarMainViewModel?
 
     public init() {}
@@ -25,13 +24,11 @@ public struct CalendarMainView: View {
     public var body: some View {
         let vm = activeViewModel
         ScrollView {
-            VStack(spacing: VNSpacing.sectionGap) {
-                // Month callout: tiết khí eyebrow + month/year headline + Can Chi seal
-                monthCalloutRow(vm: vm)
-
-                // Hero almanac card (selected day dashboard)
+            VStack(spacing: VNSpacing.lg) {
+                // 1. Primary focus: today's date, Can Chi, nearest memorial. Secondary info is collapsed.
                 TodayDashboardCard(
                     details: vm.todayDetails,
+                    upcomingMemorial: vm.upcomingMemorial,
                     onAddReminder: { presentReminderForm(vm: vm) },
                     onQuickSearch: { router.present(sheet: .search) }
                 )
@@ -39,7 +36,7 @@ public struct CalendarMainView: View {
                 .accessibilityElement(children: .contain)
                 .accessibilityIdentifier("today.card")
 
-                // Multi-Mode Calendar Container (Nhật Lịch • Tháng • Tuần • Năm).
+                // 2. Calendar. Multi-Mode Calendar Container (Nhật Lịch • Tháng • Tuần • Năm).
                 // The package fires this only after its own day sheet has finished dismissing.
                 VNCalendarContainerView(
                     viewModel: vm.adapterViewModel,
@@ -59,6 +56,7 @@ public struct CalendarMainView: View {
                 )
                 .padding(.horizontal, VNSpacing.screenMargin)
             }
+            .padding(.top, VNSpacing.sm)
             .padding(.bottom, VNSpacing.sectionGap)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
@@ -196,97 +194,6 @@ public struct CalendarMainView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)
-    }
-
-    // MARK: - Month Callout + Seal
-    private func monthCalloutRow(vm: CalendarMainViewModel) -> some View {
-        HStack(alignment: .center, spacing: VNSpacing.md) {
-            VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                Text(monthCalloutEyebrow(vm: vm))
-                    .font(.caption2.weight(.medium))
-                    .tracking(1.1)
-                    .foregroundColor(.vnAccentGoldText)
-                    .lineLimit(3)
-                    .minimumScaleFactor(0.8)
-
-                Text(monthCalloutTitle(vm: vm))
-                    .font(.system(.title2, design: .serif).weight(.semibold))
-                    .foregroundColor(.vnTextPrimary)
-                    .lineLimit(3)
-                    .minimumScaleFactor(0.8)
-            }
-            .accessibilityElement(children: .combine)
-
-            Spacer(minLength: VNSpacing.sm)
-
-            monthSealBadge(vm: vm)
-        }
-        .padding(.horizontal, VNSpacing.screenMargin)
-        .padding(.top, VNSpacing.xs)
-    }
-
-    private func monthSealBadge(vm: CalendarMainViewModel) -> some View {
-        let yearPair = displayYearCanChi(vm: vm)
-        return VStack(spacing: VNSpacing.space2) {
-            Text(yearPair.stem.vietnameseName.uppercased())
-            Text(yearPair.branch.vietnameseName.uppercased())
-        }
-        .font(.system(.caption2, design: .serif).weight(.bold))
-        .lineLimit(1)
-        .minimumScaleFactor(0.7)
-        .foregroundColor(.vnAccentDeepPrimary)
-        // ponytail: decorative seal capped at 1.5x so the month title keeps the row width.
-        .frame(width: min(sealSize, VNSize.iconButton * 1.5), height: min(sealSize, VNSize.iconButton * 1.5))
-        .background(Color.vnSurfaceElevated)
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                .stroke(Color.vnAccentDeepPrimary, lineWidth: VNBorderWidth.focus)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                .inset(by: 3)
-                .stroke(Color.vnAccentDeepPrimary.opacity(0.4), lineWidth: VNBorderWidth.hairline)
-        )
-        .shadow(color: Color.vnAccentDeepPrimary.opacity(0.15), radius: 3, x: 0, y: 2)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Ấn triện năm \(yearPair.description)")
-    }
-
-    private func monthCalloutEyebrow(vm: CalendarMainViewModel) -> String {
-        let name = AstronomicalMath.solarTerm(at: AstronomicalMath.julianDay(from: solarTermAnchorDate(vm: vm)))
-            .vietnameseName.uppercased()
-        return "TIẾT KHÍ · TIẾT \(name)"
-    }
-
-    private func monthCalloutTitle(vm: CalendarMainViewModel) -> String {
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = VNTime.vietnam
-        let month = cal.component(.month, from: vm.adapterViewModel.displayMonthDate)
-        let year = cal.component(.year, from: vm.adapterViewModel.displayMonthDate)
-        return "\(solarMonthNames[month - 1]) · \(year)"
-    }
-
-    private func displayYearCanChi(vm: CalendarMainViewModel) -> CanChiPair {
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = VNTime.vietnam
-        let year = cal.component(.year, from: vm.adapterViewModel.displayMonthDate)
-        return CanChiPair.year(for: year)
-    }
-
-    private func solarTermAnchorDate(vm: CalendarMainViewModel) -> SolarDate {
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = VNTime.vietnam
-        return SolarDate(from: vm.adapterViewModel.displayMonthDate, calendar: cal)
-    }
-
-    private var solarMonthNames: [String] {
-        [
-            "Tháng Một", "Tháng Hai", "Tháng Ba", "Tháng Tư",
-            "Tháng Năm", "Tháng Sáu", "Tháng Bảy", "Tháng Tám",
-            "Tháng Chín", "Tháng Mười", "Tháng Mười Một", "Tháng Mười Hai"
-        ]
     }
 
     private func lunarSubtitle(vm: CalendarMainViewModel) -> String {

@@ -8,15 +8,19 @@ public struct TodayDashboardCard: View {
     public let details: DayCalendarDetails?
     public var onAddReminder: () -> Void
     public var onQuickSearch: () -> Void
-    @ScaledMetric(relativeTo: .largeTitle) private var solarNumeralSize: CGFloat = 56
+    let upcomingMemorial: UpcomingMemorial?
+    @State private var showDetails = false
+    @ScaledMetric(relativeTo: .largeTitle) private var solarNumeralSize: CGFloat = 52
     @ScaledMetric(relativeTo: .title) private var lunarNumeralSize: CGFloat = 28
 
     public init(
         details: DayCalendarDetails?,
+        upcomingMemorial: UpcomingMemorial? = nil,
         onAddReminder: @escaping () -> Void = {},
         onQuickSearch: @escaping () -> Void = {}
     ) {
         self.details = details
+        self.upcomingMemorial = upcomingMemorial
         self.onAddReminder = onAddReminder
         self.onQuickSearch = onQuickSearch
     }
@@ -112,30 +116,27 @@ public struct TodayDashboardCard: View {
 
     public var body: some View {
         VStack(spacing: VNSpacing.md) {
-            VNCard(allPadding: VNSpacing.xl) {
-                VStack(alignment: .leading, spacing: 0) {
+            VNCard(allPadding: VNSpacing.lg) {
+                VStack(alignment: .leading, spacing: VNSpacing.md) {
                     heroHeader
-                    solarNumeralRow
-                    hairlineDivider
-                    lunarCalloutGrid
-                    TodayHeroGuidance(
-                        hours: EarthlyBranch.auspiciousHours(for: dynamicDayBranch),
-                        suitable: suitableText,
-                        taboo: tabooText
-                    )
+                    dateRow
+                    canChiLine
+                    if let memorial = upcomingMemorial {
+                        memorialRow(memorial)
+                    }
+                    detailsDisclosure
                 }
             }
-            .overlay(HeroCornerMarks().fill(Color.vnBorderSubtle.opacity(0.6)))
 
             TodayCardActions(onAddReminder: onAddReminder, onQuickSearch: onQuickSearch)
         }
     }
 
-    // MARK: - Hero Header (Weekday + Auspicious Pill)
+    // MARK: - Hero Header (Weekday + single auspicious badge)
     private var heroHeader: some View {
         // Side by side when it fits; stacked at large accessibility sizes.
         ViewThatFits(in: .horizontal) {
-            HStack(alignment: .top, spacing: VNSpacing.sm) {
+            HStack(alignment: .center, spacing: VNSpacing.sm) {
                 weekdayText
                 Spacer(minLength: 0)
                 hoangDaoPill
@@ -160,125 +161,109 @@ public struct TodayDashboardCard: View {
     }
 
     private var hoangDaoPill: some View {
-        VStack(alignment: .trailing, spacing: VNSpacing.xs) {
-            HStack(spacing: VNSpacing.xs) {
-                Image(systemName: "sun.max")
-                    .font(.caption2.weight(.semibold))
-                    .accessibilityHidden(true)
-                Text(dayStar.isAuspicious ? "HOÀNG ĐẠO" : "HẮC ĐẠO")
-                    .font(.caption2.weight(.semibold))
-                    .lineLimit(1)
-                    .fixedSize()
-                    .tracking(0.66)
-            }
-            .foregroundColor(.vnAccentDeepPrimary)
-            .padding(.horizontal, VNSpacing.sm)
-            .padding(.vertical, VNSpacing.xs)
-            .background(Color.vnAccentRedSurface)
-            .clipShape(Capsule())
-            .overlay(
-                Capsule().stroke(Color.vnAccentHeritageRed.opacity(0.25), lineWidth: VNBorderWidth.hairline)
-            )
-
-            Text("Sao \(dayStar.vietnameseName)")
-                .font(.caption2)
-                .foregroundColor(.vnTextSecondary)
+        HStack(spacing: VNSpacing.xs) {
+            Image(systemName: "sun.max")
+                .font(.caption2.weight(.semibold))
+                .accessibilityHidden(true)
+            Text(dayStar.isAuspicious ? "HOÀNG ĐẠO" : "HẮC ĐẠO")
+                .font(.caption2.weight(.semibold))
+                .lineLimit(1)
+                .fixedSize()
+                .tracking(0.66)
         }
+        .foregroundColor(.vnAccentDeepPrimary)
+        .padding(.horizontal, VNSpacing.sm)
+        .padding(.vertical, VNSpacing.xs)
+        .background(Color.vnAccentRedSurface)
+        .clipShape(Capsule())
     }
 
-    // MARK: - Solar Numeral
-    private var solarNumeralRow: some View {
-        HStack(alignment: .firstTextBaseline, spacing: VNSpacing.sm) {
+    // MARK: - Solar + Lunar date (primary focus)
+    private var dateRow: some View {
+        HStack(alignment: .firstTextBaseline, spacing: VNSpacing.md) {
             Text("\(currentSolarDate.day)")
                 .font(.system(size: solarNumeralSize, weight: .light))
                 .foregroundColor(.vnTextPrimary)
-
-            VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                Text("DƯƠNG LỊCH")
-                    .font(.caption2.weight(.semibold))
-                    .tracking(0.66)
-                    .foregroundColor(.vnAccentGoldText)
-
-                if let week = weekOfYearText {
-                    Text(week)
-                        .font(.caption)
-                        .foregroundColor(.vnTextSecondary)
-                }
-            }
+                .accessibilityLabel("Dương lịch ngày \(currentSolarDate.day)")
 
             Spacer(minLength: 0)
-        }
-        .padding(.top, VNSpacing.xs)
-        .accessibilityElement(children: .combine)
-    }
 
-    // Centered sun ornament breaking the hairline (canonical hero divider).
-    private var hairlineDivider: some View {
-        ZStack {
-            Divider().background(Color.vnBorderSubtle.opacity(0.6))
-            Image(systemName: "sun.max.fill")
-                .font(.caption)
-                .foregroundColor(Color.vnBorderSubtle.opacity(0.6))
-                .padding(.horizontal, VNSpacing.xs)
-                .background(Color.vnBackgroundSecondary)
-        }
-        .padding(.vertical, VNSpacing.sm)
-        .accessibilityHidden(true)
-    }
-
-    // MARK: - Lunar Callout + Can Chi
-    private var lunarCalloutGrid: some View {
-        HStack(spacing: VNSpacing.md) {
-            VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                Text("ÂM LỊCH")
+            VStack(alignment: .trailing, spacing: VNSpacing.space2) {
+                Text("Âm lịch")
                     .font(.caption2.weight(.medium))
-                    .tracking(0.66)
                     .foregroundColor(.vnAccentGoldText)
-
                 Text("Ngày \(currentLunarDate.day)")
                     .font(.system(size: lunarNumeralSize, weight: .semibold, design: .serif))
                     .foregroundColor(.vnAccentHeritageRed)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
+                    .minimumScaleFactor(0.7)
                 Text(lunarMonthName)
-                    .font(.system(.headline, design: .serif).weight(.semibold))
+                    .font(.system(.subheadline, design: .serif).weight(.semibold))
                     .foregroundColor(.vnTextPrimary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .accessibilityElement(children: .combine)
-
-            Rectangle()
-                .fill(Color.vnBorderSubtle.opacity(0.6))
-                .frame(width: VNBorderWidth.hairline)
-                .accessibilityHidden(true)
-
-            VStack(spacing: VNSpacing.xs) {
-                canChiRow(label: "Ngày", value: currentCanChi.day.description)
-                canChiRow(label: "Tháng", value: currentCanChi.month.description)
-                canChiRow(label: "Năm", value: currentCanChi.year.description)
-                canChiRow(label: "Ngũ Hành", value: dayElementName, valueColor: .vnAccentGoldText)
-            }
         }
-        .padding(.vertical, VNSpacing.sm)
     }
 
-    private func canChiRow(label: String, value: String, valueColor: Color = .vnTextPrimary) -> some View {
+    private var canChiLine: some View {
+        Text("Ngày \(currentCanChi.day.description) · Tháng \(currentCanChi.month.description) · Năm \(currentCanChi.year.description)")
+            .font(.footnote.weight(.medium))
+            .foregroundColor(.vnTextSecondary)
+            .lineLimit(2)
+            .minimumScaleFactor(0.8)
+    }
+
+    private func memorialRow(_ memorial: UpcomingMemorial) -> some View {
         HStack(spacing: VNSpacing.sm) {
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.vnTextSecondary)
-
-            Spacer(minLength: 0)
-
-            Text(value)
+            Image(systemName: "flame")
+                .font(.footnote.weight(.semibold))
+                .foregroundColor(.vnAccentHeritageRed)
+                .accessibilityHidden(true)
+            Text(memorial.title)
                 .font(.subheadline.weight(.semibold))
-                .foregroundColor(valueColor)
+                .foregroundColor(.vnTextPrimary)
+                .lineLimit(1)
+            Spacer(minLength: VNSpacing.sm)
+            Text(memorial.countdown)
+                .font(.caption.weight(.semibold))
+                .foregroundColor(.vnAccentHeritageRed)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
+        .padding(VNSpacing.sm)
+        .background(Color.vnAccentRedSurface.opacity(0.6))
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
         .accessibilityElement(children: .combine)
+    }
+
+    // MARK: - Secondary info (collapsed by default)
+    private var detailsDisclosure: some View {
+        DisclosureGroup(isExpanded: $showDetails) {
+            VStack(alignment: .leading, spacing: VNSpacing.md) {
+                Text(detailsSummary)
+                    .font(.caption)
+                    .foregroundColor(.vnTextSecondary)
+                TodayHeroGuidance(
+                    hours: EarthlyBranch.auspiciousHours(for: dynamicDayBranch),
+                    suitable: suitableText,
+                    taboo: tabooText
+                )
+            }
+            .padding(.top, VNSpacing.sm)
+        } label: {
+            Text("Giờ hoàng đạo · Nên / kiêng")
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.vnTextPrimary)
+        }
+        .tint(.vnTextSecondary)
+    }
+
+    private var detailsSummary: String {
+        [weekOfYearText, "Sao \(dayStar.vietnameseName)", "Ngũ hành \(dayElementName)"]
+            .compactMap { $0 }
+            .joined(separator: " · ")
     }
 }
 
@@ -414,32 +399,5 @@ private struct TodayCardActions: View {
                 .popoverTip(AddReminderTip())
             VNButton("Tra Cứu", icon: "magnifyingglass", variant: .secondary, size: .small, isFullWidth: true, action: onQuickSearch)
         }
-    }
-}
-
-// Four L-shaped 12x12 corner strokes framing the hero almanac card (canonical.html: top/bottom × left/right marks).
-private struct HeroCornerMarks: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let inset: CGFloat = 8
-        let arm: CGFloat = 12
-        let width: CGFloat = 1
-        guard rect.width > inset * 2 + arm, rect.height > inset * 2 + arm else { return path }
-        let left = rect.minX + inset
-        let right = rect.maxX - inset
-        let top = rect.minY + inset
-        let bottom = rect.maxY - inset
-        // Each corner draws a horizontal + vertical arm forming an "L".
-        for corner in [(left, top), (right, top), (left, bottom), (right, bottom)] {
-            let isRight = corner.0 == right
-            let isBottom = corner.1 == bottom
-            let hx = isRight ? corner.0 - arm : corner.0
-            let hy = isBottom ? corner.1 - width : corner.1
-            let vx = isRight ? corner.0 - width : corner.0
-            let vy = isBottom ? corner.1 - arm : corner.1
-            path.addRect(CGRect(x: hx, y: hy, width: arm, height: width))
-            path.addRect(CGRect(x: vx, y: vy, width: width, height: arm))
-        }
-        return path
     }
 }
