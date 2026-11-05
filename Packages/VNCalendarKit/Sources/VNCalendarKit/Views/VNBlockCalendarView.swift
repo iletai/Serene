@@ -80,10 +80,7 @@ public struct VNBlockCalendarView: View {
         )
         .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius,
                 x: VNShadow.folio.x, y: VNShadow.folio.y)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTapDetails()
-        }
+        .onTapRelease(pressedScale: 1, perform: onTapDetails)
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isButton)
         .accessibilityHint("calendar.block.accessibility_hint_details")

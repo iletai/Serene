@@ -30,40 +30,38 @@ public struct VNDayCellView: View, Equatable {
     }
 
     public var body: some View {
-        Button(action: onSelect) {
-            VStack(spacing: VNSpacing.space2) {
-                if let model = dayModel {
-                    Text("\(model.solarDay)")
-                        .font(.system(size: solarFontSize, weight: solarWeight))
-                        .foregroundColor(solarColor)
+        VStack(spacing: VNSpacing.space2) {
+            if let model = dayModel {
+                Text("\(model.solarDay)")
+                    .font(.system(size: solarFontSize, weight: solarWeight))
+                    .foregroundColor(solarColor)
 
-                    Text(model.lunarDayText)
-                        .font(.system(size: lunarFontSize, weight: lunarWeight))
-                        .italic()
-                        .foregroundColor(lunarColor)
+                Text(model.lunarDayText)
+                    .font(.system(size: lunarFontSize, weight: lunarWeight))
+                    .italic()
+                    .foregroundColor(lunarColor)
 
-                    indicatorDot
-                } else {
-                    Spacer(minLength: 0)
-                }
+                indicatorDot
+            } else {
+                Spacer(minLength: 0)
             }
-            .padding(.vertical, VNSpacing.xs)
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: 44)
-            .background(backgroundColor)
-            .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-            .overlay(
-                RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                    .strokeBorder(borderColor, lineWidth: borderWidth)
-            )
-            .opacity(isCurrentMonth ? 1.0 : 0.35)
-            .animation(reduceMotion ? nil : VNAnimation.cellSelection, value: isSelected)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(VNCellPressButtonStyle())
+        .padding(.vertical, VNSpacing.xs)
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: 44)
+        .background(backgroundColor)
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
+        .overlay(
+            RoundedRectangle(cornerRadius: VNCornerRadius.small)
+                .strokeBorder(borderColor, lineWidth: borderWidth)
+        )
+        .opacity(isCurrentMonth ? 1.0 : 0.35)
+        .animation(reduceMotion ? nil : VNAnimation.cellSelection, value: isSelected)
+        .contentShape(Rectangle())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+        .onTapRelease(perform: onSelect)
     }
 
     // MARK: - Indicator Dot (Hoàng Đạo gold / Giỗ red)
