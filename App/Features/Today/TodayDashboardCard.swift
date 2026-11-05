@@ -10,6 +10,7 @@ public struct TodayDashboardCard: View {
     public var onQuickSearch: () -> Void
     let upcomingMemorial: UpcomingMemorial?
     @State private var showDetails = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .largeTitle) private var solarNumeralSize: CGFloat = 52
     @ScaledMetric(relativeTo: .title) private var lunarNumeralSize: CGFloat = 28
 
@@ -157,6 +158,8 @@ public struct TodayDashboardCard: View {
                 .foregroundColor(.vnTextSecondary)
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
+                .contentTransition(.opacity)
+                .animation(dateAnimation, value: title)
         }
     }
 
@@ -176,6 +179,8 @@ public struct TodayDashboardCard: View {
         .padding(.vertical, VNSpacing.xs)
         .background(Color.vnAccentRedSurface)
         .clipShape(Capsule())
+        .contentTransition(.opacity)
+        .animation(dateAnimation, value: dayStar.isAuspicious)
     }
 
     // MARK: - Solar + Lunar date (primary focus)
@@ -184,6 +189,8 @@ public struct TodayDashboardCard: View {
             Text("\(currentSolarDate.day)")
                 .font(.system(size: solarNumeralSize, weight: .light))
                 .foregroundColor(.vnTextPrimary)
+                .contentTransition(.numericText())
+                .animation(dateAnimation, value: currentSolarDate.day)
                 .accessibilityLabel("Dương lịch ngày \(currentSolarDate.day)")
 
             Spacer(minLength: 0)
@@ -197,14 +204,22 @@ public struct TodayDashboardCard: View {
                     .foregroundColor(.vnAccentHeritageRed)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
+                    .contentTransition(.numericText())
+                    .animation(dateAnimation, value: currentLunarDate.day)
                 Text(lunarMonthName)
                     .font(.system(.subheadline, design: .serif).weight(.semibold))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
+                    .contentTransition(.interpolate)
+                    .animation(dateAnimation, value: currentLunarDate.month)
             }
             .accessibilityElement(children: .combine)
         }
+    }
+
+    private var dateAnimation: Animation? {
+        reduceMotion ? nil : .smooth(duration: 0.35)
     }
 
     private var canChiLine: some View {
@@ -213,6 +228,8 @@ public struct TodayDashboardCard: View {
             .foregroundColor(.vnTextSecondary)
             .lineLimit(2)
             .minimumScaleFactor(0.8)
+            .contentTransition(.opacity)
+            .animation(dateAnimation, value: currentCanChi.day.description)
     }
 
     private func memorialRow(_ memorial: UpcomingMemorial) -> some View {
@@ -231,6 +248,8 @@ public struct TodayDashboardCard: View {
                 .foregroundColor(.vnAccentHeritageRed)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+                .contentTransition(.numericText())
+                .animation(dateAnimation, value: memorial.countdown)
         }
         .padding(VNSpacing.sm)
         .background(Color.vnAccentRedSurface.opacity(0.6))
@@ -245,6 +264,8 @@ public struct TodayDashboardCard: View {
                 Text(detailsSummary)
                     .font(.caption)
                     .foregroundColor(.vnTextSecondary)
+                    .contentTransition(.opacity)
+                    .animation(dateAnimation, value: detailsSummary)
                 TodayHeroGuidance(
                     hours: EarthlyBranch.auspiciousHours(for: dynamicDayBranch),
                     suitable: suitableText,
@@ -258,6 +279,8 @@ public struct TodayDashboardCard: View {
                 .foregroundColor(.vnTextPrimary)
         }
         .tint(.vnTextSecondary)
+        .animation(reduceMotion ? nil : VNAnimation.cardExpansion, value: showDetails)
+        .sensoryFeedback(.selection, trigger: showDetails)
     }
 
     private var detailsSummary: String {

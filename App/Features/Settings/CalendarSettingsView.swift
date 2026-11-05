@@ -25,6 +25,7 @@ public struct CalendarSettingsView: View {
 
     // Sync State
     @State private var isSyncing = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var syncStatusBanner: String?
 
     public init() {}
@@ -216,6 +217,7 @@ public struct CalendarSettingsView: View {
                 }
                 .padding(.horizontal, VNSpacing.sm)
                 .padding(.top, VNSpacing.space2)
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
     }
@@ -289,6 +291,7 @@ public struct CalendarSettingsView: View {
             )
         }
         .disabled(isSyncing)
+        .animation(reduceMotion ? nil : .smooth(duration: 0.25), value: isSyncing)
     }
 
     // MARK: - Section 3: Tùy Biến Lịch Ngày
@@ -426,11 +429,15 @@ public struct CalendarSettingsView: View {
                 formatter.dateFormat = "HH:mm, dd/MM"
                 let nowStr = formatter.string(from: Date())
                 lastSyncTimestamp = "Hôm nay, \(nowStr)"
-                syncStatusBanner = "Đã đồng bộ 48 văn khấn & 12 lễ tiết mới nhất."
+                withAnimation(reduceMotion ? nil : .smooth) {
+                    syncStatusBanner = "Đã đồng bộ 48 văn khấn & 12 lễ tiết mới nhất."
+                }
 
                 VNHaptics.impact(.success, enabled: isHapticEnabled)
             } catch {
-                syncStatusBanner = "Dữ liệu ngoại tuyến bản địa đã sẵn sàng."
+                withAnimation(reduceMotion ? nil : .smooth) {
+                    syncStatusBanner = "Dữ liệu ngoại tuyến bản địa đã sẵn sàng."
+                }
             }
             isSyncing = false
         }

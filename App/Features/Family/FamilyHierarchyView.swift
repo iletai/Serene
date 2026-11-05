@@ -16,6 +16,7 @@ public struct FamilyHierarchyView: View {
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
     @State private var viewModel: FamilyHierarchyViewModel?
     @State private var isCheckingGate = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .footnote) private var railBadgeSize: CGFloat = 32
     @ScaledMetric(relativeTo: .footnote) private var memberBadgeSize: CGFloat = VNSize.iconButton
 
@@ -166,6 +167,8 @@ public struct FamilyHierarchyView: View {
 
                 if !vm.reminders.isEmpty {
                     Text("\(vm.reminders.count) tiền nhân")
+                        .contentTransition(.numericText())
+                        .animation(reduceMotion ? nil : .snappy, value: vm.reminders.count)
                         .font(.caption2.weight(.semibold))
                         .foregroundColor(.vnOnGoldContainer)
                         .padding(.horizontal, VNSpacing.sm)
@@ -225,6 +228,11 @@ public struct FamilyHierarchyView: View {
         VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
             ForEach(vm.groupedGenerations) { group in
                 generationBand(group)
+                    .scrollTransition(.animated(.smooth), axis: .vertical) { content, phase in
+                        content
+                            .opacity(reduceMotion || phase.isIdentity ? 1 : 0.4)
+                            .offset(y: reduceMotion ? 0 : phase.value * 12)
+                    }
             }
         }
     }
@@ -253,6 +261,8 @@ public struct FamilyHierarchyView: View {
                     Text("\(group.members.count) vị")
                         .font(.caption.weight(.medium))
                         .foregroundColor(.vnTextSecondary)
+                        .contentTransition(.numericText())
+                        .animation(reduceMotion ? nil : .snappy, value: group.members.count)
                 }
                 .dynamicTypeSize(...DynamicTypeSize.accessibility1)
 
