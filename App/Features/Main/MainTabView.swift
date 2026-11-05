@@ -13,11 +13,11 @@ public enum MainTab: Int, CaseIterable, Identifiable, Sendable {
     public var title: String {
         switch self {
         case .calendar:
-            return "Lịch Ngày"
+            return String(localized: "tab.calendar")
         case .memorial:
-            return "Ngày Giỗ"
+            return String(localized: "tab.memorials")
         case .family:
-            return "Gia Tộc"
+            return String(localized: "tab.family")
         }
     }
 

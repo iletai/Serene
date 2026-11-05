@@ -2,14 +2,24 @@ import SwiftUI
 import VNCalendarDomain
 import VNCalendarDesignSystem
 
-enum MemorialFilterTab: String, CaseIterable, Identifiable {
-    case all = "Tất cả"
-    case deathAnniversary = "Giỗ Gia Tiên"
-    case ancestral = "Chạp Họ / Kỵ"
-    case worship = "Lễ Tiết & Vía"
-    case other = "Khác"
+enum MemorialFilterTab: CaseIterable, Identifiable {
+    case all
+    case deathAnniversary
+    case ancestral
+    case worship
+    case other
 
-    var id: String { rawValue }
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .all: String(localized: "timeline.filter_all")
+        case .deathAnniversary: String(localized: "timeline.filter_death_anniversary")
+        case .ancestral: String(localized: "timeline.filter_ancestral")
+        case .worship: String(localized: "timeline.filter_worship")
+        case .other: String(localized: "timeline.filter_other")
+        }
+    }
 
     func matches(category: ReminderCategory) -> Bool {
         switch self {
@@ -46,7 +56,7 @@ struct MemorialFilterPills: View {
                         },
                         label: {
                             HStack(spacing: VNSpacing.xs) {
-                                Text(tab.rawValue)
+                                Text(tab.title)
                                     .font(.caption.weight(isSelected ? .semibold : .medium))
                                     .frame(minHeight: VNSize.minTapTarget)
 
