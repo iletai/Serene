@@ -1,6 +1,8 @@
 # Chính Sách Bảo Mật (Privacy Policy) — An Niên (Serene)
 
-*Cập nhật lần cuối: 13/10/2026*
+*Cập nhật lần cuối: 05/11/2026*
+
+Bản đầy đủ, luôn mới nhất: https://apps-site-six.vercel.app/apps/annien/privacy
 
 Ứng dụng **An Niên** ("chúng tôi", "ứng dụng") tôn trọng và cam kết bảo vệ quyền riêng tư của bạn.
 
@@ -11,7 +13,7 @@
 An Niên được thiết kế theo nguyên tắc **ưu tiên ngoại tuyến (offline-first)** và **tôn trọng quyền riêng tư**:
 
 - **Không tạo tài khoản**: Ứng dụng không yêu cầu đăng ký, đăng nhập tài khoản bên thứ ba, hay cung cấp thông tin định danh cá nhân.
-- **Không theo dõi (No Tracking)**: Ứng dụng không sử dụng IDFA, cookie theo dõi, hoặc bất kỳ SDK phân tích/quảng cáo nào để theo dõi bạn trên các ứng dụng và trang web khác.
+- **Theo dõi chỉ khi bạn cho phép**: Bản miễn phí hiển thị quảng cáo Google AdMob. IDFA chỉ được dùng nếu bạn chọn "Cho phép" ở hộp thoại theo dõi của iOS; gói Pro tắt quảng cáo. Xem mục 3a bên dưới.
 - **Không gửi dữ liệu người dùng về máy chủ riêng**: Toàn bộ ngày giỗ chạp, sự kiện gia đình, ghi chú bạn tạo đều được lưu trữ trực tiếp trên thiết bị của bạn.
 
 ---
@@ -33,6 +35,12 @@ An Niên được thiết kế theo nguyên tắc **ưu tiên ngoại tuyến (o
 ### d. Dữ Liệu Nội Dung Chung (microCMS)
 - Ứng dụng tải về dữ liệu nội dung tĩnh công khai (văn khấn, tiết khí, ngày lễ) từ hệ thống CMS qua kết nối HTTPS bảo mật.
 - Kết nối này chỉ tải nội dung xuống, không gửi bất kỳ thông tin cá nhân hay định danh thiết bị nào lên hệ thống.
+
+---
+
+## 3a. Quảng Cáo (Google AdMob)
+
+Google AdMob có thể thu thập mã định danh thiết bị (IDFA khi bạn cho phép), dữ liệu tương tác quảng cáo, thông tin thiết bị, vị trí ước tính từ địa chỉ IP và dữ liệu chẩn đoán để phân phát, đo lường và chống gian lận quảng cáo. Tại EEA/UK và các khu vực yêu cầu, app hiển thị biểu mẫu đồng ý (Google UMP). Bạn đổi lựa chọn tại Cài đặt > Quyền riêng tư & Bảo mật > Theo dõi.
 
 ---
 
@@ -61,4 +69,4 @@ Nếu bạn có thắc mắc về chính sách bảo mật này, vui lòng liên
 
 # Privacy Policy (English Summary)
 
-**An Niên (Serene)** is an offline-first Vietnamese lunar-solar calendar application. We do not collect, track, or share your personal data. All memorial dates and settings are stored locally on your device via SwiftData, with optional iCloud private database synchronization for Pro subscribers (handled securely by Apple). Payments are processed securely by Apple via StoreKit 2. We do not integrate third-party advertising or analytics SDKs. Contact: iletai@hotmail.com.
+**An Niên (Serene)** is an offline-first Vietnamese lunar-solar calendar application. We do not collect, track, or share your personal data. All memorial dates and settings are stored locally on your device via SwiftData, with optional iCloud private database synchronization for Pro subscribers (handled securely by Apple). Payments are processed securely by Apple via StoreKit 2. The free tier shows Google AdMob ads (device identifiers such as IDFA are used only if you allow tracking; a Google UMP consent form is shown where required); Pro removes ads. We use no analytics SDKs. Contact: iletai@hotmail.com.
