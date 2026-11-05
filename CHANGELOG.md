@@ -2,6 +2,16 @@
 
 Mọi thay đổi đáng chú ý của dự án An Niên (Serene) được ghi nhận tại đây theo chuẩn [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.1] - 2026-11-05
+
+### Added
+- Quảng cáo Google AdMob cho bản miễn phí (banner, interstitial, native) với biểu mẫu đồng ý UMP và hộp thoại theo dõi ATT; người dùng Pro không thấy quảng cáo.
+- Xem quảng cáo có tặng thưởng để thêm tối đa 5 ngày nhớ ngoài giới hạn 5 ngày của bản miễn phí.
+
+### Changed
+- Chính sách bảo mật, hỗ trợ và `app-ads.txt` chuyển sang trang riêng của ứng dụng.
+- Chính sách bảo mật cập nhật khai báo AdMob/IDFA.
+
 ## [1.0.0] - 2026-10-19
 
 ### Added
