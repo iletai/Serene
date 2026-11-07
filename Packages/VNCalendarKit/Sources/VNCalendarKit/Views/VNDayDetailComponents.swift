@@ -6,6 +6,7 @@ import VNCalendarDesignSystem
 
 struct VNDayEvaluationView: View {
     let dayModel: VNCalendarDayModel
+    let showSolarTermsAndTruc: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
@@ -20,37 +21,41 @@ struct VNDayEvaluationView: View {
 
                 Spacer()
 
-                Text(dayModel.lunarOfficer.title)
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.vnAccentHeritageRed)
-                    .padding(.horizontal, VNSpacing.sm)
-                    .padding(.vertical, VNSpacing.space2)
-                    .background(Color.vnAccentHeritageRed.opacity(0.1))
-                    .clipShape(Capsule())
+                if showSolarTermsAndTruc {
+                    Text(dayModel.lunarOfficer.title)
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.vnAccentHeritageRed)
+                        .padding(.horizontal, VNSpacing.sm)
+                        .padding(.vertical, VNSpacing.space2)
+                        .background(Color.vnAccentHeritageRed.opacity(0.1))
+                        .clipShape(Capsule())
+                }
             }
 
-            Divider().background(Color.vnBorderSubtle)
+            if showSolarTermsAndTruc {
+                Divider().background(Color.vnBorderSubtle)
 
-            HStack(alignment: .top, spacing: VNSpacing.xs) {
-                Text("daydetail.officer.label")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.vnTextSecondary)
-
-                Text(dayModel.lunarOfficer.summary)
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(.vnTextPrimary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            if let term = dayModel.solarTermName {
                 HStack(alignment: .top, spacing: VNSpacing.xs) {
-                    Text("daydetail.solar_term.label")
+                    Text("daydetail.officer.label")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.vnTextSecondary)
 
-                    Text(String(format: String(localized: "daydetail.solar_term.description"), term))
+                    Text(dayModel.lunarOfficer.summary)
                         .font(.system(size: 13, weight: .regular))
                         .foregroundColor(.vnTextPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if let term = dayModel.solarTermName {
+                    HStack(alignment: .top, spacing: VNSpacing.xs) {
+                        Text("daydetail.solar_term.label")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.vnTextSecondary)
+
+                        Text(String(format: String(localized: "daydetail.solar_term.description"), term))
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(.vnTextPrimary)
+                    }
                 }
             }
         }

@@ -25,9 +25,8 @@ final class SettingsViewModel {
     func syncContent() {
         isSyncingContent = true
         Task {
-            await container.syncProverbs()
             do {
-                try await container.holidayRepository.synchronizeRemoteContent()
+                try await container.syncRemoteContent()
                 backupStatusMessage = String(localized: "settings.data.sync_success")
             } catch {
                 backupStatusMessage = String(localized: "settings.data.sync_offline")

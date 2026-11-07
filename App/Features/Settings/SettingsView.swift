@@ -5,6 +5,15 @@ import VNCalendarDesignSystem
 import VNCalendarKit
 import VNCalendarData
 
+private extension Bundle {
+    /// "1.0.1 (Build 12)" from Info.plist; keeps Settings and About in sync with the shipped build.
+    var appVersionDescription: String {
+        let version = object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "-"
+        let build = object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "-"
+        return "\(version) (Build \(build))"
+    }
+}
+
 private let settingsLogger = Logger(subsystem: "com.iletai.annien", category: "SettingsView")
 
 public struct SettingsView: View {
@@ -130,7 +139,7 @@ public struct SettingsView: View {
                 VNSectionLabel(String(localized: "settings.about.header"))
                 VNGroupCard {
                     Button { router.push(.about) } label: {
-                        VNSettingsRow(icon: "info.circle.fill", title: String(localized: "settings.about.version"), subtitle: "1.0.0 (Build 1)", tint: .vnAccentGoldText)
+                        VNSettingsRow(icon: "info.circle.fill", title: String(localized: "settings.about.version"), subtitle: Bundle.main.appVersionDescription, tint: .vnAccentGoldText)
                     }
                     .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                 }
@@ -330,7 +339,7 @@ public struct AboutSettingsView: View {
                     VNSectionLabel(String(localized: "settings.about.header"))
 
                     VStack(spacing: 0) {
-                        infoRow(String(localized: "settings.about.version"), value: "1.0.0 (Build 1)")
+                        infoRow(String(localized: "settings.about.version"), value: Bundle.main.appVersionDescription)
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
                         infoRow(String(localized: "settings.about.copyright"), value: "An Niên • iletai")
                     }

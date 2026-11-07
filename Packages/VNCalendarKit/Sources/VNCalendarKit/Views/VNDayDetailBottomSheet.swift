@@ -6,6 +6,9 @@ public struct VNDayDetailBottomSheet: View {
     public let dayModel: VNCalendarDayModel
     public var onAddReminder: () -> Void = {}
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(VNCalendarPreferenceKey.showAuspiciousHours) private var showAuspiciousHours = true
+    @AppStorage(VNCalendarPreferenceKey.showSolarTermsAndTruc) private var showSolarTermsAndTruc = true
+    @AppStorage(VNCalendarPreferenceKey.showDailyQuote) private var showDailyQuote = true
 
     public init(dayModel: VNCalendarDayModel, onAddReminder: @escaping () -> Void = {}) {
         self.dayModel = dayModel
@@ -17,11 +20,11 @@ public struct VNDayDetailBottomSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: VNSpacing.md) {
                     headerDateCluster
-                    VNDayEvaluationView(dayModel: dayModel).vnSheetSectionAppear(1)
+                    VNDayEvaluationView(dayModel: dayModel, showSolarTermsAndTruc: showSolarTermsAndTruc).vnSheetSectionAppear(1)
                     VNDayDirectionsView(dayModel: dayModel).vnSheetSectionAppear(2)
-                    auspiciousHoursSection.vnSheetSectionAppear(3)
+                    if showAuspiciousHours { auspiciousHoursSection.vnSheetSectionAppear(3) }
                     VNDayActivitiesView(dayModel: dayModel).vnSheetSectionAppear(4)
-                    folkQuoteCard.vnSheetSectionAppear(5)
+                    if showDailyQuote { folkQuoteCard.vnSheetSectionAppear(5) }
                     familyEventsSection.vnSheetSectionAppear(6)
                     actionButton.vnSheetSectionAppear(7)
                 }
@@ -94,7 +97,7 @@ public struct VNDayDetailBottomSheet: View {
 
     private var culturalBadgesRow: some View {
         HStack(spacing: VNSpacing.xs) {
-            if let term = dayModel.solarTermName {
+            if showSolarTermsAndTruc, let term = dayModel.solarTermName {
                 Text(String(format: String(localized: "daydetail.badge.solar_term"), term))
                     .font(.caption2.weight(.semibold))
                     .foregroundColor(.vnAccentGoldText)

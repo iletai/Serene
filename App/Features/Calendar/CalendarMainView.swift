@@ -8,6 +8,7 @@ public struct CalendarMainView: View {
     @Environment(AppContainer.self) private var container
     @Environment(AppRouter.self) private var router
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
+    @AppStorage(VNCalendarPreferenceKey.defaultDisplayMode) private var defaultDisplayModeRaw = "month"
     @State private var viewModel: CalendarMainViewModel?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -16,6 +17,9 @@ public struct CalendarMainView: View {
     private var activeViewModel: CalendarMainViewModel {
         if let existing = viewModel { return existing }
         return CalendarMainViewModel(
+            adapterViewModel: VNCalendarAdapterViewModel(
+                initialMode: VNCalendarDisplayMode(rawValue: defaultDisplayModeRaw) ?? .month
+            ),
             getMonthCalendarUseCase: container.getMonthCalendarUseCase,
             reminderRepository: container.reminderRepository,
             evaluateFeatureGateUseCase: container.evaluateFeatureGateUseCase

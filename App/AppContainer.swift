@@ -160,6 +160,13 @@ public final class AppContainer {
         )
     }
 
+    /// Syncs every remote content type and stamps the time shown in Settings; throws when holidays cannot be refreshed.
+    public func syncRemoteContent() async throws {
+        await syncProverbs()
+        try await holidayRepository.synchronizeRemoteContent()
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: ContentSyncPolicy.lastSyncKey)
+    }
+
     /// Refreshes proverbs from microCMS and pushes them into the calendar's quote source.
     /// Never throws: offline/failed sync must not break callers' status messaging.
     public func syncProverbs() async {
