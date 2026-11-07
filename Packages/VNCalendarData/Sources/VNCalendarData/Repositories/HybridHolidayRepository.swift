@@ -117,7 +117,12 @@ public final class HybridHolidayRepository: HolidayRepositoryProtocol, Sendable 
                     updatedAt: dto.updatedAt ?? Date()
                 )
             }
-            try await dataActor.upsertHolidays(holidays)
+            do {
+                try await dataActor.upsertHolidays(holidays)
+            } catch {
+                await client.clearETag(endpoint: "holidays")
+                throw error
+            }
         }
     }
 }
