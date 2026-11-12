@@ -5,6 +5,7 @@ public struct VNDayCellView: View, Equatable {
     public let dayModel: VNCalendarDayModel?
     public let isSelected: Bool
     public let isCurrentMonth: Bool
+    public let highlightMoon: Bool
     public let onSelect: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -15,18 +16,21 @@ public struct VNDayCellView: View, Equatable {
         dayModel: VNCalendarDayModel?,
         isSelected: Bool,
         isCurrentMonth: Bool = true,
+        highlightMoon: Bool = true,
         onSelect: @escaping () -> Void
     ) {
         self.dayModel = dayModel
         self.isSelected = isSelected
         self.isCurrentMonth = isCurrentMonth
+        self.highlightMoon = highlightMoon
         self.onSelect = onSelect
     }
 
     nonisolated public static func == (lhs: VNDayCellView, rhs: VNDayCellView) -> Bool {
         lhs.dayModel == rhs.dayModel &&
         lhs.isSelected == rhs.isSelected &&
-        lhs.isCurrentMonth == rhs.isCurrentMonth
+        lhs.isCurrentMonth == rhs.isCurrentMonth &&
+        lhs.highlightMoon == rhs.highlightMoon
     }
 
     public var body: some View {
@@ -86,11 +90,11 @@ public struct VNDayCellView: View, Equatable {
     }
 
     private var isFirstLunarDay: Bool {
-        isCurrentMonth && dayModel?.isFirstDayOfLunarMonth == true
+        highlightMoon && isCurrentMonth && dayModel?.isFirstDayOfLunarMonth == true
     }
 
     private var isFullMoon: Bool {
-        isCurrentMonth && dayModel?.isFullMoonDay == true
+        highlightMoon && isCurrentMonth && dayModel?.isFullMoonDay == true
     }
 
     private var solarWeight: Font.Weight {

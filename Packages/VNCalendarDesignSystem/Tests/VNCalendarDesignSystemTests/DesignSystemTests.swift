@@ -129,25 +129,25 @@ final class DesignSystemTests: XCTestCase {
 
     func testSealBadgePresets() {
         let mungMot = VNSealBadge.mungMot()
-        XCTAssertEqual(mungMot.text, "MÙNG 1")
+        XCTAssertEqual(mungMot.text, String(localized: "ds.seal.mung_mot"))
         XCTAssertEqual(mungMot.shape, .rounded())
         XCTAssertEqual(mungMot.color, .cinnabarWhite)
         XCTAssertNotNil(mungMot.body)
 
         let ram = VNSealBadge.ram()
-        XCTAssertEqual(ram.text, "RẰM")
+        XCTAssertEqual(ram.text, String(localized: "ds.seal.ram"))
         XCTAssertEqual(ram.shape, .rounded())
         XCTAssertEqual(ram.color, .cinnabarGold)
         XCTAssertNotNil(ram.body)
 
         let gio = VNSealBadge.gio()
-        XCTAssertEqual(gio.text, "GIỖ")
+        XCTAssertEqual(gio.text, String(localized: "ds.seal.gio"))
         XCTAssertEqual(gio.shape, .square)
         XCTAssertEqual(gio.color, .vermilionDarkGold)
         XCTAssertNotNil(gio.body)
 
         let tet = VNSealBadge.tet()
-        XCTAssertEqual(tet.text, "TẾT")
+        XCTAssertEqual(tet.text, String(localized: "ds.seal.tet"))
         XCTAssertEqual(tet.shape, .pill)
         XCTAssertEqual(tet.color, .cinnabarGold)
         XCTAssertNotNil(tet.body)
@@ -182,10 +182,10 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertEqual(VNCalendarMode.week.rawValue, "week")
         XCTAssertEqual(VNCalendarMode.year.rawValue, "year")
 
-        XCTAssertEqual(VNCalendarMode.block.title, "Nhật Lịch")
-        XCTAssertEqual(VNCalendarMode.month.title, "Tháng")
-        XCTAssertEqual(VNCalendarMode.week.title, "Tuần")
-        XCTAssertEqual(VNCalendarMode.year.title, "Năm")
+        XCTAssertEqual(VNCalendarMode.block.title, String(localized: "ds.calendar.mode.block"))
+        XCTAssertEqual(VNCalendarMode.month.title, String(localized: "ds.calendar.mode.month"))
+        XCTAssertEqual(VNCalendarMode.week.title, String(localized: "ds.calendar.mode.week"))
+        XCTAssertEqual(VNCalendarMode.year.title, String(localized: "ds.calendar.mode.year"))
 
         XCTAssertFalse(VNCalendarMode.block.icon.isEmpty)
         XCTAssertFalse(VNCalendarMode.month.icon.isEmpty)

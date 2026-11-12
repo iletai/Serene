@@ -6818,23 +6818,6 @@
         }
       }
     },
-    "settings.microcms.last_sync_default": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today, %@"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hôm nay, %@"
-          }
-        }
-      }
-    },
     "settings.calendar.title": {
       "extractionState": "manual",
       "localizations": {
@@ -7154,91 +7137,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Chỉ tải khi kết nối Wi-Fi"
-          }
-        }
-      }
-    },
-    "settings.microcms.offline_cache": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Offline storage"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lưu trữ ngoại tuyến (Offline)"
-          }
-        }
-      }
-    },
-    "settings.microcms.connected": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cloud MicroCMS: Connected"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "MicroCMS Đám Mây: Đã Kết Nối"
-          }
-        }
-      }
-    },
-    "settings.microcms.stat_prayers": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Prayers"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Văn Khấn"
-          }
-        }
-      }
-    },
-    "settings.microcms.stat_holidays": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Festivals"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Lễ Tiết"
-          }
-        }
-      }
-    },
-    "settings.microcms.stat_quotes": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Wishes"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Lời Chúc"
           }
         }
       }
@@ -10333,6 +10231,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sự Kiện Kỷ Niệm"
+          }
+        }
+      }
+    },
+    "settings.microcms.never_synced": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not synced yet"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa đồng bộ"
           }
         }
       }

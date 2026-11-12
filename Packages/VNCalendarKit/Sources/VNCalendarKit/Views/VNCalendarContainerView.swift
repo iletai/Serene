@@ -19,6 +19,8 @@ public struct VNCalendarContainerView: View {
     /// so the host can present its own sheet without colliding with this one.
     public var onAddReminderForSelectedDate: () -> Void = {}
     @State private var addReminderAfterDismiss = false
+    @AppStorage(VNCalendarPreferenceKey.startOfWeek) private var startOfWeek = 2
+    @AppStorage(VNCalendarPreferenceKey.highlightFullAndNewMoon) private var highlightMoon = true
 
     public init(
         viewModel: VNCalendarAdapterViewModel,
@@ -63,7 +65,7 @@ public struct VNCalendarContainerView: View {
 
             case .week:
                 VNWeekCalendarView(
-                    weekDays: viewModel.currentWeekDates(),
+                    weekDays: viewModel.currentWeekDates(startsOnSunday: startsOnSunday),
                     selectedDayModel: viewModel.selectedDayModel,
                     onSelectDay: { key, date in
                         viewModel.selectDateKey(key, date: date)
@@ -167,10 +169,9 @@ public struct VNCalendarContainerView: View {
         }
         .calendarWeekdayHeader { _ in
             HStack(spacing: 0) {
-                ForEach(["T2", "T3", "T4", "T5", "T6", "T7"], id: \.self) { day in
-                    weekdayLabel(day)
+                ForEach(weekdayLabels, id: \.self) { day in
+                    weekdayLabel(day, sunday: day == "CN")
                 }
-                weekdayLabel("CN", sunday: true)
             }
             .padding(.vertical, VNSpacing.xs)
             .overlay(
@@ -189,15 +190,23 @@ public struct VNCalendarContainerView: View {
                 dayModel: model,
                 isSelected: isSelected,
                 isCurrentMonth: state.isCurrentMonth,
+                highlightMoon: highlightMoon,
                 onSelect: {
                     viewModel.selectDateKey(key, date: state.date)
                 }
             )
             .equatable()
         }
-        .calendarFirstWeekday(.monday)
+        .calendarFirstWeekday(startsOnSunday ? .sunday : .monday)
         .calendarLocale(Locale(identifier: "vi_VN"))
         .environment(\.calendar, Self.vietnamCalendar)
+    }
+
+    private var startsOnSunday: Bool { startOfWeek == 1 }
+
+    private var weekdayLabels: [String] {
+        let monFirst = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
+        return startsOnSunday ? ["CN"] + monFirst.dropLast() : monFirst
     }
 
     private func weekdayLabel(_ day: String, sunday: Bool = false) -> some View {

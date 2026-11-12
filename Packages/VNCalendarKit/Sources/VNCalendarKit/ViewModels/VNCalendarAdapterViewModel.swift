@@ -200,8 +200,8 @@ public final class VNCalendarAdapterViewModel {
 
     // MARK: - Data Providers
 
-    public func currentWeekDates() -> [VNCalendarDayModel] {
-        cache.computeWeekDays(around: selectedDate, reminders: allReminders)
+    public func currentWeekDates(startsOnSunday: Bool = false) -> [VNCalendarDayModel] {
+        cache.computeWeekDays(around: selectedDate, reminders: allReminders, startsOnSunday: startsOnSunday)
     }
 
     public func yearMonthsData() -> [VNYearMonthModel] {
