@@ -109,12 +109,12 @@ public struct AncestralShareCardView: View {
             // Header Title
             VStack(spacing: VNSpacing.xs) {
                 Text("timeline.share_card_title")
-                    .font(.system(.footnote, design: .serif, weight: .bold))
+                    .font(.vnDisplay(.footnote, weight: .bold))
                     .foregroundColor(.vnAccentHeritageRed)
                     .tracking(2.0)
 
                 Text("timeline.share_card_subtitle")
-                    .font(.system(.caption2, design: .serif).italic())
+                    .font(.vnDisplay(.caption2, weight: .medium, italic: true))
                     .foregroundColor(.vnTextSecondary)
             }
 
@@ -136,7 +136,7 @@ public struct AncestralShareCardView: View {
                 }
 
                 Text(reminder.title)
-                    .font(.system(.title2, design: .serif, weight: .bold))
+                    .font(.vnDisplay(.title2, weight: .bold))
                     .foregroundColor(.vnTextPrimary)
                     .multilineTextAlignment(.center)
             }
@@ -150,7 +150,7 @@ public struct AncestralShareCardView: View {
                             .font(.caption2.weight(.bold))
                             .foregroundColor(.vnTextSecondary)
                         Text(lunarDateString)
-                            .font(.system(.subheadline, design: .serif, weight: .bold))
+                            .font(.vnDisplay(.subheadline, weight: .bold))
                             .foregroundColor(.vnAccentHeritageRed)
                     }
 
@@ -177,7 +177,7 @@ public struct AncestralShareCardView: View {
 
             if let note = reminder.note, !note.isEmpty {
                 Text(String(format: String(localized: "timeline.share_note_format"), note))
-                    .font(.system(.caption, design: .serif, weight: .medium))
+                    .font(.vnDisplay(.caption, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, VNSpacing.md)

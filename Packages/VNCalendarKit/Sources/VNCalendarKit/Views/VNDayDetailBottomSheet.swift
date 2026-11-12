@@ -58,7 +58,7 @@ public struct VNDayDetailBottomSheet: View {
 
             HStack(spacing: VNSpacing.sm) {
                 Text(lunarHeroText)
-                    .font(.system(.title, design: .serif).weight(.bold))
+                    .font(.vnDisplay(.title, weight: .bold))
                     .foregroundColor(.vnAccentHeritageRed)
 
                 if dayModel.isFirstDayOfLunarMonth {
@@ -188,7 +188,7 @@ public struct VNDayDetailBottomSheet: View {
             }
 
             Text(dayModel.folkQuote.quote)
-                .font(.system(.footnote, design: .serif).weight(.medium).italic())
+                .font(.vnDisplay(.footnote, weight: .medium, italic: true))
                 .foregroundColor(.vnTextPrimary)
                 .lineSpacing(3)
                 .fixedSize(horizontal: false, vertical: true)
@@ -196,7 +196,7 @@ public struct VNDayDetailBottomSheet: View {
             HStack {
                 Spacer()
                 Text("— \(dayModel.folkQuote.authorOrOrigin)")
-                    .font(.system(.caption2, design: .serif))
+                    .font(.vnDisplay(.caption2))
                     .foregroundColor(.vnTextSecondary)
             }
         }
@@ -242,7 +242,7 @@ public struct VNDayDetailBottomSheet: View {
 
                             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                                 Text(item.title)
-                                    .font(.system(.subheadline, design: .serif).weight(.semibold))
+                                    .font(.vnDisplay(.subheadline, weight: .semibold))
                                     .foregroundColor(.vnTextPrimary)
 
                                 Text(item.isAncestorDeath ? String(localized: "calendar.event.type.death_anniversary") : String(localized: "daydetail.event.type.anniversary"))

@@ -29,7 +29,7 @@ struct MemorialHeroCard: View {
 
             // Memorial Title (New York Serif, title2 bold)
             Text(reminder.title)
-                .font(.system(.title2, design: .serif).weight(.bold))
+                .font(.vnDisplay(.title2, weight: .bold))
                 .foregroundColor(.vnTextPrimary)
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
@@ -55,7 +55,7 @@ struct MemorialHeroCard: View {
                             .foregroundColor(.vnTextSecondary)
                             .accessibilityHidden(true)
                         Text(note)
-                            .font(.system(.caption, design: .serif))
+                            .font(.vnDisplay(.caption))
                             .italic()
                             .foregroundColor(.vnTextSecondary)
                             .lineLimit(2)

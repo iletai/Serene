@@ -135,7 +135,7 @@ struct MemorialTimelineCard: View {
     private var titleRow: some View {
         HStack(spacing: VNSpacing.sm) {
             Text(reminder.title)
-                .font(.system(.callout, design: .serif).weight(.semibold))
+                .font(.vnDisplay(.callout, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
@@ -162,7 +162,7 @@ struct MemorialTimelineCard: View {
 
     private func noteRow(_ note: String) -> some View {
         Text(note)
-            .font(.system(.caption, design: .serif))
+            .font(.vnDisplay(.caption))
             .italic()
             .foregroundColor(.vnTextSecondary)
             .lineLimit(1)

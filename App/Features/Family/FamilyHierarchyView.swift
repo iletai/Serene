@@ -82,7 +82,7 @@ public struct FamilyHierarchyView: View {
         HStack(spacing: VNSpacing.sm) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("family.title")
-                    .font(.system(.headline, design: .serif).weight(.bold))
+                    .font(.vnDisplay(.headline, weight: .bold))
                     .foregroundColor(Color.vnAccentDeepPrimary)
                 Text("family.subtitle")
                     .font(.caption2)
@@ -140,7 +140,7 @@ public struct FamilyHierarchyView: View {
                 .accessibilityHidden(true)
 
             Text("family.locked_title")
-                .font(.system(.title2, design: .serif).weight(.semibold))
+                .font(.vnDisplay(.title2, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
 
@@ -202,7 +202,7 @@ public struct FamilyHierarchyView: View {
                 .accessibilityHidden(true)
 
             Text("family.empty_title")
-                .font(.system(.title2, design: .serif).weight(.semibold))
+                .font(.vnDisplay(.title2, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
 
@@ -284,7 +284,7 @@ public struct FamilyHierarchyView: View {
                     .foregroundColor(.vnAccentGoldText)
 
                 Text(group.generationTitle)
-                    .font(.system(.headline, design: .serif).weight(.bold))
+                    .font(.vnDisplay(.headline, weight: .bold))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
@@ -321,7 +321,7 @@ public struct FamilyHierarchyView: View {
     private func generationRail(rank: String) -> some View {
         VStack(spacing: VNSpacing.sm) {
             Text(FamilyMemberGroup.badgeText(fromRank: rank))
-                .font(.system(.footnote, design: .serif).weight(.bold))
+                .font(.vnDisplay(.footnote, weight: .bold))
                 .foregroundColor(.vnAccentHeritageRed)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
@@ -395,7 +395,7 @@ public struct FamilyHierarchyView: View {
                 VNSealBadge.gio(size: .small)
             } else {
                 Text("family.seal_toc")
-                    .font(.system(.footnote, design: .serif).weight(.bold))
+                    .font(.vnDisplay(.footnote, weight: .bold))
                     .foregroundColor(Color.vnAccentGoldText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -406,7 +406,7 @@ public struct FamilyHierarchyView: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text(member.title)
-                    .font(.system(.subheadline, design: .serif).weight(.semibold))
+                    .font(.vnDisplay(.subheadline, weight: .semibold))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)

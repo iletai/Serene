@@ -21,11 +21,11 @@ struct RitualPrayerModal: View {
                         }
 
                         Text(title)
-                            .font(.system(.title2, design: .serif).weight(.bold))
+                            .font(.vnDisplay(.title2, weight: .bold))
                             .foregroundColor(.vnTextPrimary)
 
                         Text("timeline.prayer_modal_subtitle")
-                            .font(.system(.footnote, design: .serif))
+                            .font(.vnDisplay(.footnote))
                             .italic()
                             .foregroundColor(.vnTextSecondary)
                     }
@@ -34,7 +34,7 @@ struct RitualPrayerModal: View {
 
                     VStack(alignment: .leading, spacing: VNSpacing.md) {
                         Text(String(format: String(localized: "timeline.prayer_modal_body"), title))
-                        .font(.system(.subheadline, design: .serif))
+                        .font(.vnDisplay(.subheadline))
                         .foregroundColor(.vnTextPrimary)
                         .lineSpacing(VNSpacing.sm)
                         .padding(VNSpacing.lg)

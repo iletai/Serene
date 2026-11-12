@@ -43,14 +43,14 @@ struct ReminderHeaderView: View {
                 }
 
                 Text(isEditing ? String(localized: "reminder.title_edit") : String(localized: "reminder.title_add"))
-                    .font(.system(.title, design: .serif, weight: .semibold))
+                    .font(.vnDisplay(.title, weight: .semibold))
                     .foregroundColor(.vnTextPrimary)
                     .minimumScaleFactor(0.8)
                     .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                     .accessibilityAddTraits(.isHeader)
 
                 Text("reminder.subtitle")
-                    .font(.system(.footnote, design: .serif))
+                    .font(.vnDisplay(.footnote))
                     .italic()
                     .foregroundColor(.vnTextSecondary)
 
@@ -77,7 +77,7 @@ struct ReminderHeaderView: View {
                     .tracking(0.66)
                     .foregroundColor(.vnAccentGoldText)
                 Text(String(format: String(localized: "reminder.preview_lunar_date"), lunarDate.day, lunarDate.month))
-                    .font(.system(.subheadline, design: .serif, weight: .bold))
+                    .font(.vnDisplay(.subheadline, weight: .bold))
                     .tracking(0.28)
                     .foregroundColor(.vnAccentHeritageRed)
                     .lineLimit(1)

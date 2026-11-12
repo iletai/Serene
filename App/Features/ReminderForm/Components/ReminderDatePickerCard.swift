@@ -97,7 +97,7 @@ struct ReminderDatePickerCard: View {
                             .foregroundColor(.vnAccentHeritageRed)
                             .accessibilityHidden(true)
                         Text(astronomicalPreviewText)
-                            .font(.system(.caption, design: .serif))
+                            .font(.vnDisplay(.caption))
                             .foregroundColor(.vnTextSecondary)
                             .lineLimit(2)
                             .minimumScaleFactor(0.8)

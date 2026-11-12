@@ -17,7 +17,7 @@ struct MemorialTimelineDivider: View {
                     .foregroundColor(.vnAccentImperialGold)
 
                 Text(title)
-                    .font(.system(.caption, design: .serif).weight(.semibold))
+                    .font(.vnDisplay(.caption, weight: .semibold))
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(1)
             }

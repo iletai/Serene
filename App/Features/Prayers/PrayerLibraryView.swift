@@ -83,7 +83,7 @@ public struct PrayerLibraryView: View {
                 .padding(.top, VNSpacing.space2)
 
             Text("prayers.header_desc")
-                .font(.system(.footnote, design: .serif))
+                .font(.vnDisplay(.footnote))
                 .italic()
                 .foregroundColor(.vnTextSecondary)
         }
@@ -140,7 +140,7 @@ public struct PrayerLibraryView: View {
                     vm.selectedCategory = nil
                 } label: {
                     Text("prayers.category_all")
-                        .font(.system(.caption, design: .serif, weight: .semibold))
+                        .font(.vnDisplay(.caption, weight: .semibold))
                         .foregroundColor(vm.selectedCategory == nil ? .vnAccentDeepPrimary : .vnTextSecondary)
                         .frame(minHeight: VNSize.minTapTarget)
                         .padding(.horizontal, VNSpacing.lg)
@@ -207,7 +207,7 @@ public struct PrayerLibraryView: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(prayer.title)
-                    .font(.system(.subheadline, design: .serif, weight: .semibold))
+                    .font(.vnDisplay(.subheadline, weight: .semibold))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)

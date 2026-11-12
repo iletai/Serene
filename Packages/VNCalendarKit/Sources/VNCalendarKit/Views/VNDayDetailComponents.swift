@@ -16,7 +16,7 @@ struct VNDayEvaluationView: View {
                     .font(.system(size: 14, weight: .semibold))
 
                 Text(dayModel.zodiacStar.fullTitle)
-                    .font(.system(size: 15, weight: .semibold, design: .serif))
+                    .font(.vnDisplay(size: 15, weight: .semibold))
                     .foregroundColor(dayModel.isAuspiciousDay ? .vnStatusSuccess : .vnTextPrimary)
 
                 Spacer()
@@ -98,7 +98,7 @@ struct VNDayDirectionsView: View {
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                 Text(direction)
-                    .font(.system(size: 14, weight: .bold, design: .serif))
+                    .font(.vnDisplay(size: 14, weight: .bold))
                     .foregroundColor(color)
             }
         }

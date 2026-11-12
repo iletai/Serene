@@ -116,7 +116,7 @@ public extension View {
                     // Canonical top-bar type scale (canonical.html): serif red 18/600 + label 11/500.
                     VStack(spacing: VNSpacing.space2) {
                         Text(title)
-                            .font(.system(size: 18, weight: .semibold, design: .serif))
+                            .font(.vnDisplay(size: 18, weight: .semibold))
                             .foregroundColor(.vnAccentDeepPrimary)
                         if let subtitle {
                             Text(subtitle)

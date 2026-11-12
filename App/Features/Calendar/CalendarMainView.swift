@@ -101,7 +101,7 @@ public struct CalendarMainView: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("calendar.brand_title")
-                    .font(.system(.headline, design: .serif).weight(.semibold))
+                    .font(.vnDisplay(.headline, weight: .semibold))
                     .foregroundColor(.vnAccentDeepPrimary)
                     .lineLimit(1)
 

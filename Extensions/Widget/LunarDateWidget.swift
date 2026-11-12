@@ -62,7 +62,7 @@ public struct LunarWidgetEntryView: View {
             Spacer()
 
             Text("\(entry.solarDay)")
-                .font(.system(size: 40, weight: .bold, design: .serif))
+                .font(.vnDisplay(size: 40, weight: .bold))
                 .foregroundColor(Color.vnTextPrimary)
 
             Spacer()
@@ -105,7 +105,7 @@ public struct LunarWidgetEntryView: View {
                     .foregroundColor(Color.vnTextSecondary)
 
                 Text(String(format: String(localized: "widget.lunar_day_text"), entry.lunarDayText))
-                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .font(.vnDisplay(size: 24, weight: .bold))
                     .foregroundColor(Color.vnAccentHeritageRed)
 
                 Text(String(format: String(localized: "widget.year_can_chi"), entry.lunarYearCanChi))

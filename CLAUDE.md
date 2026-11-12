@@ -181,5 +181,5 @@ Configuration files are in `Config/`:
   - Disallowed: Force unwrapping, implicitly unwrapped optionals.
 - **Design System (`DESIGN.md`)**:
   - Canonical values: `Packages/VNCalendarDesignSystem/Sources/VNCalendarDesignSystem/Tokens/ColorTokens.swift`. `DESIGN.md` documents the same tokens.
-  - Key tokens: New Rice Ivory (`#FEF9F1`), Woven Linen (`#F8F3EB`), Deep Calligraphic Ink (`#1D1C17`), Hearth Ash (`#59413C`), Cinnabar Lacquer Red (`#C23B22`), Imperial Chrysanthemum Gold (`#C5A059`).
-  - Typography: Apple New York Serif (ceremonial titles, dates) + SF Pro (matrix numerals, body).
+  - Direction "Phố Đèn Lồng": Lantern Red `vnAccentHeritageRed` (`#CC1636`), Mai Yellow `vnAccentImperialGold` (`#FFC21A`, fill only), Dong-Leaf Green `vnAccentJade` (`#007A55`), Hội An Blue `vnAccentSky` (`#1F5FE0`) on cool mist `#F4F5FA` / lunar-night indigo `#0D0E1C`.
+  - Typography: Be Vietnam Pro (bundled in the DS package, registered on first use). Use `Font.vn*` tokens or `Font.vnDisplay(...)`, never `.system(design: .serif)`.

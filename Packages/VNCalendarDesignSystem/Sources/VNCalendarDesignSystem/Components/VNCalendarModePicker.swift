@@ -77,7 +77,7 @@ public struct VNCalendarModePicker: View {
                     }
                 } label: {
                     segmentLabel(mode, showTitle: showTitles)
-                        .font(.system(size: 13, weight: isSelected ? .semibold : .medium, design: .serif))
+                        .font(.vnDisplay(size: 13, weight: isSelected ? .semibold : .medium))
                         .foregroundColor(isSelected ? .vnBackgroundPrimary : .vnTextSecondary)
                         .padding(.horizontal, VNSpacing.xs)
                         .padding(.vertical, VNSpacing.sm)

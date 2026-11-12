@@ -100,13 +100,13 @@ public struct UpcomingTimelineView: View {
             HStack(alignment: .lastTextBaseline) {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
                     Text("timeline.title")
-                        .font(.system(.title, design: .serif).weight(.bold))
+                        .font(.vnDisplay(.title, weight: .bold))
                         .foregroundColor(.vnTextPrimary)
                         .lineLimit(2)
                         .minimumScaleFactor(0.8)
 
                     Text("timeline.subtitle")
-                        .font(.system(.footnote, design: .serif))
+                        .font(.vnDisplay(.footnote))
                         .italic()
                         .foregroundColor(.vnTextSecondary)
                 }

@@ -134,7 +134,7 @@ public struct CulturalArticlesView: View {
                 .foregroundColor(.vnTextPrimary)
 
             Text("articles.header_desc")
-                .font(.system(.footnote, design: .serif))
+                .font(.vnDisplay(.footnote))
                 .italic()
                 .foregroundColor(.vnTextSecondary)
         }
@@ -226,7 +226,7 @@ public struct CulturalArticlesView: View {
     private func emptyStateSection(vm: CulturalArticlesViewModel) -> some View {
         VStack(spacing: VNSpacing.md) {
             Text("articles.empty_title")
-                .font(.system(.title2, design: .serif).weight(.semibold))
+                .font(.vnDisplay(.title2, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
 
             Text("articles.empty_body")
@@ -253,7 +253,7 @@ public struct CulturalArticlesView: View {
             VStack(alignment: .leading, spacing: VNSpacing.sm) {
                 HStack(alignment: .top) {
                     Text(holiday.title)
-                        .font(.system(.headline, design: .serif))
+                        .font(.vnDisplay(.headline))
                         .foregroundColor(.vnTextPrimary)
                         .multilineTextAlignment(.leading)
 
@@ -344,7 +344,7 @@ public struct HolidayDetailSheet: View {
                             .tracking(0.8)
 
                         Text(holiday.summary)
-                            .font(.system(.subheadline, design: .serif))
+                            .font(.vnDisplay(.subheadline))
                             .foregroundColor(.vnTextPrimary)
                             .lineSpacing(VNSpacing.xs)
                     }
@@ -419,7 +419,7 @@ public struct HolidayDetailSheet: View {
                             }
 
                             Text(rituals)
-                                .font(.system(.subheadline, design: .serif))
+                                .font(.vnDisplay(.subheadline))
                                 .foregroundColor(.vnTextPrimary)
                                 .lineSpacing(VNSpacing.sm)
                                 .padding(VNSpacing.cardPadding)

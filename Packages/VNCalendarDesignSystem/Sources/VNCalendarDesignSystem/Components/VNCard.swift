@@ -21,7 +21,7 @@ public struct VNCard<Content: View>: View {
     public init(
         cornerRadius: CGFloat = VNCard.defaultCornerRadius,
         backgroundColor: Color = Color.vnBackgroundSecondary,
-        borderColor: Color = Color.vnAccentImperialGold.opacity(0.28),
+        borderColor: Color = Color.vnBorderSubtle,
         borderWidth: CGFloat = VNBorderWidth.hairline,
         padding: EdgeInsets = EdgeInsets(
             top: VNSpacing.xl,
@@ -45,7 +45,7 @@ public struct VNCard<Content: View>: View {
         allPadding: CGFloat,
         cornerRadius: CGFloat = VNCard.defaultCornerRadius,
         backgroundColor: Color = Color.vnBackgroundSecondary,
-        borderColor: Color = Color.vnAccentImperialGold.opacity(0.28),
+        borderColor: Color = Color.vnBorderSubtle,
         borderWidth: CGFloat = VNBorderWidth.hairline,
         shadow: VNShadow.ShadowConfig? = VNCard.folioShadow,
         @ViewBuilder content: () -> Content

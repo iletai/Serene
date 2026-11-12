@@ -86,7 +86,7 @@ public struct VNWeekCalendarView: View {
 
                         // Ngày Dương
                         Text("\(day.solarDay)")
-                            .font(.system(size: 16, weight: isSelected ? .bold : .semibold, design: .serif))
+                            .font(.vnDisplay(size: 16, weight: isSelected ? .bold : .semibold))
                             .foregroundColor(isSelected ? .vnOnAccent : .vnTextPrimary)
 
                         // Ngày Âm (1/8 hoặc 23)
@@ -135,7 +135,7 @@ public struct VNWeekCalendarView: View {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
                     HStack(spacing: VNSpacing.xs) {
                         Text("\(model.weekdayName), \(model.solarDay)/\(model.solarMonth)/\(model.solarYear)")
-                            .font(.system(size: 15, weight: .bold, design: .serif))
+                            .font(.vnDisplay(size: 15, weight: .bold))
                             .foregroundColor(.vnTextPrimary)
 
                         if model.isToday {
@@ -203,7 +203,7 @@ public struct VNWeekCalendarView: View {
                                     .frame(width: VNSpacing.xs, height: VNSpacing.xs)
                             }
                             Text(String(format: String(localized: "calendar.hour.branch_name"), branch.vietnameseName))
-                                .font(.system(size: 11, weight: isAuspicious ? .bold : .medium, design: .serif))
+                                .font(.vnDisplay(size: 11, weight: isAuspicious ? .bold : .medium))
                                 .foregroundColor(isAuspicious ? .vnTextPrimary : .vnTextSecondary)
                         }
 
@@ -278,7 +278,7 @@ public struct VNWeekCalendarView: View {
 
                             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                                 Text(item.title)
-                                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                                    .font(.vnDisplay(size: 13, weight: .semibold))
                                     .foregroundColor(.vnTextPrimary)
 
                                 Text(item.isAncestorDeath ? String(localized: "calendar.event.type.death_anniversary") : String(localized: "calendar.event.type.family_memory"))

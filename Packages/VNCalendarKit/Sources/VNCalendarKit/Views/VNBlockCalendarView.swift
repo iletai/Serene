@@ -97,7 +97,7 @@ public struct VNBlockCalendarView: View {
             Spacer()
 
             Text("calendar.block.header_title")
-                .font(.system(size: 11, weight: .bold, design: .serif))
+                .font(.vnDisplay(size: 11, weight: .bold))
                 .foregroundColor(.vnOnAccent)
                 .tracking(2.0)
 
@@ -116,7 +116,7 @@ public struct VNBlockCalendarView: View {
     private func blocSolarSection(for model: VNCalendarDayModel) -> some View {
         VStack(spacing: VNSpacing.space2) {
             Text(model.weekdayName.uppercased())
-                .font(.system(size: 16, weight: .bold, design: .serif))
+                .font(.vnDisplay(size: 16, weight: .bold))
                 .foregroundColor(isWeekend(model.weekdayName) ? .vnAccentHeritageRed : .vnTextSecondary)
                 .tracking(1.2)
                 .padding(.top, VNSpacing.sm)
@@ -136,7 +136,7 @@ public struct VNBlockCalendarView: View {
         VStack(spacing: VNSpacing.xs) {
             HStack(spacing: VNSpacing.sm) {
                 Text(lunarDayDisplay(for: model))
-                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .font(.vnDisplay(size: 24, weight: .bold))
                     .foregroundColor(.vnAccentHeritageRed)
 
                 if model.isFirstDayOfLunarMonth {
@@ -149,7 +149,7 @@ public struct VNBlockCalendarView: View {
             }
 
             Text(String(format: String(localized: "calendar.block.lunar_month_year"), model.lunarMonthName, model.lunarYearCanChi))
-                .font(.system(size: 14, weight: .semibold, design: .serif))
+                .font(.vnDisplay(size: 14, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
 
             Text(String(format: String(localized: "calendar.block.lunar_day_month_canchi"), model.lunarDayCanChi, model.lunarMonthCanChi))
@@ -206,7 +206,7 @@ public struct VNBlockCalendarView: View {
             }
 
             Text(model.folkQuote.quote)
-                .font(.system(size: 14, weight: .medium, design: .serif).italic())
+                .font(.vnDisplay(size: 14, weight: .medium, italic: true))
                 .foregroundColor(.vnTextPrimary)
                 .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
@@ -214,7 +214,7 @@ public struct VNBlockCalendarView: View {
             HStack {
                 Spacer()
                 Text("— \(model.folkQuote.authorOrOrigin)")
-                    .font(.system(size: 11, weight: .regular, design: .serif))
+                    .font(.vnDisplay(size: 11, weight: .regular))
                     .foregroundColor(.vnTextSecondary)
             }
         }
@@ -260,7 +260,7 @@ public struct VNBlockCalendarView: View {
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                 Text(model.joyGodDirection)
-                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .font(.vnDisplay(size: 13, weight: .semibold))
                     .foregroundColor(.vnAccentHeritageRed)
             }
 
@@ -272,7 +272,7 @@ public struct VNBlockCalendarView: View {
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                 Text(model.wealthGodDirection)
-                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .font(.vnDisplay(size: 13, weight: .semibold))
                     .foregroundColor(.vnAccentGoldText)
             }
 
@@ -354,7 +354,7 @@ public struct VNBlockCalendarView: View {
 
             Button(action: onSelectToday) {
                 Text("calendar.action.today_title")
-                    .font(.system(size: 12, weight: .semibold, design: .serif))
+                    .font(.vnDisplay(size: 12, weight: .semibold))
                     .foregroundColor(.vnAccentHeritageRed)
                     .padding(.horizontal, VNSpacing.lg)
                     .padding(.vertical, VNSpacing.sm)
