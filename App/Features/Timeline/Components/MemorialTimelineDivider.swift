@@ -14,7 +14,7 @@ struct MemorialTimelineDivider: View {
                 Image(systemName: "sparkles")
                     .font(.caption2)
                     .accessibilityHidden(true)
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
 
                 Text(title)
                     .font(.vnDisplay(.caption, weight: .semibold))

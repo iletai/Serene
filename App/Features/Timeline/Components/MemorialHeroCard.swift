@@ -84,7 +84,7 @@ struct MemorialHeroCard: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.hairline)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
         )
         .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius,
                 x: VNShadow.folio.x, y: VNShadow.folio.y)

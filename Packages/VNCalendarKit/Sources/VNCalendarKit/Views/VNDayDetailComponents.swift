@@ -12,7 +12,7 @@ struct VNDayEvaluationView: View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             HStack(spacing: VNSpacing.xs) {
                 Image(systemName: dayModel.isAuspiciousDay ? "sparkles" : "circle.circle")
-                    .foregroundColor(dayModel.isAuspiciousDay ? .vnAccentImperialGold : .vnTextSecondary)
+                    .foregroundColor(dayModel.isAuspiciousDay ? .vnAccentGoldText : .vnTextSecondary)
                     .font(.system(size: 14, weight: .semibold))
 
                 Text(dayModel.zodiacStar.fullTitle)
@@ -83,7 +83,7 @@ struct VNDayDirectionsView: View {
 
             HStack(spacing: VNSpacing.md) {
                 directionPill(title: String(localized: "daydetail.direction.joy_god_explained"), direction: dayModel.joyGodDirection, color: .vnAccentHeritageRed)
-                directionPill(title: String(localized: "daydetail.direction.wealth_god_explained"), direction: dayModel.wealthGodDirection, color: .vnAccentImperialGold)
+                directionPill(title: String(localized: "daydetail.direction.wealth_god_explained"), direction: dayModel.wealthGodDirection, color: .vnAccentGoldText)
             }
         }
     }

@@ -160,7 +160,7 @@ public struct MainTabView: View {
                 .background(.ultraThinMaterial, in: Capsule())
         }
         .overlay(Capsule().stroke(Color.vnBorderSubtle.opacity(0.4), lineWidth: VNBorderWidth.hairline))
-        // Canonical float shadow (DESIGN §4): red-tinted float, not folio card shadow.
+        // Floating bar shadow, not the folio card shadow.
         .shadow(color: VNShadow.floating.color, radius: VNShadow.floating.radius,
                 x: VNShadow.floating.x, y: VNShadow.floating.y)
         .padding(.horizontal, VNSpacing.lg)
@@ -187,8 +187,8 @@ public struct MainTabView: View {
                     .symbolEffect(.bounce, value: reduceMotion ? false : isSelected)
 
                 Text(tab.title)
-                    .font(.caption2.weight(isSelected ? .semibold : .regular))
-                    .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextSecondary)
+                    .font(.vnDisplay(.caption2, weight: isSelected ? .bold : .medium))
+                    .foregroundColor(isSelected ? .vnAccentDeepPrimary : .vnTextSecondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
@@ -197,7 +197,7 @@ public struct MainTabView: View {
             .background {
                 if isSelected {
                     Capsule()
-                        .fill(Color.vnAccentHeritageRed.opacity(0.1))
+                        .fill(Color.vnAccentRedSurface)
                         .matchedGeometryEffect(id: "selectedPill", in: pillNamespace)
                 }
             }

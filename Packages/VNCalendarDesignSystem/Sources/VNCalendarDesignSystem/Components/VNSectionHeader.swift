@@ -15,7 +15,7 @@ public struct VNSectionHeader: View {
             height: CGFloat = VNSectionHeader.accentBarHeight
         )
         case seal(text: String = "ẤN", color: Color = .vnAccentDeepPrimary)
-        case icon(systemName: String, color: Color = .vnAccentImperialGold)
+        case icon(systemName: String, color: Color = .vnAccentGoldText)
         case none
     }
 

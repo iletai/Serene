@@ -338,7 +338,7 @@ public struct CalendarSettingsView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
         )
     }
 

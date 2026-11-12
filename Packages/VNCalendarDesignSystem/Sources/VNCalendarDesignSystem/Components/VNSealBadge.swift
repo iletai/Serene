@@ -132,6 +132,7 @@ public struct VNSealBadge: View {
         .background(backgroundColor)
         .clipShape(SealBadgeShape(shape: shape))
         .overlay(innerRing)
+        .overlay(customBorder)
         .shadow(
             color: VNShadow.card.color,
             radius: VNShadow.card.radius,
@@ -176,6 +177,14 @@ public struct VNSealBadge: View {
     private var innerRing: some View {
         SealBadgeShape(shape: shape, inset: 3)
             .stroke(foregroundColor.opacity(0.55), lineWidth: VNBorderWidth.regular)
+    }
+
+    /// Only `.custom` seals take an outer border; the cinnabar presets are solid.
+    @ViewBuilder
+    private var customBorder: some View {
+        if case .custom(_, _, let border?) = color {
+            SealBadgeShape(shape: shape).stroke(border, lineWidth: VNBorderWidth.regular)
+        }
     }
 
     private var isCanonicalSquare: Bool {

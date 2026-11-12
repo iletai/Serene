@@ -231,7 +231,7 @@ public struct PrayerLibraryView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
         )
         .shadow(color: folioShadow.color, radius: folioShadow.radius, x: folioShadow.x, y: folioShadow.y)
         .contentShape(Rectangle())

@@ -104,7 +104,7 @@ public struct VNDayCellView: View, Equatable {
 
     private var solarColor: Color {
         if isToday { return .vnOnAccent }
-        if isFullMoon { return .vnAccentImperialGold }
+        if isFullMoon { return .vnAccentGoldText }
         if isFirstLunarDay { return .vnAccentHeritageRed }
         if !isCurrentMonth { return .vnTextTertiary }
         return .vnTextPrimary
@@ -112,7 +112,7 @@ public struct VNDayCellView: View, Equatable {
 
     private var lunarColor: Color {
         if isToday { return .vnOnAccent }
-        if isFullMoon { return .vnAccentImperialGold }
+        if isFullMoon { return .vnAccentGoldText }
         if isFirstLunarDay { return .vnAccentHeritageRed }
         if !isCurrentMonth { return .vnTextTertiary.opacity(0.7) }
         return .vnTextSecondary

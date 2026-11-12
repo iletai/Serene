@@ -116,7 +116,7 @@ public struct VNWeekCalendarView: View {
                         RoundedRectangle(cornerRadius: VNCornerRadius.card)
                             .stroke(
                                 isSelected ? Color.vnAccentHeritageRed :
-                                    (day.isToday ? Color.vnAccentImperialGold : Color.vnBorderSubtle.opacity(0.4)),
+                                    (day.isToday ? Color.vnAccentHeritageRed : Color.vnBorderSubtle.opacity(0.4)),
                                 lineWidth: isSelected ? VNBorderWidth.active : VNBorderWidth.hairline
                             )
                     )
@@ -209,7 +209,7 @@ public struct VNWeekCalendarView: View {
 
                         Text(branch.timeRange)
                             .font(.system(size: 9, weight: .regular))
-                            .foregroundColor(isAuspicious ? .vnAccentImperialGold : .vnTextTertiary)
+                            .foregroundColor(isAuspicious ? .vnAccentGoldText : .vnTextTertiary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, VNSpacing.xs)

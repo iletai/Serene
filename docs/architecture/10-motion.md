@@ -7,18 +7,19 @@ and `Modifiers/VNMotion.swift`, `VNCellPressButtonStyle.swift`, `VNHaptics.swift
 
 | Token | Value | Use for |
 |---|---|---|
-| `pressDown` | easeOut 0.12s | finger down (instant, no bounce) |
-| `press` | snappy 0.25s, bounce 0.15 | release settle after a tap |
-| `selection` | snappy 0.25s | focus, toggle, selected state, small text swaps |
+| `pressDown` | easeOut 0.10s | finger down (instant, no bounce) |
+| `press` | spring response 0.42, damping 0.55 | release, springs back with overshoot |
+| `selection` | snappy 0.30s, bounce 0.25 | focus, toggle, selected state, small text swaps |
 | `layout` | smooth 0.3s | insert/remove/reorder, counters (`numericText`) |
-| `appear` | smooth 0.4s | entrance fade + slide (`vnAppear`) |
+| `appear` | spring response 0.52, damping 0.85 | entrance fade + 16pt rise (`vnAppear`) |
 | `expand` | snappy 0.35s, bounce 0.08 | expand/collapse of cards and sections |
 | `reduced` | easeOut 0.15s | automatic Reduce Motion fallback, do not use directly |
 | `monthTransition`, `cellSelection`, `sheetSpring`, `cardExpansion` | legacy | calendar grid / sheets, names kept |
 
 ## Rules
 
-1. Durations stay within 0.2-0.45s (except `pressDown`, which must feel instant). No bounce above 0.15.
+1. Interactive motion is springy (overshoot up to about 15%) and over within 0.6s. `VNSealBadge` stamps in (scale 1.9 → 0.9 → 1.05 → 1, -18° → -3°, 0.52s).
+   Playful in the calendar, quiet in remembrance: memorial screens use only press, selection and appear (seals may stamp).
 2. Never write raw `.animation(...)` / `withAnimation` with ad-hoc numbers in features. Use a token via `vnAnimation(_:value:)`.
 3. Press feedback: `.buttonStyle(.vnPress)` (cells), `.vnPress(scale: 0.98)` (cards), `.vnRowPress` (list rows), `VNButton` (built in).
 4. Haptics only through `VNHaptics` / `vnSelectionFeedback` / `vnImpactFeedback` / `vnSuccessFeedback`. All honor the `hapticFeedbackEnabled` setting. One haptic per user action.

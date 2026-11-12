@@ -121,7 +121,7 @@ public struct OmniSearchView: View {
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                     .overlay(
                         RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                            .stroke(Color.vnAccentImperialGold.opacity(0.22), lineWidth: VNBorderWidth.regular)
+                            .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
                     )
 
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
@@ -251,7 +251,7 @@ public struct OmniSearchView: View {
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                    .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                    .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
             )
             .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
     }

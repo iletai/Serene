@@ -24,7 +24,7 @@ struct ReminderTitleSection: View {
                 allPadding: VNSpacing.cardPadding,
                 cornerRadius: VNCornerRadius.card,
                 backgroundColor: Color.vnBackgroundSecondary,
-                borderColor: showsError ? Color.vnStatusError : Color.vnAccentImperialGold.opacity(0.28),
+                borderColor: showsError ? Color.vnStatusError : Color.vnBorderStrong,
                 shadow: nil
             ) {
                 VStack(alignment: .leading, spacing: VNSpacing.md) {

@@ -8,7 +8,7 @@ import SwiftUI
 /// VNGroupCard {
 ///     VNSettingsRow(icon: "calendar", title: "Lịch", tint: .vnAccentHeritageRed)
 ///     VNDivider()
-///     VNSettingsRow(icon: "bell", title: "Thông báo", tint: .vnAccentImperialGold)
+///     VNSettingsRow(icon: "bell", title: "Thông báo", tint: .vnAccentGoldText)
 /// }
 /// ```
 public struct VNGroupCard<Content: View>: View {
@@ -26,7 +26,7 @@ public struct VNGroupCard<Content: View>: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.hairline)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
         )
     }
 }

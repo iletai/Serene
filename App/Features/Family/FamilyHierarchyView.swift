@@ -224,7 +224,7 @@ public struct FamilyHierarchyView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
         )
         .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
         .padding(.horizontal, VNSpacing.screenMargin)
@@ -439,7 +439,7 @@ public struct FamilyHierarchyView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
         )
         .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
     }

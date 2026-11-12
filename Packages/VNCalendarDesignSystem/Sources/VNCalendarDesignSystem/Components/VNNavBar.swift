@@ -58,7 +58,7 @@ public struct VNDismissButton: View {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                        .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.hairline)
+                        .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                 )
 
         case .text(let label):

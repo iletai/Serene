@@ -58,7 +58,7 @@ public struct VNSearchField: View {
             .overlay(
                 RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
                     .stroke(
-                        isFocused ? Color.vnAccentHeritageRed.opacity(0.5) : Color.vnAccentImperialGold.opacity(0.28),
+                        isFocused ? Color.vnAccentHeritageRed.opacity(0.5) : Color.vnBorderStrong,
                         lineWidth: isFocused ? VNBorderWidth.active : VNBorderWidth.hairline
                     )
             )

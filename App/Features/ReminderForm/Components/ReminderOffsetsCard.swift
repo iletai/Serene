@@ -24,7 +24,7 @@ struct ReminderOffsetsCard: View {
                 allPadding: VNSpacing.cardPadding,
                 cornerRadius: VNCornerRadius.card,
                 backgroundColor: Color.vnBackgroundSecondary,
-                borderColor: Color.vnAccentImperialGold.opacity(0.28),
+                borderColor: Color.vnBorderSubtle,
                 shadow: nil
             ) {
                 OffsetFlowLayout(spacing: VNSpacing.xs) {

@@ -35,7 +35,7 @@ public struct LunarWidgetEntryView: View {
         VStack(spacing: VNSpacing.sm) {
             Image(systemName: "lock.fill")
                 .font(.system(size: 22, weight: .semibold))
-                .foregroundColor(Color.vnAccentImperialGold)
+                .foregroundColor(Color.vnAccentGoldText)
             Text("widget.upgrade_title")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(Color.vnTextPrimary)
@@ -82,8 +82,8 @@ public struct LunarWidgetEntryView: View {
                         .font(.system(size: 9, weight: .semibold))
                         .padding(.horizontal, VNSpacing.xs)
                         .padding(.vertical, VNSpacing.space2)
-                        .background(Color.vnAccentImperialGold.opacity(0.15))
-                        .foregroundColor(Color.vnAccentImperialGold)
+                        .background(Color.vnAccentJadeSurface)
+                        .foregroundColor(Color.vnAccentJade)
                         .clipShape(Capsule())
                 }
             }
@@ -115,7 +115,7 @@ public struct LunarWidgetEntryView: View {
                 if let term = entry.solarTermName {
                     Text(String(format: String(localized: "widget.solar_term_prefix"), term))
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color.vnAccentImperialGold)
+                        .foregroundColor(Color.vnAccentJade)
                 }
             }
 

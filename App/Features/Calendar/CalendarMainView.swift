@@ -51,7 +51,7 @@ public struct CalendarMainView: View {
                 .clipShape(RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius))
                 .overlay(
                     RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius)
-                        .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.hairline)
+                        .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                 )
                 .shadow(
                     color: VNCard<EmptyView>.folioShadow.color,
