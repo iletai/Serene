@@ -50,7 +50,7 @@ public struct VNCalendarHeaderView: View {
 
                 if let subtitle = headerSubtitle {
                     Text(subtitle)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.vnDisplay(size: 11, weight: .medium))
                         .foregroundColor(.vnTextSecondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)

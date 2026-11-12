@@ -155,7 +155,7 @@ struct MemorialTimelineCard: View {
     private var dateRow: some View {
         HStack(spacing: VNSpacing.xs) {
             Image(systemName: "calendar").font(.caption2).accessibilityHidden(true)
-            Text(dateText).font(.caption.weight(.medium)).monospacedDigit()
+            Text(dateText).font(.vnDisplay(.caption, weight: .medium)).monospacedDigit()
         }
         .foregroundColor(.vnTextSecondary)
     }

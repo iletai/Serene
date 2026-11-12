@@ -202,7 +202,7 @@ public struct CalendarSettingsView: View {
                         .foregroundColor(.vnStatusSuccess)
                         .accessibilityHidden(true)
                     Text(banner)
-                        .font(.caption)
+                        .font(.vnDisplay(.caption))
                         .foregroundColor(.vnTextSecondary)
                 }
                 .padding(.horizontal, VNSpacing.sm)
@@ -214,7 +214,7 @@ public struct CalendarSettingsView: View {
 
     private var microCMSStatusHeader: some View {
         Text(lastSyncText)
-            .font(.caption)
+            .font(.vnDisplay(.caption))
             .foregroundColor(.vnTextSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(VNSpacing.lg)
@@ -272,7 +272,7 @@ public struct CalendarSettingsView: View {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         rowLabel(icon: "quote.opening", tint: .vnAccentGoldText, title: String(localized: "settings.daily.quote"))
                         Text(String(localized: "settings.daily.quote_desc"))
-                            .font(.caption)
+                            .font(.vnDisplay(.caption))
                             .foregroundColor(.vnTextSecondary)
                             .padding(.leading, settingsSubtitleLeadingInset)
                     }
@@ -305,12 +305,12 @@ public struct CalendarSettingsView: View {
                         rowLabel(icon: "globe.asia.australia.fill", tint: .vnAccentHeritageRed, title: String(localized: "settings.timezone.lunar"))
                         Spacer()
                         Text("GMT+7")
-                            .font(.footnote.weight(.bold))
+                            .font(.vnDisplay(.footnote, weight: .bold))
                             .foregroundColor(.vnAccentGoldText)
                     }
 
                     Text(String(localized: "settings.timezone.astronomy_desc"))
-                        .font(.caption)
+                        .font(.vnDisplay(.caption))
                         .foregroundColor(.vnTextSecondary)
                         .lineSpacing(3)
                         .padding(.top, VNSpacing.space2)
@@ -323,7 +323,7 @@ public struct CalendarSettingsView: View {
     // MARK: - Helper UI Components
     private func sectionHeader(title: String) -> some View {
         Text(title)
-            .font(.caption2.weight(.medium))
+            .font(.vnDisplay(.caption2, weight: .medium))
             .tracking(0.7)
             .foregroundColor(.vnOnGoldContainer)
             .padding(.horizontal, VNSpacing.xs)
@@ -356,7 +356,7 @@ public struct CalendarSettingsView: View {
                         .stroke(tint.opacity(0.22), lineWidth: VNBorderWidth.regular)
                 )
             Text(title)
-                .font(.callout)
+                .font(.vnDisplay(.callout))
                 .foregroundColor(.vnTextPrimary)
                 .minimumScaleFactor(0.8)
         }

@@ -85,7 +85,7 @@ public struct FamilyHierarchyView: View {
                     .font(.vnDisplay(.headline, weight: .bold))
                     .foregroundColor(Color.vnAccentDeepPrimary)
                 Text("family.subtitle")
-                    .font(.caption2)
+                    .font(.vnDisplay(.caption2))
                     .foregroundColor(.vnTextSecondary)
             }
 
@@ -145,7 +145,7 @@ public struct FamilyHierarchyView: View {
                 .multilineTextAlignment(.center)
 
             Text("family.locked_body")
-                .font(.subheadline)
+                .font(.vnDisplay(.subheadline))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(VNSpacing.xs)
@@ -167,7 +167,7 @@ public struct FamilyHierarchyView: View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
                 Text("family.eyebrow")
-                    .font(.caption2.weight(.bold))
+                    .font(.vnDisplay(.caption2, weight: .bold))
                     .tracking(0.66)
                     .foregroundColor(.vnAccentGoldText)
 
@@ -177,7 +177,7 @@ public struct FamilyHierarchyView: View {
                     Text(String(format: String(localized: "family.count_ancestors"), vm.reminders.count))
                         .contentTransition(.numericText())
                         .animation(reduceMotion ? nil : .snappy, value: vm.reminders.count)
-                        .font(.caption2.weight(.semibold))
+                        .font(.vnDisplay(.caption2, weight: .semibold))
                         .foregroundColor(.vnOnGoldContainer)
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.xs)
@@ -207,7 +207,7 @@ public struct FamilyHierarchyView: View {
                 .multilineTextAlignment(.center)
 
             Text("family.empty_body")
-                .font(.subheadline)
+                .font(.vnDisplay(.subheadline))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(VNSpacing.xs)
@@ -279,7 +279,7 @@ public struct FamilyHierarchyView: View {
         } label: {
             HStack(spacing: VNSpacing.sm) {
                 Text(group.generationRank)
-                    .font(.caption2.weight(.bold))
+                    .font(.vnDisplay(.caption2, weight: .bold))
                     .tracking(0.66)
                     .foregroundColor(.vnAccentGoldText)
 
@@ -292,7 +292,7 @@ public struct FamilyHierarchyView: View {
                 Spacer()
 
                 Text(String(format: String(localized: "family.group_count"), group.members.count))
-                    .font(.caption.weight(.medium))
+                    .font(.vnDisplay(.caption, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                     .contentTransition(.numericText())
                     .vnAnimation(VNAnimation.layout, value: group.members.count)
@@ -412,7 +412,7 @@ public struct FamilyHierarchyView: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(memberSubtitle(member))
-                    .font(.caption)
+                    .font(.vnDisplay(.caption))
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)

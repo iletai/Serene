@@ -23,7 +23,7 @@ struct VNDayEvaluationView: View {
 
                 if showSolarTermsAndTruc {
                     Text(dayModel.lunarOfficer.title)
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.vnDisplay(size: 12, weight: .bold))
                         .foregroundColor(.vnAccentHeritageRed)
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.space2)
@@ -37,11 +37,11 @@ struct VNDayEvaluationView: View {
 
                 HStack(alignment: .top, spacing: VNSpacing.xs) {
                     Text("daydetail.officer.label")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.vnDisplay(size: 13, weight: .semibold))
                         .foregroundColor(.vnTextSecondary)
 
                     Text(dayModel.lunarOfficer.summary)
-                        .font(.system(size: 13, weight: .regular))
+                        .font(.vnDisplay(size: 13, weight: .regular))
                         .foregroundColor(.vnTextPrimary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -49,11 +49,11 @@ struct VNDayEvaluationView: View {
                 if let term = dayModel.solarTermName {
                     HStack(alignment: .top, spacing: VNSpacing.xs) {
                         Text("daydetail.solar_term.label")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.vnDisplay(size: 13, weight: .semibold))
                             .foregroundColor(.vnTextSecondary)
 
                         Text(String(format: String(localized: "daydetail.solar_term.description"), term))
-                            .font(.system(size: 13, weight: .regular))
+                            .font(.vnDisplay(size: 13, weight: .regular))
                             .foregroundColor(.vnTextPrimary)
                     }
                 }
@@ -77,7 +77,7 @@ struct VNDayDirectionsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("daydetail.section.directions")
-                .font(.system(size: 11, weight: .bold))
+                .font(.vnDisplay(size: 11, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
@@ -95,7 +95,7 @@ struct VNDayDirectionsView: View {
                 .frame(width: 8, height: 8)
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(title)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.vnDisplay(size: 11, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                 Text(direction)
                     .font(.vnDisplay(size: 14, weight: .bold))
@@ -117,7 +117,7 @@ struct VNDayActivitiesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("daydetail.section.activities")
-                .font(.system(size: 11, weight: .bold))
+                .font(.vnDisplay(size: 11, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
@@ -158,11 +158,11 @@ struct VNDayActivitiesView: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(label)
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.vnDisplay(size: 12, weight: .bold))
                     .foregroundColor(color)
 
                 Text(content)
-                    .font(.system(size: 12, weight: .regular))
+                    .font(.vnDisplay(size: 12, weight: .regular))
                     .foregroundColor(contentColor)
             }
         }

@@ -65,7 +65,7 @@ struct ReminderHeaderView: View {
     private var datePreview: some View {
         HStack(alignment: .center, spacing: VNSpacing.md) {
             Text("\(solarDate.day)")
-                .font(.system(size: numeralSize, weight: .light))
+                .font(.vnDisplay(size: numeralSize, weight: .light))
                 .foregroundColor(.vnTextPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)

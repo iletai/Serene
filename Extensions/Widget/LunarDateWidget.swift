@@ -37,10 +37,10 @@ public struct LunarWidgetEntryView: View {
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundColor(Color.vnAccentGoldText)
             Text("widget.upgrade_title")
-                .font(.system(size: 13, weight: .semibold))
+                .font(.vnDisplay(size: 13, weight: .semibold))
                 .foregroundColor(Color.vnTextPrimary)
             Text("widget.upgrade_subtitle")
-                .font(.system(size: 10))
+                .font(.vnDisplay(size: 10))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color.vnTextSecondary)
         }
@@ -51,11 +51,11 @@ public struct LunarWidgetEntryView: View {
         VStack(alignment: .leading, spacing: VNSpacing.space2) {
             HStack {
                 Text(entry.weekdayName)
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.vnDisplay(size: 13, weight: .bold))
                     .foregroundColor(Color.vnTextSecondary)
                 Spacer()
                 Text("\(entry.solarMonth)/\(entry.solarYear)")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.vnDisplay(size: 11, weight: .semibold))
                     .foregroundColor(Color.vnTextSecondary)
             }
 
@@ -70,16 +70,16 @@ public struct LunarWidgetEntryView: View {
             HStack {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
                     Text(String(format: String(localized: "widget.lunar_day_text"), entry.lunarDayText))
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.vnDisplay(size: 14, weight: .bold))
                         .foregroundColor(Color.vnAccentHeritageRed)
                     Text(entry.lunarYearCanChi)
-                        .font(.system(size: 10))
+                        .font(.vnDisplay(size: 10))
                         .foregroundColor(Color.vnTextSecondary)
                 }
                 Spacer()
                 if let term = entry.solarTermName {
                     Text(term)
-                        .font(.system(size: 9, weight: .semibold))
+                        .font(.vnDisplay(size: 9, weight: .semibold))
                         .padding(.horizontal, VNSpacing.xs)
                         .padding(.vertical, VNSpacing.space2)
                         .background(Color.vnAccentJadeSurface)
@@ -101,7 +101,7 @@ public struct LunarWidgetEntryView: View {
             // Left: Date Info
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text("\(entry.weekdayName), \(entry.solarDay)/\(entry.solarMonth)/\(entry.solarYear)")
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.vnDisplay(size: 12, weight: .bold))
                     .foregroundColor(Color.vnTextSecondary)
 
                 Text(String(format: String(localized: "widget.lunar_day_text"), entry.lunarDayText))
@@ -109,12 +109,12 @@ public struct LunarWidgetEntryView: View {
                     .foregroundColor(Color.vnAccentHeritageRed)
 
                 Text(String(format: String(localized: "widget.year_can_chi"), entry.lunarYearCanChi))
-                    .font(.system(size: 11))
+                    .font(.vnDisplay(size: 11))
                     .foregroundColor(Color.vnTextSecondary)
 
                 if let term = entry.solarTermName {
                     Text(String(format: String(localized: "widget.solar_term_prefix"), term))
-                        .font(.system(size: 10, weight: .semibold))
+                        .font(.vnDisplay(size: 10, weight: .semibold))
                         .foregroundColor(Color.vnAccentJade)
                 }
             }
@@ -125,7 +125,7 @@ public struct LunarWidgetEntryView: View {
             // Right: Upcoming Reminders / Info
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text("widget.upcoming_header")
-                    .font(.system(size: 9, weight: .bold))
+                    .font(.vnDisplay(size: 9, weight: .bold))
                     .foregroundColor(Color.vnTextSecondary)
 
                 if let title = entry.nextMemorialTitle, let days = entry.nextMemorialDaysLeft {
@@ -134,16 +134,16 @@ public struct LunarWidgetEntryView: View {
                             .fill(Color.vnAccentHeritageRed)
                             .frame(width: 4, height: 4)
                         Text(title)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.vnDisplay(size: 12, weight: .medium))
                             .foregroundColor(Color.vnTextPrimary)
                         Spacer()
                         Text(String(format: String(localized: "widget.days_left"), days))
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.vnDisplay(size: 10, weight: .bold))
                             .foregroundColor(Color.vnAccentHeritageRed)
                     }
                 } else {
                     Text("widget.no_memorial")
-                        .font(.system(size: 11))
+                        .font(.vnDisplay(size: 11))
                         .foregroundColor(Color.vnTextTertiary)
                 }
             }
@@ -163,21 +163,21 @@ public struct LunarWidgetEntryView: View {
     private var circularLockScreenView: some View {
         VStack(spacing: VNSpacing.space2) {
             Text("\(entry.lunarDay)")
-                .font(.system(size: 16, weight: .bold))
+                .font(.vnDisplay(size: 16, weight: .bold))
             Text("widget.lunar_abbrev")
-                .font(.system(size: 9, weight: .semibold))
+                .font(.vnDisplay(size: 9, weight: .semibold))
         }
     }
 
     private var rectangularLockScreenView: some View {
         VStack(alignment: .leading, spacing: VNSpacing.space2) {
             Text("\(entry.weekdayName), \(entry.solarDay)/\(entry.solarMonth)")
-                .font(.system(size: 11, weight: .bold))
+                .font(.vnDisplay(size: 11, weight: .bold))
             Text(String(format: String(localized: "widget.rectangular_lunar_format"), entry.lunarDayText, entry.lunarYearCanChi))
-                .font(.system(size: 11))
+                .font(.vnDisplay(size: 11))
             if let term = entry.solarTermName {
                 Text(String(format: String(localized: "widget.solar_term_prefix"), term))
-                    .font(.system(size: 10))
+                    .font(.vnDisplay(size: 10))
             }
         }
     }

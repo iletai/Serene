@@ -56,14 +56,14 @@ public struct SettingsView: View {
                         let proTitle = String(localized: "settings.membership.pro_title")
                         let freeTitle = String(localized: "settings.membership.free_title")
                         Text(isPro ? proTitle : freeTitle)
-                            .font(.callout.weight(.semibold))
+                            .font(.vnDisplay(.callout, weight: .semibold))
                             .foregroundColor(.vnTextPrimary)
                             .lineLimit(2)
                             .minimumScaleFactor(0.8)
                         let proSubtitle = String(localized: "settings.membership.pro_subtitle")
                         let freeSubtitle = String(localized: "settings.membership.free_subtitle")
                         Text(isPro ? proSubtitle : freeSubtitle)
-                            .font(.caption)
+                            .font(.vnDisplay(.caption))
                             .foregroundColor(.vnTextSecondary)
                             .lineLimit(2)
                             .minimumScaleFactor(0.8)
@@ -250,7 +250,7 @@ public struct DataBackupSettingsView: View {
                         if let msg = vm.backupStatusMessage {
                             VNRowDivider()
                             Text(msg)
-                                .font(.caption)
+                                .font(.vnDisplay(.caption))
                                 .foregroundColor(.vnStatusSuccess)
                                 .padding(.horizontal, VNSpacing.cardPadding)
                                 .padding(.vertical, VNSpacing.sm)
@@ -280,7 +280,7 @@ public struct DataBackupSettingsView: View {
     ) -> some View {
         HStack {
             Label(title, systemImage: icon)
-                .font(.callout)
+                .font(.vnDisplay(.callout))
                 .foregroundColor(.vnTextPrimary)
             Spacer()
             trailing()
@@ -309,11 +309,11 @@ public struct PrivacySecuritySettingsView: View {
 
                     VStack(alignment: .leading, spacing: VNSpacing.md) {
                         Text(String(localized: "settings.privacy.zero_knowledge_title"))
-                            .font(.headline)
+                            .font(.vnDisplay(.headline))
                             .foregroundColor(.vnTextPrimary)
 
                         Text(String(localized: "settings.privacy.zero_knowledge_body"))
-                            .font(.subheadline)
+                            .font(.vnDisplay(.subheadline))
                             .foregroundColor(.vnTextSecondary)
                             .lineSpacing(4)
                     }
@@ -358,11 +358,11 @@ public struct AboutSettingsView: View {
     private func infoRow(_ title: String, value: String) -> some View {
         HStack {
             Text(title)
-                .font(.callout)
+                .font(.vnDisplay(.callout))
                 .foregroundColor(.vnTextPrimary)
             Spacer()
             Text(value)
-                .font(.subheadline.weight(.medium))
+                .font(.vnDisplay(.subheadline, weight: .medium))
                 .foregroundColor(.vnTextSecondary)
         }
         .padding(.horizontal, VNSpacing.cardPadding)

@@ -81,7 +81,7 @@ public struct UpcomingTimelineView: View {
                         .accessibilityHidden(true)
                         .foregroundColor(.vnAccentHeritageRed)
                     Text("timeline.ancestor_eyebrow")
-                        .font(.caption2.weight(.bold))
+                        .font(.vnDisplay(.caption2, weight: .bold))
                         .tracking(1.0)
                         .foregroundColor(.vnAccentHeritageRed)
                 }
@@ -115,7 +115,7 @@ public struct UpcomingTimelineView: View {
 
                 if !vm.reminders.isEmpty {
                     Text(String(format: String(localized: "timeline.events_count"), vm.reminders.count))
-                        .font(.caption2.weight(.semibold))
+                        .font(.vnDisplay(.caption2, weight: .semibold))
                         .foregroundColor(.vnAccentHeritageRed)
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.xs)
@@ -144,7 +144,7 @@ public struct UpcomingTimelineView: View {
                 .accessibilityHidden(true)
 
             TextField("timeline.search_placeholder", text: $boundVM.searchQuery)
-                .font(.footnote)
+                .font(.vnDisplay(.footnote))
 
             if !vm.searchQuery.isEmpty {
                 Button {

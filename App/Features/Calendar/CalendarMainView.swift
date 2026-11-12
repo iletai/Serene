@@ -106,7 +106,7 @@ public struct CalendarMainView: View {
                     .lineLimit(1)
 
                 Text(lunarSubtitle(vm: vm))
-                    .font(.caption2.weight(.medium))
+                    .font(.vnDisplay(.caption2, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(2)
                     .contentTransition(.opacity)
@@ -148,7 +148,7 @@ public struct CalendarMainView: View {
         } label: {
             HStack(spacing: VNSpacing.xs) {
                 Text(String(currentYear))
-                    .font(.caption2.weight(.medium))
+                    .font(.vnDisplay(.caption2, weight: .medium))
                     .lineLimit(1)
                     .fixedSize()
                     .contentTransition(.numericText())

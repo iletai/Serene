@@ -15,7 +15,7 @@ struct RitualPrayerModal: View {
                             VNSealBadge.gio(size: .medium)
 
                             Text("timeline.prayer_modal_eyebrow")
-                                .font(.caption2.weight(.bold))
+                                .font(.vnDisplay(.caption2, weight: .bold))
                                 .tracking(1.0)
                                 .foregroundColor(.vnAccentHeritageRed)
                         }

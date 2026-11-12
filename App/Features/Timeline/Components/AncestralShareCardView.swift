@@ -76,7 +76,7 @@ public struct AncestralShareCardView: View {
                     Button("action.close") {
                         dismiss()
                     }
-                    .font(.subheadline.weight(.medium))
+                    .font(.vnDisplay(.subheadline, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                     .frame(minHeight: VNSize.minTapTarget)
                     .contentShape(Rectangle())
@@ -127,7 +127,7 @@ public struct AncestralShareCardView: View {
             VStack(spacing: VNSpacing.xs) {
                 if let rel = reminder.relationship, !rel.isEmpty {
                     Text(rel.uppercased())
-                        .font(.caption.weight(.bold))
+                        .font(.vnDisplay(.caption, weight: .bold))
                         .foregroundColor(.vnAccentGoldText)
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.space2)
@@ -147,7 +147,7 @@ public struct AncestralShareCardView: View {
                 HStack(spacing: VNSpacing.md) {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         Text("timeline.share_lunar_label")
-                            .font(.caption2.weight(.bold))
+                            .font(.vnDisplay(.caption2, weight: .bold))
                             .foregroundColor(.vnTextSecondary)
                         Text(lunarDateString)
                             .font(.vnDisplay(.subheadline, weight: .bold))
@@ -158,10 +158,10 @@ public struct AncestralShareCardView: View {
 
                     VStack(alignment: .trailing, spacing: VNSpacing.space2) {
                         Text("timeline.share_solar_label")
-                            .font(.caption2.weight(.bold))
+                            .font(.vnDisplay(.caption2, weight: .bold))
                             .foregroundColor(.vnTextSecondary)
                         Text(nextDateString)
-                            .font(.footnote.weight(.semibold))
+                            .font(.vnDisplay(.footnote, weight: .semibold))
                             .foregroundColor(.vnTextPrimary)
                     }
                 }
@@ -186,7 +186,7 @@ public struct AncestralShareCardView: View {
             // Footer Stamp
             HStack {
                 Text("timeline.share_footer")
-                    .font(.caption2.weight(.semibold))
+                    .font(.vnDisplay(.caption2, weight: .semibold))
                     .foregroundColor(.vnTextTertiary)
                     .tracking(1.0)
 

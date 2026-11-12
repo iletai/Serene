@@ -99,7 +99,7 @@ public struct VNMoonPhaseView: View {
                         .foregroundColor(isFullMoon ? .vnAccentHeritageRed : .vnTextPrimary)
 
                     Text(String(format: String(localized: "ds.moon.illumination"), illuminationPercent))
-                        .font(.system(size: 9, weight: .regular))
+                        .font(.vnDisplay(size: 9, weight: .regular))
                         .foregroundColor(.vnTextSecondary)
                 }
             }

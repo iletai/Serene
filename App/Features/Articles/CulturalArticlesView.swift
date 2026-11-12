@@ -230,7 +230,7 @@ public struct CulturalArticlesView: View {
                 .foregroundColor(.vnTextPrimary)
 
             Text("articles.empty_body")
-                .font(.subheadline)
+                .font(.vnDisplay(.subheadline))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .padding(.horizontal, VNSpacing.screenMargin)
@@ -274,7 +274,7 @@ public struct CulturalArticlesView: View {
                 }
 
                 Text(holiday.summary)
-                    .font(.caption)
+                    .font(.vnDisplay(.caption))
                     .foregroundColor(.vnTextSecondary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
@@ -282,11 +282,11 @@ public struct CulturalArticlesView: View {
                 HStack(spacing: VNSpacing.xs) {
                     if holiday.rituals != nil {
                         Label("articles.has_prayer", systemImage: "book.pages.fill")
-                            .font(.caption2.weight(.semibold))
+                            .font(.vnDisplay(.caption2, weight: .semibold))
                             .foregroundColor(Color.vnAccentDeepPrimary)
                     } else {
                         Text(isLunar ? String(localized: "articles.calendar_lunar") : String(localized: "articles.calendar_solar"))
-                            .font(.caption2)
+                            .font(.vnDisplay(.caption2))
                             .foregroundColor(.vnTextSecondary)
                     }
 
@@ -324,7 +324,7 @@ public struct HolidayDetailSheet: View {
                     VStack(alignment: .leading, spacing: VNSpacing.xs) {
                         let calendarName = holiday.calendarType == .lunar ? String(localized: "articles.calendar_lunar_title") : String(localized: "articles.calendar_solar_title")
                         Text(String(format: String(localized: "articles.detail_date"), holiday.day, holiday.month, calendarName))
-                            .font(.subheadline.bold())
+                            .font(.vnDisplay(.subheadline, weight: .bold))
                             .foregroundColor(.vnAccentHeritageRed)
 
                         Text(holiday.title)
@@ -339,7 +339,7 @@ public struct HolidayDetailSheet: View {
                     // Summary / Meaning
                     VStack(alignment: .leading, spacing: VNSpacing.xs) {
                         Text("articles.section_meaning")
-                            .font(.caption2.bold())
+                            .font(.vnDisplay(.caption2, weight: .bold))
                             .foregroundColor(.vnTextSecondary)
                             .tracking(0.8)
 
@@ -352,12 +352,12 @@ public struct HolidayDetailSheet: View {
                     if let customs = holiday.customs {
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             Text("articles.section_customs")
-                                .font(.caption2.bold())
+                                .font(.vnDisplay(.caption2, weight: .bold))
                                 .foregroundColor(.vnStatusSuccess)
                                 .tracking(0.8)
 
                             Text(customs)
-                                .font(.subheadline)
+                                .font(.vnDisplay(.subheadline))
                                 .foregroundColor(.vnTextPrimary)
                                 .lineSpacing(VNSpacing.xs)
                                 .padding(VNSpacing.cardPadding)
@@ -374,12 +374,12 @@ public struct HolidayDetailSheet: View {
                     if let taboos = holiday.taboos {
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             Text("articles.section_taboos")
-                                .font(.caption2.bold())
+                                .font(.vnDisplay(.caption2, weight: .bold))
                                 .foregroundColor(.vnStatusError)
                                 .tracking(0.8)
 
                             Text(taboos)
-                                .font(.subheadline)
+                                .font(.vnDisplay(.subheadline))
                                 .foregroundColor(.vnTextPrimary)
                                 .lineSpacing(VNSpacing.xs)
                                 .padding(VNSpacing.cardPadding)
@@ -397,7 +397,7 @@ public struct HolidayDetailSheet: View {
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             HStack {
                                 Text("articles.section_ritual")
-                                    .font(.caption2.bold())
+                                    .font(.vnDisplay(.caption2, weight: .bold))
                                     .foregroundColor(.vnAccentGoldText)
                                     .tracking(0.8)
 
@@ -410,7 +410,7 @@ public struct HolidayDetailSheet: View {
                                     VNHaptics.impact(.success, enabled: hapticFeedbackEnabled)
                                 } label: {
                                     Label("articles.action.copy", systemImage: "doc.on.doc")
-                                        .font(.caption2.weight(.semibold))
+                                        .font(.vnDisplay(.caption2, weight: .semibold))
                                         .foregroundColor(.vnAccentHeritageRed)
                                         .frame(minHeight: VNSize.minTapTarget)
                                         .contentShape(Rectangle())

@@ -136,7 +136,7 @@ public struct VNCalendarContainerView: View {
     private func legendItem(symbol: String, label: String) -> some View {
         HStack(spacing: VNSpacing.xs) {
             Text(symbol)
-                .font(.caption2)
+                .font(.vnDisplay(.caption2))
             legendLabel(label)
         }
     }
@@ -153,7 +153,7 @@ public struct VNCalendarContainerView: View {
 
     private func legendLabel(_ label: String) -> Text {
         Text(label)
-            .font(.caption2)
+            .font(.vnDisplay(.caption2))
             .foregroundColor(.vnTextSecondary)
     }
 
@@ -211,7 +211,7 @@ public struct VNCalendarContainerView: View {
 
     private func weekdayLabel(_ day: String, sunday: Bool = false) -> some View {
         Text(day)
-            .font(.caption2.weight(sunday ? .bold : .semibold))
+            .font(.vnDisplay(.caption2, weight: sunday ? .bold : .semibold))
             .tracking(0.66)
             .foregroundColor(sunday ? .vnAccentHeritageRed : .vnTextSecondary)
             .frame(maxWidth: .infinity)

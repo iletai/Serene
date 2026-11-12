@@ -34,7 +34,7 @@ public struct VNSearchField: View {
                     prompt: Text(placeholder)
                         .foregroundColor(.vnTextTertiary)
                 )
-                .font(.system(size: 15))
+                .font(.vnDisplay(size: 15))
                 .foregroundColor(.vnTextPrimary)
                 .focused($isFocused)
                 .submitLabel(.search)

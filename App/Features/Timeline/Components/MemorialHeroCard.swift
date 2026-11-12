@@ -44,7 +44,7 @@ struct MemorialHeroCard: View {
                         .foregroundColor(.vnAccentHeritageRed)
                         .accessibilityHidden(true)
                     Text(dateText)
-                        .font(.subheadline.weight(.semibold))
+                        .font(.vnDisplay(.subheadline, weight: .semibold))
                         .foregroundColor(.vnAccentHeritageRed)
                 }
 
@@ -95,7 +95,7 @@ struct MemorialHeroCard: View {
             VNSealBadge.gio(size: .medium)
 
             Text(reminder.relationship ?? String(localized: "timeline.default_relationship"))
-                .font(.caption2.weight(.bold))
+                .font(.vnDisplay(.caption2, weight: .bold))
                 .tracking(0.8)
                 .foregroundColor(.vnAccentHeritageRed)
                 .lineLimit(1)
@@ -109,7 +109,7 @@ struct MemorialHeroCard: View {
 
     private var countdownBadge: some View {
         Text(countdownText)
-            .font(.caption.weight(.bold))
+            .font(.vnDisplay(.caption, weight: .bold))
             .foregroundColor(.vnOnAccent)
             .lineLimit(1)
             .fixedSize(horizontal: true, vertical: false)

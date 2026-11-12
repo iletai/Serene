@@ -24,7 +24,7 @@ public struct VNSectionLabel: View {
 
     public var body: some View {
         Text(text.uppercased())
-            .font(.system(size: 11, weight: .medium))
+            .font(.vnDisplay(size: 11, weight: .medium))
             .tracking(0.7)
             .foregroundColor(labelColor)
             .frame(maxWidth: .infinity, alignment: .leading)

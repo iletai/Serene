@@ -74,12 +74,12 @@ public struct VNSettingsRow<Trailing: View>: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(title)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.vnDisplay(size: 16, weight: .medium))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(1)
                 if let subtitle {
                     Text(subtitle)
-                        .font(.system(size: 12))
+                        .font(.vnDisplay(size: 12))
                         .foregroundColor(.vnTextSecondary)
                         .lineLimit(1)
                 }

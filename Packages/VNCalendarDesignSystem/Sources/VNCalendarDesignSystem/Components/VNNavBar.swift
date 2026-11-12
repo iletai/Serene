@@ -63,12 +63,12 @@ public struct VNDismissButton: View {
 
         case .text(let label):
             Text(label)
-                .font(.system(size: 15, weight: .medium))
+                .font(.vnDisplay(size: 15, weight: .medium))
                 .foregroundColor(.vnAccentDeepPrimary)
 
         case .done:
             Text(String(localized: "settings.action.done"))
-                .font(.system(size: 15, weight: .semibold))
+                .font(.vnDisplay(size: 15, weight: .semibold))
                 .foregroundColor(.vnOnAccent)
                 .padding(.horizontal, VNSpacing.md)
                 .padding(.vertical, VNSpacing.xs)
@@ -120,7 +120,7 @@ public extension View {
                             .foregroundColor(.vnAccentDeepPrimary)
                         if let subtitle {
                             Text(subtitle)
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.vnDisplay(size: 11, weight: .medium))
                                 .foregroundColor(.vnTextSecondary)
                         }
                     }

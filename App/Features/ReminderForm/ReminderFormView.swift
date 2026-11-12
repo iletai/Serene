@@ -113,13 +113,13 @@ public struct ReminderFormView: View {
         @Bindable var boundVM = vm
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text("reminder.notes_extra_header")
-                .font(.caption2.weight(.bold))
+                .font(.vnDisplay(.caption2, weight: .bold))
                 .tracking(0.5)
                 .foregroundColor(.vnTextTertiary)
                 .accessibilityAddTraits(.isHeader)
 
             TextField("reminder.notes_placeholder", text: $boundVM.note, axis: .vertical)
-                .font(.subheadline)
+                .font(.vnDisplay(.subheadline))
                 .foregroundColor(.vnTextPrimary)
                 .lineLimit(3...5)
                 .focused($focusedField, equals: .note)

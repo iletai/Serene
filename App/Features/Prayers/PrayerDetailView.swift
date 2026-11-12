@@ -106,7 +106,7 @@ public struct PrayerDetailView: View {
             .overlay(alignment: .bottom) {
                 if showCopiedAlert {
                     Text("prayers.copied_toast")
-                        .font(.footnote.weight(.semibold))
+                        .font(.vnDisplay(.footnote, weight: .semibold))
                         .foregroundColor(.vnOnAccent)
                         .padding(.horizontal, VNSpacing.lg)
                         .padding(.vertical, VNSpacing.sm)
@@ -158,7 +158,7 @@ public struct PrayerDetailView: View {
                     .foregroundColor(.vnAccentGoldText)
                     .accessibilityHidden(true)
                 Text(prayer.occasion)
-                    .font(.footnote.weight(.medium))
+                    .font(.vnDisplay(.footnote, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
             }
         }
@@ -172,7 +172,7 @@ public struct PrayerDetailView: View {
                 .font(.vnDisplay(.headline, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
             Text("prayers.offerings_subtitle")
-                .font(.caption2)
+                .font(.vnDisplay(.caption2))
                 .foregroundColor(.vnTextSecondary)
 
             VNRowDivider()
@@ -314,7 +314,7 @@ public struct PrayerDetailView: View {
                 .foregroundColor(.vnTextPrimary)
 
             Text(notes)
-                .font(.caption)
+                .font(.vnDisplay(.caption))
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(3)
         }

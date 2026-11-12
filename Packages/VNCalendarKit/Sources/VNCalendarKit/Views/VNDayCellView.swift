@@ -37,11 +37,11 @@ public struct VNDayCellView: View, Equatable {
         VStack(spacing: VNSpacing.space2) {
             if let model = dayModel {
                 Text("\(model.solarDay)")
-                    .font(.system(size: solarFontSize, weight: solarWeight))
+                    .font(.vnDisplay(size: solarFontSize, weight: solarWeight))
                     .foregroundColor(solarColor)
 
                 Text(model.lunarDayText)
-                    .font(.system(size: lunarFontSize, weight: lunarWeight))
+                    .font(.vnDisplay(size: lunarFontSize, weight: lunarWeight))
                     .italic()
                     .foregroundColor(lunarColor)
 

@@ -57,12 +57,12 @@ struct MemorialFilterPills: View {
                         label: {
                             HStack(spacing: VNSpacing.xs) {
                                 Text(tab.title)
-                                    .font(.caption.weight(isSelected ? .semibold : .medium))
+                                    .font(.vnDisplay(.caption, weight: isSelected ? .semibold : .medium))
                                     .frame(minHeight: VNSize.minTapTarget)
 
                                 if itemCount > 0 {
                                     Text("(\(itemCount))")
-                                        .font(.caption2)
+                                        .font(.vnDisplay(.caption2))
                                         .monospacedDigit()
                                 }
                             }

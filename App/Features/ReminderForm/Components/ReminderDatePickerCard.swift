@@ -23,7 +23,7 @@ struct ReminderDatePickerCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("reminder.date_header")
-                .font(.caption2.weight(.medium))
+                .font(.vnDisplay(.caption2, weight: .medium))
                 .tracking(0.66)
                 .foregroundColor(.vnAccentGoldText)
                 .lineLimit(2)
@@ -64,13 +64,13 @@ struct ReminderDatePickerCard: View {
 
                         VStack(alignment: .leading, spacing: VNSpacing.xs) {
                             Text("reminder.year_optional")
-                                .font(.caption.weight(.medium))
+                                .font(.vnDisplay(.caption, weight: .medium))
                                 .lineLimit(2)
                                 .minimumScaleFactor(0.8)
                                 .foregroundColor(.vnTextSecondary)
                             TextField("reminder.year_placeholder", text: $year)
                                 .keyboardType(.numberPad)
-                                .font(.callout.weight(.semibold))
+                                .font(.vnDisplay(.callout, weight: .semibold))
                                 .foregroundColor(.vnTextPrimary)
                                 .focused($isYearFocused)
                                 .padding(.bottom, VNSpacing.sm)
@@ -85,7 +85,7 @@ struct ReminderDatePickerCard: View {
 
                     if dateType == .lunar {
                         Toggle("reminder.leap_month", isOn: $isLeapMonth)
-                            .font(.footnote.weight(.medium))
+                            .font(.vnDisplay(.footnote, weight: .medium))
                             .foregroundColor(.vnTextPrimary)
                             .tint(Color.vnAccentHeritageRed)
                     }
@@ -115,11 +115,11 @@ struct ReminderDatePickerCard: View {
     private func pickerColumn<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text(title)
-                .font(.caption.weight(.medium))
+                .font(.vnDisplay(.caption, weight: .medium))
                 .foregroundColor(.vnTextSecondary)
             content()
                 .pickerStyle(.menu)
-                .font(.callout.weight(.semibold))
+                .font(.vnDisplay(.callout, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
                 .padding(.bottom, VNSpacing.xs)
                 .background(Color.clear)

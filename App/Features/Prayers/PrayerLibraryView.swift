@@ -213,7 +213,7 @@ public struct PrayerLibraryView: View {
                     .minimumScaleFactor(0.8)
 
                 Text(prayer.occasion)
-                    .font(.caption)
+                    .font(.vnDisplay(.caption))
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
@@ -248,7 +248,7 @@ public struct PrayerLibraryView: View {
                 .padding(.top, VNSpacing.lg)
 
             Text("prayers.empty_title")
-                .font(.subheadline.weight(.medium))
+                .font(.vnDisplay(.subheadline, weight: .medium))
                 .foregroundColor(.vnTextSecondary)
         }
         .frame(maxWidth: .infinity)
