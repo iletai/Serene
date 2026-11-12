@@ -9,7 +9,7 @@ struct ReminderCategoryGrid: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("reminder.category_header")
-                .font(.caption2.weight(.medium))
+                .font(.vnDisplay(.caption2, weight: .medium))
                 .tracking(0.66)
                 .foregroundColor(.vnAccentGoldText)
                 .lineLimit(2)
@@ -46,12 +46,12 @@ struct ReminderCategoryGrid: View {
 
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         Text(cat.title)
-                            .font(.system(.footnote, design: .serif, weight: .semibold))
+                            .font(.vnDisplay(.footnote, weight: .semibold))
                             .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextPrimary)
                             .lineLimit(2)
                             .minimumScaleFactor(0.8)
                         Text(subtitle)
-                            .font(.caption2)
+                            .font(.vnDisplay(.caption2))
                             .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextSecondary)
                             .lineLimit(2)
                             .minimumScaleFactor(0.8)
@@ -61,7 +61,7 @@ struct ReminderCategoryGrid: View {
 
                     if isMain {
                         Text("reminder.cat.main_badge")
-                            .font(.system(.caption2, design: .serif, weight: .semibold))
+                            .font(.vnDisplay(.caption2, weight: .semibold))
                             .foregroundColor(.vnAccentHeritageRed)
                             .padding(.horizontal, VNSpacing.xs)
                             .padding(.vertical, VNSpacing.space2)

@@ -51,7 +51,7 @@ public struct CalendarMainView: View {
                 .clipShape(RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius))
                 .overlay(
                     RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius)
-                        .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.hairline)
+                        .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                 )
                 .shadow(
                     color: VNCard<EmptyView>.folioShadow.color,
@@ -101,12 +101,12 @@ public struct CalendarMainView: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("calendar.brand_title")
-                    .font(.system(.headline, design: .serif).weight(.semibold))
+                    .font(.vnDisplay(.headline, weight: .semibold))
                     .foregroundColor(.vnAccentDeepPrimary)
                     .lineLimit(1)
 
                 Text(lunarSubtitle(vm: vm))
-                    .font(.caption2.weight(.medium))
+                    .font(.vnDisplay(.caption2, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(2)
                     .contentTransition(.opacity)
@@ -148,7 +148,7 @@ public struct CalendarMainView: View {
         } label: {
             HStack(spacing: VNSpacing.xs) {
                 Text(String(currentYear))
-                    .font(.caption2.weight(.medium))
+                    .font(.vnDisplay(.caption2, weight: .medium))
                     .lineLimit(1)
                     .fixedSize()
                     .contentTransition(.numericText())

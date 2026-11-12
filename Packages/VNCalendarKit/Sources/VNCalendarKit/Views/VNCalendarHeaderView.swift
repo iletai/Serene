@@ -43,14 +43,14 @@ public struct VNCalendarHeaderView: View {
 
             VStack(spacing: VNSpacing.space2) {
                 Text(headerTitle)
-                    .font(.system(size: 19, weight: .bold, design: .serif))
+                    .font(.vnDisplay(size: 19, weight: .bold))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
 
                 if let subtitle = headerSubtitle {
                     Text(subtitle)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.vnDisplay(size: 11, weight: .medium))
                         .foregroundColor(.vnTextSecondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
@@ -62,7 +62,7 @@ public struct VNCalendarHeaderView: View {
             HStack(spacing: VNSpacing.xs) {
                 Button(action: onToday) {
                     Text("action.today")
-                        .font(.system(size: 12, weight: .semibold, design: .serif))
+                        .font(.vnDisplay(size: 12, weight: .semibold))
                         .lineLimit(1)
                         .fixedSize()
                         .padding(.horizontal, VNSpacing.sm)

@@ -22,6 +22,9 @@ let package = Package(
             dependencies: [
                 .product(name: "VNCalendarDomain", package: "VNCalendarDomain")
             ],
+            resources: [
+                .process("Resources")
+            ],
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency")
             ]

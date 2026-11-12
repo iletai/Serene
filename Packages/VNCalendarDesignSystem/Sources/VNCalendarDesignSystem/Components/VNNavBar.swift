@@ -58,17 +58,17 @@ public struct VNDismissButton: View {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                        .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.hairline)
+                        .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
                 )
 
         case .text(let label):
             Text(label)
-                .font(.system(size: 15, weight: .medium))
+                .font(.vnDisplay(size: 15, weight: .medium))
                 .foregroundColor(.vnAccentDeepPrimary)
 
         case .done:
             Text(String(localized: "settings.action.done"))
-                .font(.system(size: 15, weight: .semibold))
+                .font(.vnDisplay(size: 15, weight: .semibold))
                 .foregroundColor(.vnOnAccent)
                 .padding(.horizontal, VNSpacing.md)
                 .padding(.vertical, VNSpacing.xs)
@@ -116,11 +116,11 @@ public extension View {
                     // Canonical top-bar type scale (canonical.html): serif red 18/600 + label 11/500.
                     VStack(spacing: VNSpacing.space2) {
                         Text(title)
-                            .font(.system(size: 18, weight: .semibold, design: .serif))
+                            .font(.vnDisplay(size: 18, weight: .semibold))
                             .foregroundColor(.vnAccentDeepPrimary)
                         if let subtitle {
                             Text(subtitle)
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.vnDisplay(size: 11, weight: .medium))
                                 .foregroundColor(.vnTextSecondary)
                         }
                     }

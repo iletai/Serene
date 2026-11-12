@@ -37,11 +37,11 @@ public struct VNDayCellView: View, Equatable {
         VStack(spacing: VNSpacing.space2) {
             if let model = dayModel {
                 Text("\(model.solarDay)")
-                    .font(.system(size: solarFontSize, weight: solarWeight))
+                    .font(.vnDisplay(size: solarFontSize, weight: solarWeight))
                     .foregroundColor(solarColor)
 
                 Text(model.lunarDayText)
-                    .font(.system(size: lunarFontSize, weight: lunarWeight))
+                    .font(.vnDisplay(size: lunarFontSize, weight: lunarWeight))
                     .italic()
                     .foregroundColor(lunarColor)
 
@@ -104,7 +104,7 @@ public struct VNDayCellView: View, Equatable {
 
     private var solarColor: Color {
         if isToday { return .vnOnAccent }
-        if isFullMoon { return .vnAccentImperialGold }
+        if isFullMoon { return .vnAccentGoldText }
         if isFirstLunarDay { return .vnAccentHeritageRed }
         if !isCurrentMonth { return .vnTextTertiary }
         return .vnTextPrimary
@@ -112,7 +112,7 @@ public struct VNDayCellView: View, Equatable {
 
     private var lunarColor: Color {
         if isToday { return .vnOnAccent }
-        if isFullMoon { return .vnAccentImperialGold }
+        if isFullMoon { return .vnAccentGoldText }
         if isFirstLunarDay { return .vnAccentHeritageRed }
         if !isCurrentMonth { return .vnTextTertiary.opacity(0.7) }
         return .vnTextSecondary

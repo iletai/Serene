@@ -13,7 +13,7 @@ struct ReminderTitleSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text(String(localized: "reminderForm.title.header"))
-                .font(.caption2.weight(.medium))
+                .font(.vnDisplay(.caption2, weight: .medium))
                 .tracking(0.66)
                 .foregroundColor(.vnAccentGoldText)
                 .lineLimit(2)
@@ -24,13 +24,13 @@ struct ReminderTitleSection: View {
                 allPadding: VNSpacing.cardPadding,
                 cornerRadius: VNCornerRadius.card,
                 backgroundColor: Color.vnBackgroundSecondary,
-                borderColor: showsError ? Color.vnStatusError : Color.vnAccentImperialGold.opacity(0.28),
+                borderColor: showsError ? Color.vnStatusError : Color.vnBorderStrong,
                 shadow: nil
             ) {
                 VStack(alignment: .leading, spacing: VNSpacing.md) {
                     VStack(alignment: .leading, spacing: 0) {
                         TextField(String(localized: "reminderForm.title.placeholder"), text: $title)
-                            .font(.callout.weight(.semibold))
+                            .font(.vnDisplay(.callout, weight: .semibold))
                             .foregroundColor(.vnTextPrimary)
                             .focused(focusedField, equals: .title)
                             .submitLabel(.next)
@@ -43,14 +43,14 @@ struct ReminderTitleSection: View {
 
                     if showsError {
                         Label(errorMessage, systemImage: "exclamationmark.circle.fill")
-                            .font(.footnote)
+                            .font(.vnDisplay(.footnote))
                             .foregroundColor(.vnStatusError)
                     }
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: VNSpacing.xs) {
                             Text(String(localized: "reminderForm.role.label"))
-                                .font(.caption)
+                                .font(.vnDisplay(.caption))
                                 .foregroundColor(.vnTextSecondary)
 
                             let roles = ["Nội Tộc", "Ngoại Tộc", "Cụ", "Ông", "Bà", "Cha / Bố", "Mẹ", "Bác", "Chú", "Cô", "Dì", "Anh / Chị"]
@@ -86,7 +86,7 @@ struct ReminderTitleSection: View {
                             .accessibilityHidden(true)
                     }
                     Text(role)
-                        .font(.footnote.weight(isSelected ? .semibold : .regular))
+                        .font(.vnDisplay(.footnote, weight: isSelected ? .semibold : .regular))
                         .lineLimit(1)
                 }
                 .foregroundColor(isSelected ? .vnAccentDeepPrimary : .vnTextSecondary)

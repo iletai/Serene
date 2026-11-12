@@ -66,7 +66,7 @@ struct AnNienApp: App {
                 }
                 .appUpdateSheet(
                     action: $updateAction,
-                    accentColor: Color.vnAccentImperialGold
+                    accentColor: Color.vnCinnabarLacquerRed
                 )
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {

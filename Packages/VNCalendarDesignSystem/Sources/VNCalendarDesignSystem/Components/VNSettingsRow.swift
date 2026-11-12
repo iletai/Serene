@@ -16,7 +16,7 @@ import SwiftUI
 /// VNSettingsRow(icon: "arrow.clockwise", title: "Làm mới", tint: .vnStatusSuccess)
 ///
 /// // Value display row
-/// VNSettingsRow(icon: "info.circle.fill", title: "Phiên bản", tint: .vnAccentImperialGold,
+/// VNSettingsRow(icon: "info.circle.fill", title: "Phiên bản", tint: .vnAccentGoldText,
 ///               trailing: { Text("1.0.0").font(.vnCaption1).foregroundColor(.vnTextSecondary) })
 /// ```
 public struct VNSettingsRow<Trailing: View>: View {
@@ -32,7 +32,7 @@ public struct VNSettingsRow<Trailing: View>: View {
         icon: String? = nil,
         title: String,
         subtitle: String? = nil,
-        tint: Color = .vnAccentImperialGold,
+        tint: Color = .vnAccentGoldText,
         showChevron: Bool = true
     ) where Trailing == EmptyView {
         self.icon = icon
@@ -48,7 +48,7 @@ public struct VNSettingsRow<Trailing: View>: View {
         icon: String? = nil,
         title: String,
         subtitle: String? = nil,
-        tint: Color = .vnAccentImperialGold,
+        tint: Color = .vnAccentGoldText,
         showChevron: Bool = false,
         @ViewBuilder trailing: @escaping () -> Trailing
     ) {
@@ -74,12 +74,12 @@ public struct VNSettingsRow<Trailing: View>: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(title)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.vnDisplay(size: 16, weight: .medium))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(1)
                 if let subtitle {
                     Text(subtitle)
-                        .font(.system(size: 12))
+                        .font(.vnDisplay(size: 12))
                         .foregroundColor(.vnTextSecondary)
                         .lineLimit(1)
                 }

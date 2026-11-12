@@ -33,7 +33,7 @@ public struct VN12HourTimelineView: View {
             HStack(spacing: VNSpacing.xs) {
                 Image(systemName: "clock.badge.checkmark")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
 
                 Text("ds.hour.timeline_header")
                     .font(.vnCaption2)
@@ -44,8 +44,8 @@ public struct VN12HourTimelineView: View {
                 Spacer()
 
                 Text("ds.hour.legend_auspicious")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.vnAccentImperialGold)
+                    .font(.vnDisplay(size: 10, weight: .medium))
+                    .foregroundColor(.vnAccentGoldText)
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
@@ -73,11 +73,11 @@ public struct VN12HourTimelineView: View {
                     .frame(width: VNSpacing.xs, height: VNSpacing.xs)
             }
             Text(item.name)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.vnDisplay(size: 11, weight: .semibold))
                 .foregroundColor(.vnAccentHeritageRed)
 
             Text(item.timeRange)
-                .font(.system(size: 10, weight: .regular))
+                .font(.vnDisplay(size: 10, weight: .regular))
                 .foregroundColor(.vnTextTertiary)
         }
         .padding(.horizontal, VNSpacing.sm)

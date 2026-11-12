@@ -13,7 +13,7 @@ struct ReminderOffsetsCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("reminder.offsets_header")
-                .font(.caption2.weight(.medium))
+                .font(.vnDisplay(.caption2, weight: .medium))
                 .tracking(0.66)
                 .foregroundColor(.vnAccentGoldText)
                 .lineLimit(2)
@@ -24,7 +24,7 @@ struct ReminderOffsetsCard: View {
                 allPadding: VNSpacing.cardPadding,
                 cornerRadius: VNCornerRadius.card,
                 backgroundColor: Color.vnBackgroundSecondary,
-                borderColor: Color.vnAccentImperialGold.opacity(0.28),
+                borderColor: Color.vnBorderSubtle,
                 shadow: nil
             ) {
                 OffsetFlowLayout(spacing: VNSpacing.xs) {
@@ -78,7 +78,7 @@ struct ReminderOffsetsCard: View {
                             .accessibilityHidden(true)
                     }
                     Text(title)
-                        .font(.footnote.weight(selected ? .semibold : .regular))
+                        .font(.vnDisplay(.footnote, weight: selected ? .semibold : .regular))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }

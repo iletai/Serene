@@ -15,7 +15,7 @@ public struct VNSectionHeader: View {
             height: CGFloat = VNSectionHeader.accentBarHeight
         )
         case seal(text: String = "ẤN", color: Color = .vnAccentDeepPrimary)
-        case icon(systemName: String, color: Color = .vnAccentImperialGold)
+        case icon(systemName: String, color: Color = .vnAccentGoldText)
         case none
     }
 
@@ -87,7 +87,7 @@ public struct VNSectionHeader: View {
                 .frame(width: width, height: height)
         case .seal(let text, let color):
             Text(text)
-                .font(.system(size: 9, weight: .bold, design: .serif))
+                .font(.vnDisplay(size: 9, weight: .bold))
                 .foregroundColor(.vnOnAccent)
                 .padding(.horizontal, VNSpacing.xs)
                 .padding(.vertical, VNSpacing.space2)
