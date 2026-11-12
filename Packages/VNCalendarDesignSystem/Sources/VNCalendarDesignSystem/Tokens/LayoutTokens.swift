@@ -24,8 +24,8 @@ public enum VNSize {
     public static let iconBadge: CGFloat = 24
     /// Visual button heights. Hit area stays >= `minTapTarget` via contentShape, so compact buttons do not look "fat".
     public static let buttonSmall: CGFloat = 36
-    public static let buttonMedium: CGFloat = 44
-    public static let buttonLarge: CGFloat = 50
+    public static let buttonMedium: CGFloat = 46
+    public static let buttonLarge: CGFloat = 56
 }
 
 public enum VNLayout {
@@ -35,15 +35,14 @@ public enum VNLayout {
 }
 
 public enum VNCornerRadius {
-    /// Micro shape below the spacing scale: 3pt accent bars, 10×10 legend swatches (DESIGN §4.3).
-    /// Bumped +2 for a softer edge on tiny shapes.
-    public static let micro: CGFloat = 4
-    /// Buttons, grid cells, mode segments, seal-rounded, chips. Uniform +4 across the scale.
-    public static let small: CGFloat = 8
-    /// Cards, fields, inner panels. Same hierarchy, rounder corners.
-    public static let card: CGFloat = 12
-    /// Bottom sheets. Keeps the modal layer clearly above card radius.
-    public static let sheet: CGFloat = 28
+    /// Accent bars, legend swatches, ribbons, the Hắc Đạo tag.
+    public static let micro: CGFloat = 6
+    /// Grid cells, hour cells, icon tiles, rounded seals.
+    public static let small: CGFloat = 12
+    /// Cards, group cards, panels.
+    public static let card: CGFloat = 20
+    /// Bottom sheets and modals.
+    public static let sheet: CGFloat = 32
     public static let pill: CGFloat = 999
 }
 
@@ -52,19 +51,29 @@ public enum VNBorderWidth {
     public static let hairline: CGFloat = 1.0
     /// Sub-pixel hairline for the rare divider that must read thinner than 1px.
     public static let hairlineThin: CGFloat = 0.5
-    public static let regular: CGFloat = 1.0
-    public static let active: CGFloat = 1.5
-    public static let focus: CGFloat = 2.0
+    /// Secondary button, field outline at rest, the seal's inner ring.
+    public static let regular: CGFloat = 1.5
+    /// Focused field, current hour, selected card.
+    public static let active: CGFloat = 2.0
+    /// Keyboard focus ring, offset 2pt.
+    public static let focus: CGFloat = 3.0
 }
 
 public enum VNShadow {
-    public static let card = ShadowConfig(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
-    public static let warmDiffuse = ShadowConfig(color: Color.black.opacity(0.06), radius: 16, x: 0, y: 6)
-    public static let floating = ShadowConfig(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 6)
-    /// Faint neutral folio shadow `0 4px 20px rgba(0,0,0,0.05)`. Spread omitted: SwiftUI has no spread param.
-    public static let folio = ShadowConfig(color: Color.black.opacity(0.05), radius: 20, x: 0, y: 4)
-    /// Soft modal shadow honoring "no heavy shadows" (DESIGN §4).
-    public static let modal = ShadowConfig(color: Color.black.opacity(0.08), radius: 16, x: 0, y: 8)
+    // Cool ink-tinted shadows (#15162B) plus one hard lip under pressable pills.
+    public static let card = ShadowConfig(color: ink.opacity(0.08), radius: 6, x: 0, y: 2)
+    /// Red glow under the hero card and the primary CTA.
+    public static let warmDiffuse = ShadowConfig(color: Color(hex: 0xCC1636).opacity(0.22), radius: 32, x: 0, y: 12)
+    public static let floating = ShadowConfig(color: ink.opacity(0.16), radius: 32, x: 0, y: 12)
+    /// Default card shadow `0 8px 24px rgba(21,22,43,0.08)`.
+    public static let folio = ShadowConfig(color: ink.opacity(0.08), radius: 24, x: 0, y: 8)
+    public static let modal = ShadowConfig(color: ink.opacity(0.20), radius: 48, x: 0, y: 20)
+    /// Hard 4pt ledge under pressable pills; it disappears as the pill presses down.
+    public static let lip = ShadowConfig(
+        color: Color(light: ink.opacity(0.22), dark: Color.black.opacity(0.5)), radius: 0, x: 0, y: 4
+    )
+
+    private static let ink = Color(hex: 0x15162B)
 
     public struct ShadowConfig: Sendable {
         public let color: Color

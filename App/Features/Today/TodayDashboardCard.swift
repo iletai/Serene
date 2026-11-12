@@ -163,7 +163,7 @@ public struct TodayDashboardCard: View {
     private var weekdayText: some View {
         if let title = weekdayTitle {
             Text(title)
-                .font(.subheadline.weight(.semibold))
+                .font(.vnDisplay(.subheadline, weight: .semibold))
                 .foregroundColor(.vnTextSecondary)
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
@@ -178,7 +178,7 @@ public struct TodayDashboardCard: View {
                 .font(.caption2.weight(.semibold))
                 .accessibilityHidden(true)
             Text(dayStar.isAuspicious ? LocalizedStringKey("today.auspicious") : LocalizedStringKey("today.inauspicious"))
-                .font(.caption2.weight(.semibold))
+                .font(.vnDisplay(.caption2, weight: .semibold))
                 .lineLimit(1)
                 .fixedSize()
                 .tracking(0.66)
@@ -196,7 +196,7 @@ public struct TodayDashboardCard: View {
     private var dateRow: some View {
         HStack(alignment: .firstTextBaseline, spacing: VNSpacing.md) {
             Text("\(currentSolarDate.day)")
-                .font(.system(size: solarNumeralSize, weight: .light))
+                .font(.vnDisplay(size: solarNumeralSize, weight: .light))
                 .foregroundColor(.vnTextPrimary)
                 .contentTransition(.numericText())
                 .animation(dateAnimation, value: currentSolarDate.day)
@@ -206,17 +206,17 @@ public struct TodayDashboardCard: View {
 
             VStack(alignment: .trailing, spacing: VNSpacing.space2) {
                 Text("common.date_type_lunar")
-                    .font(.caption2.weight(.medium))
+                    .font(.vnDisplay(.caption2, weight: .medium))
                     .foregroundColor(.vnAccentGoldText)
                 Text(String(format: String(localized: "today.lunar_day"), currentLunarDate.day))
-                    .font(.system(size: lunarNumeralSize, weight: .semibold, design: .serif))
+                    .font(.vnDisplay(size: lunarNumeralSize, weight: .semibold))
                     .foregroundColor(.vnAccentHeritageRed)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                     .contentTransition(.numericText())
                     .animation(dateAnimation, value: currentLunarDate.day)
                 Text(lunarMonthName)
-                    .font(.system(.subheadline, design: .serif).weight(.semibold))
+                    .font(.vnDisplay(.subheadline, weight: .semibold))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -233,7 +233,7 @@ public struct TodayDashboardCard: View {
 
     private var canChiLine: some View {
         Text(String(format: String(localized: "today.canchi_line"), currentCanChi.day.description, currentCanChi.month.description, currentCanChi.year.description))
-            .font(.footnote.weight(.medium))
+            .font(.vnDisplay(.footnote, weight: .medium))
             .foregroundColor(.vnTextSecondary)
             .lineLimit(2)
             .minimumScaleFactor(0.8)
@@ -248,12 +248,12 @@ public struct TodayDashboardCard: View {
                 .foregroundColor(.vnAccentHeritageRed)
                 .accessibilityHidden(true)
             Text(memorial.title)
-                .font(.subheadline.weight(.semibold))
+                .font(.vnDisplay(.subheadline, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
                 .lineLimit(1)
             Spacer(minLength: VNSpacing.sm)
             Text(memorial.countdown)
-                .font(.caption.weight(.semibold))
+                .font(.vnDisplay(.caption, weight: .semibold))
                 .foregroundColor(.vnAccentHeritageRed)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -271,7 +271,7 @@ public struct TodayDashboardCard: View {
         DisclosureGroup(isExpanded: $showDetails) {
             VStack(alignment: .leading, spacing: VNSpacing.md) {
                 Text(detailsSummary)
-                    .font(.caption)
+                    .font(.vnDisplay(.caption))
                     .foregroundColor(.vnTextSecondary)
                     .contentTransition(.opacity)
                     .animation(dateAnimation, value: detailsSummary)
@@ -284,7 +284,7 @@ public struct TodayDashboardCard: View {
             .padding(.top, VNSpacing.sm)
         } label: {
             Text("today.details_title")
-                .font(.subheadline.weight(.semibold))
+                .font(.vnDisplay(.subheadline, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
         }
         .tint(.vnTextSecondary)
@@ -318,14 +318,14 @@ private struct TodayHeroGuidance: View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack(spacing: VNSpacing.sm) {
                 Text("hero.auspicious_hours")
-                    .font(.caption2.weight(.semibold))
+                    .font(.vnDisplay(.caption2, weight: .semibold))
                     .tracking(0.66)
                     .foregroundColor(.vnTextSecondary)
 
                 Spacer(minLength: 0)
 
                 Text(String(format: String(localized: "today.auspicious_hours_count"), hours.count))
-                    .font(.caption2.weight(.medium))
+                    .font(.vnDisplay(.caption2, weight: .medium))
                     .foregroundColor(.vnAccentGoldText)
             }
             .accessibilityElement(children: .combine)
@@ -343,11 +343,11 @@ private struct TodayHeroGuidance: View {
     private func hourChip(for branch: EarthlyBranch) -> some View {
         VStack(spacing: VNSpacing.space2) {
             Text(branch.vietnameseName)
-                .font(.caption2.weight(.semibold))
+                .font(.vnDisplay(.caption2, weight: .semibold))
                 .foregroundColor(.vnAccentDeepPrimary)
 
             Text(hourRangeText(branch))
-                .font(.caption2)
+                .font(.vnDisplay(.caption2))
                 .foregroundColor(.vnTextSecondary)
         }
         .padding(.horizontal, VNSpacing.sm)
@@ -396,14 +396,14 @@ private struct TodayHeroGuidance: View {
                     .accessibilityHidden(true)
 
                 Text(title)
-                    .font(.caption2.weight(.semibold))
+                    .font(.vnDisplay(.caption2, weight: .semibold))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
             }
 
             Text(text)
-                .font(.caption)
+                .font(.vnDisplay(.caption))
                 .foregroundColor(.vnTextPrimary)
                 .lineSpacing(2)
         }

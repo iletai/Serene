@@ -1,3 +1,4 @@
+import CoreText
 import XCTest
 @testable import VNCalendarDesignSystem
 import SwiftUI
@@ -81,29 +82,33 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertEqual(VNSpacing.golden, 32)
         XCTAssertEqual(VNSpacing.hero, 48)
 
-        XCTAssertEqual(VNCornerRadius.micro, 4)
-        XCTAssertEqual(VNCornerRadius.small, 8)
-        XCTAssertEqual(VNCornerRadius.card, 12)
-        XCTAssertEqual(VNCornerRadius.sheet, 28)
+        XCTAssertEqual(VNCornerRadius.micro, 6)
+        XCTAssertEqual(VNCornerRadius.small, 12)
+        XCTAssertEqual(VNCornerRadius.card, 20)
+        XCTAssertEqual(VNCornerRadius.sheet, 32)
         XCTAssertEqual(VNCornerRadius.pill, 999)
 
         XCTAssertEqual(VNBorderWidth.hairline, 1.0)
         XCTAssertEqual(VNBorderWidth.hairlineThin, 0.5)
-        XCTAssertEqual(VNBorderWidth.regular, 1.0)
-        XCTAssertEqual(VNBorderWidth.active, 1.5)
-        XCTAssertEqual(VNBorderWidth.focus, 2.0)
+        XCTAssertEqual(VNBorderWidth.regular, 1.5)
+        XCTAssertEqual(VNBorderWidth.active, 2.0)
+        XCTAssertEqual(VNBorderWidth.focus, 3.0)
 
-        XCTAssertEqual(VNShadow.card.radius, 4)
-        XCTAssertEqual(VNShadow.warmDiffuse.radius, 16)
-        XCTAssertEqual(VNShadow.floating.radius, 12)
-        XCTAssertEqual(VNShadow.modal.radius, 16)
-        XCTAssertEqual(VNShadow.modal.color, Color.black.opacity(0.08))
+        XCTAssertEqual(VNShadow.card.radius, 6)
+        XCTAssertEqual(VNShadow.warmDiffuse.radius, 32)
+        XCTAssertEqual(VNShadow.floating.radius, 32)
+        XCTAssertEqual(VNShadow.modal.radius, 48)
+        XCTAssertEqual(VNShadow.modal.color, Color(hex: 0x15162B).opacity(0.20))
 
-        // Folio shadow: 0 4px 20px rgba(0,0,0,0.05) — spread omitted (SwiftUI has none).
-        XCTAssertEqual(VNShadow.folio.radius, 20)
-        XCTAssertEqual(VNShadow.folio.y, 4)
+        // Folio shadow: 0 8px 24px rgba(21,22,43,0.08).
+        XCTAssertEqual(VNShadow.folio.radius, 24)
+        XCTAssertEqual(VNShadow.folio.y, 8)
         XCTAssertEqual(VNShadow.folio.x, 0)
-        XCTAssertEqual(VNShadow.folio.color, Color.black.opacity(0.05))
+        XCTAssertEqual(VNShadow.folio.color, Color(hex: 0x15162B).opacity(0.08))
+
+        // Hard 4pt lip under pressable pills.
+        XCTAssertEqual(VNShadow.lip.radius, 0)
+        XCTAssertEqual(VNShadow.lip.y, 4)
     }
 
     func testBadgeViewStyles() {
@@ -129,25 +134,25 @@ final class DesignSystemTests: XCTestCase {
 
     func testSealBadgePresets() {
         let mungMot = VNSealBadge.mungMot()
-        XCTAssertEqual(mungMot.text, "MÙNG 1")
+        XCTAssertEqual(mungMot.text, String(localized: "ds.seal.mung_mot"))
         XCTAssertEqual(mungMot.shape, .rounded())
         XCTAssertEqual(mungMot.color, .cinnabarWhite)
         XCTAssertNotNil(mungMot.body)
 
         let ram = VNSealBadge.ram()
-        XCTAssertEqual(ram.text, "RẰM")
+        XCTAssertEqual(ram.text, String(localized: "ds.seal.ram"))
         XCTAssertEqual(ram.shape, .rounded())
         XCTAssertEqual(ram.color, .cinnabarGold)
         XCTAssertNotNil(ram.body)
 
         let gio = VNSealBadge.gio()
-        XCTAssertEqual(gio.text, "GIỖ")
+        XCTAssertEqual(gio.text, String(localized: "ds.seal.gio"))
         XCTAssertEqual(gio.shape, .square)
         XCTAssertEqual(gio.color, .vermilionDarkGold)
         XCTAssertNotNil(gio.body)
 
         let tet = VNSealBadge.tet()
-        XCTAssertEqual(tet.text, "TẾT")
+        XCTAssertEqual(tet.text, String(localized: "ds.seal.tet"))
         XCTAssertEqual(tet.shape, .pill)
         XCTAssertEqual(tet.color, .cinnabarGold)
         XCTAssertNotNil(tet.body)
@@ -165,7 +170,7 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertEqual(customBadge.icon, "sparkles")
         XCTAssertEqual(customBadge.shape, .circle)
         XCTAssertEqual(customBadge.size, .large)
-        XCTAssertEqual(customBadge.size.fontSize, 13)
+        XCTAssertEqual(customBadge.size.fontSize, 14)
         XCTAssertNotNil(customBadge.body)
 
         let smallBadge = VNSealBadge(text: "ẤN", size: .small)
@@ -182,10 +187,10 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertEqual(VNCalendarMode.week.rawValue, "week")
         XCTAssertEqual(VNCalendarMode.year.rawValue, "year")
 
-        XCTAssertEqual(VNCalendarMode.block.title, "Nhật Lịch")
-        XCTAssertEqual(VNCalendarMode.month.title, "Tháng")
-        XCTAssertEqual(VNCalendarMode.week.title, "Tuần")
-        XCTAssertEqual(VNCalendarMode.year.title, "Năm")
+        XCTAssertEqual(VNCalendarMode.block.title, String(localized: "ds.calendar.mode.block"))
+        XCTAssertEqual(VNCalendarMode.month.title, String(localized: "ds.calendar.mode.month"))
+        XCTAssertEqual(VNCalendarMode.week.title, String(localized: "ds.calendar.mode.week"))
+        XCTAssertEqual(VNCalendarMode.year.title, String(localized: "ds.calendar.mode.year"))
 
         XCTAssertFalse(VNCalendarMode.block.icon.isEmpty)
         XCTAssertFalse(VNCalendarMode.month.icon.isEmpty)
@@ -252,8 +257,8 @@ final class DesignSystemTests: XCTestCase {
         }
         XCTAssertEqual(defaultCard.cornerRadius, VNCornerRadius.card)
         XCTAssertEqual(defaultCard.backgroundColor, Color.vnBackgroundSecondary)
-        // DESIGN §4: gold-tinted hairline (gold @ 0.28) on rice-paper cards.
-        XCTAssertEqual(defaultCard.borderColor, Color.vnAccentImperialGold.opacity(0.28))
+        // Cards: vnBorderSubtle hairline + folio shadow.
+        XCTAssertEqual(defaultCard.borderColor, Color.vnBorderSubtle)
         XCTAssertEqual(defaultCard.borderWidth, VNBorderWidth.hairline)
         // DESIGN §4: card padding 20pt.
         XCTAssertEqual(defaultCard.padding, EdgeInsets(
@@ -261,17 +266,16 @@ final class DesignSystemTests: XCTestCase {
         ))
         XCTAssertNotNil(defaultCard.body)
 
-        // DESIGN §4 folio shadow: radius 20 / y 4.
         typealias DefaultCard = VNCard<Text>
-        XCTAssertEqual(DefaultCard.folioShadow.radius, 20)
-        XCTAssertEqual(DefaultCard.folioShadow.y, 4)
+        XCTAssertEqual(DefaultCard.folioShadow.radius, 24)
+        XCTAssertEqual(DefaultCard.folioShadow.y, 8)
         XCTAssertEqual(DefaultCard.defaultCornerRadius, VNCornerRadius.card)
 
-        // DESIGN §5.1 hero numeral: 56pt light serif. Font has no size API on macOS;
+        // Hero numeral: 72pt Be Vietnam Pro ExtraBold. Font has no size API on macOS;
         // UIFont bridge verifies point size on iOS.
         XCTAssertNotNil(Font.vnHeroNumeral)
         #if canImport(UIKit)
-        XCTAssertEqual(UIFont(Font.vnHeroNumeral).pointSize, 56, accuracy: 0.5)
+        XCTAssertEqual(UIFont(Font.vnHeroNumeral).pointSize, 72, accuracy: 0.5)
         #endif
 
         let customCard = VNCard(
@@ -293,5 +297,13 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertEqual(customCard.borderWidth, VNBorderWidth.regular)
         XCTAssertNil(customCard.shadow)
         XCTAssertNotNil(customCard.body)
+    }
+
+    func testBeVietnamProRegistersOnFirstFontUse() {
+        _ = Font.vnBody
+        for name in ["BeVietnamPro-Regular", "BeVietnamPro-ExtraBold", "BeVietnamPro-MediumItalic"] {
+            // CoreText silently falls back to another font when the name is not registered.
+            XCTAssertEqual(CTFontCopyPostScriptName(CTFontCreateWithName(name as CFString, 12, nil)) as String, name)
+        }
     }
 }

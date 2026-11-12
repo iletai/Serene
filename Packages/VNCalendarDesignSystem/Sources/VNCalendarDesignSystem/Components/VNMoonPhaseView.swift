@@ -95,11 +95,11 @@ public struct VNMoonPhaseView: View {
             if showTitle {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
                     Text(phaseType.localizedName)
-                        .font(.system(size: 11, weight: .semibold, design: .serif))
+                        .font(.vnDisplay(size: 11, weight: .semibold))
                         .foregroundColor(isFullMoon ? .vnAccentHeritageRed : .vnTextPrimary)
 
                     Text(String(format: String(localized: "ds.moon.illumination"), illuminationPercent))
-                        .font(.system(size: 9, weight: .regular))
+                        .font(.vnDisplay(size: 9, weight: .regular))
                         .foregroundColor(.vnTextSecondary)
                 }
             }

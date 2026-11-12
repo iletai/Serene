@@ -55,7 +55,9 @@ public struct VNChip: View {
 
     private var foregroundColor: Color {
         switch variant {
-        case .solarTerm, .auspicious:
+        case .solarTerm:
+            return .vnAccentJade
+        case .auspicious:
             return .vnOnGoldContainer
         case .inauspicious:
             return .vnTextSecondary
@@ -68,7 +70,9 @@ public struct VNChip: View {
 
     private var backgroundColor: Color {
         switch variant {
-        case .solarTerm, .auspicious:
+        case .solarTerm:
+            return Color.vnAccentJadeSurface
+        case .auspicious:
             return Color.vnGoldContainer
         case .inauspicious:
             return Color.vnBackgroundTertiary
@@ -81,7 +85,9 @@ public struct VNChip: View {
 
     private var borderColor: Color {
         switch variant {
-        case .solarTerm, .auspicious:
+        case .solarTerm:
+            return Color.vnAccentJade.opacity(0.25)
+        case .auspicious:
             return Color.vnAccentImperialGold.opacity(0.35)
         case .inauspicious:
             return Color.vnBorderSubtle

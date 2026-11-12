@@ -57,7 +57,7 @@ public struct VNWeekCalendarView: View {
                     anniversariesSection(for: model)
                 } else {
                     Text("calendar.week.empty_selection")
-                        .font(.system(size: 14))
+                        .font(.vnDisplay(size: 14))
                         .foregroundColor(.vnTextSecondary)
                         .padding(.top, VNSpacing.space32)
                 }
@@ -81,18 +81,18 @@ public struct VNWeekCalendarView: View {
                     VStack(spacing: VNSpacing.space2) {
                         // Thứ (T2, T3...)
                         Text(shortWeekday(from: day.weekdayName))
-                            .font(.system(size: 11, weight: .semibold))
+                            .font(.vnDisplay(size: 11, weight: .semibold))
                             .foregroundColor(isSelected ? .vnOnAccent : .vnTextSecondary)
 
                         // Ngày Dương
                         Text("\(day.solarDay)")
-                            .font(.system(size: 16, weight: isSelected ? .bold : .semibold, design: .serif))
+                            .font(.vnDisplay(size: 16, weight: isSelected ? .bold : .semibold))
                             .foregroundColor(isSelected ? .vnOnAccent : .vnTextPrimary)
 
                         // Ngày Âm (1/8 hoặc 23)
                         let isHighlight = day.isFirstDayOfLunarMonth || day.isFullMoonDay
                         Text(day.lunarDayText)
-                            .font(.system(size: 10, weight: isHighlight ? .bold : .regular))
+                            .font(.vnDisplay(size: 10, weight: isHighlight ? .bold : .regular))
                             .foregroundColor(
                                 isSelected ? .vnOnAccent : (isHighlight ? .vnAccentHeritageRed : .vnTextSecondary)
                             )
@@ -116,7 +116,7 @@ public struct VNWeekCalendarView: View {
                         RoundedRectangle(cornerRadius: VNCornerRadius.card)
                             .stroke(
                                 isSelected ? Color.vnAccentHeritageRed :
-                                    (day.isToday ? Color.vnAccentImperialGold : Color.vnBorderSubtle.opacity(0.4)),
+                                    (day.isToday ? Color.vnAccentHeritageRed : Color.vnBorderSubtle.opacity(0.4)),
                                 lineWidth: isSelected ? VNBorderWidth.active : VNBorderWidth.hairline
                             )
                     )
@@ -135,12 +135,12 @@ public struct VNWeekCalendarView: View {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
                     HStack(spacing: VNSpacing.xs) {
                         Text("\(model.weekdayName), \(model.solarDay)/\(model.solarMonth)/\(model.solarYear)")
-                            .font(.system(size: 15, weight: .bold, design: .serif))
+                            .font(.vnDisplay(size: 15, weight: .bold))
                             .foregroundColor(.vnTextPrimary)
 
                         if model.isToday {
                             Text("action.today")
-                                .font(.system(size: 10, weight: .bold))
+                                .font(.vnDisplay(size: 10, weight: .bold))
                                 .foregroundColor(.vnAccentHeritageRed)
                                 .padding(.horizontal, VNSpacing.xs)
                                 .padding(.vertical, VNSpacing.space2)
@@ -150,11 +150,11 @@ public struct VNWeekCalendarView: View {
                     }
 
                     Text(String(format: String(localized: "calendar.week.lunar_summary"), model.lunarDay, model.lunarMonthName, model.lunarDayCanChi))
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.vnDisplay(size: 13, weight: .medium))
                         .foregroundColor(.vnAccentHeritageRed)
 
                     Text(String(format: String(localized: "calendar.astro.star_and_officer"), model.zodiacStar.fullTitle, model.lunarOfficer.name))
-                        .font(.system(size: 11, weight: .regular))
+                        .font(.vnDisplay(size: 11, weight: .regular))
                         .foregroundColor(.vnTextSecondary)
                 }
 
@@ -180,7 +180,7 @@ public struct VNWeekCalendarView: View {
     private func lunarHoursTimeline(for model: VNCalendarDayModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("calendar.week.section.earthly_branches")
-                .font(.system(size: 10, weight: .bold))
+                .font(.vnDisplay(size: 10, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.6)
 
@@ -203,13 +203,13 @@ public struct VNWeekCalendarView: View {
                                     .frame(width: VNSpacing.xs, height: VNSpacing.xs)
                             }
                             Text(String(format: String(localized: "calendar.hour.branch_name"), branch.vietnameseName))
-                                .font(.system(size: 11, weight: isAuspicious ? .bold : .medium, design: .serif))
+                                .font(.vnDisplay(size: 11, weight: isAuspicious ? .bold : .medium))
                                 .foregroundColor(isAuspicious ? .vnTextPrimary : .vnTextSecondary)
                         }
 
                         Text(branch.timeRange)
-                            .font(.system(size: 9, weight: .regular))
-                            .foregroundColor(isAuspicious ? .vnAccentImperialGold : .vnTextTertiary)
+                            .font(.vnDisplay(size: 9, weight: .regular))
+                            .foregroundColor(isAuspicious ? .vnAccentGoldText : .vnTextTertiary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, VNSpacing.xs)
@@ -241,7 +241,7 @@ public struct VNWeekCalendarView: View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             HStack {
                 Text("calendar.week.section.events_and_anniversaries")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.vnDisplay(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                     .tracking(0.6)
 
@@ -249,7 +249,7 @@ public struct VNWeekCalendarView: View {
 
                 Button(action: onAddReminder) {
                     Label("calendar.action.add", systemImage: "plus")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.vnDisplay(size: 11, weight: .semibold))
                         .foregroundColor(.vnAccentHeritageRed)
                 }
                 .frame(minHeight: 44)
@@ -264,7 +264,7 @@ public struct VNWeekCalendarView: View {
                         .foregroundColor(.vnTextTertiary)
 
                     Text("calendar.events.empty_message")
-                        .font(.system(size: 12))
+                        .font(.vnDisplay(size: 12))
                         .foregroundColor(.vnTextSecondary)
                 }
                 .padding(.vertical, VNSpacing.sm)
@@ -278,11 +278,11 @@ public struct VNWeekCalendarView: View {
 
                             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                                 Text(item.title)
-                                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                                    .font(.vnDisplay(size: 13, weight: .semibold))
                                     .foregroundColor(.vnTextPrimary)
 
                                 Text(item.isAncestorDeath ? String(localized: "calendar.event.type.death_anniversary") : String(localized: "calendar.event.type.family_memory"))
-                                    .font(.system(size: 11))
+                                    .font(.vnDisplay(size: 11))
                                     .foregroundColor(.vnTextSecondary)
                             }
 

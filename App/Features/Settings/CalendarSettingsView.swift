@@ -7,20 +7,19 @@ public struct CalendarSettingsView: View {
     @Environment(AppContainer.self) private var container
 
     // Calendar Display Preferences
-    @AppStorage("defaultCalendarDisplayMode") private var defaultDisplayModeRaw: String = "month"
-    @AppStorage("calendarStartOfWeek") private var startOfWeek = 2 // 2 = Monday, 1 = Sunday
-    @AppStorage("highlightFullAndNewMoon") private var highlightFullAndNewMoon = true
-    @AppStorage("showAuspiciousHours") private var showAuspiciousHours = true
-    @AppStorage("showSolarTermsAndTruc") private var showSolarTermsAndTruc = true
+    @AppStorage(VNCalendarPreferenceKey.defaultDisplayMode) private var defaultDisplayModeRaw: String = "month"
+    @AppStorage(VNCalendarPreferenceKey.startOfWeek) private var startOfWeek = 2 // 2 = Monday, 1 = Sunday
+    @AppStorage(VNCalendarPreferenceKey.highlightFullAndNewMoon) private var highlightFullAndNewMoon = true
+    @AppStorage(VNCalendarPreferenceKey.showAuspiciousHours) private var showAuspiciousHours = true
+    @AppStorage(VNCalendarPreferenceKey.showSolarTermsAndTruc) private var showSolarTermsAndTruc = true
 
     // MicroCMS Preferences
-    @AppStorage("autoSyncMicroCMS") private var autoSyncMicroCMS = true
-    @AppStorage("microCMSWifiOnly") private var microCMSWifiOnly = false
-    @AppStorage("cachePrayersOffline") private var cachePrayersOffline = true
-    @AppStorage("microCMSLastSyncDate") private var lastSyncTimestamp = String(format: String(localized: "settings.microcms.last_sync_default"), "21:00")
+    @AppStorage(ContentSyncPolicy.autoSyncKey) private var autoSyncMicroCMS = true
+    @AppStorage(ContentSyncPolicy.wifiOnlyKey) private var microCMSWifiOnly = false
+    @AppStorage(ContentSyncPolicy.lastSyncKey) private var lastSyncAt: Double = 0
 
     // Day Customization Preferences
-    @AppStorage("showDailyAuspiciousQuote") private var showDailyQuote = true
+    @AppStorage(VNCalendarPreferenceKey.showDailyQuote) private var showDailyQuote = true
     @AppStorage("hapticFeedbackEnabled") private var isHapticEnabled = true
 
     // Sync State
@@ -192,15 +191,6 @@ public struct CalendarSettingsView: View {
 
                 rowDivider
 
-                Toggle(isOn: $cachePrayersOffline) {
-                    rowLabel(icon: "arrow.down.circle.fill", tint: .vnAccentHeritageRed, title: String(localized: "settings.microcms.offline_cache"))
-                }
-                .tint(.vnAccentHeritageRed)
-                .padding(.horizontal, VNSpacing.lg)
-                .padding(.vertical, VNSpacing.md)
-
-                rowDivider
-
                 syncNowButton
                     .padding(VNSpacing.lg)
             }
@@ -212,7 +202,7 @@ public struct CalendarSettingsView: View {
                         .foregroundColor(.vnStatusSuccess)
                         .accessibilityHidden(true)
                     Text(banner)
-                        .font(.caption)
+                        .font(.vnDisplay(.caption))
                         .foregroundColor(.vnTextSecondary)
                 }
                 .padding(.horizontal, VNSpacing.sm)
@@ -222,42 +212,19 @@ public struct CalendarSettingsView: View {
         }
     }
 
-    @ViewBuilder
     private var microCMSStatusHeader: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            HStack(alignment: .center, spacing: VNSpacing.sm) {
-                Circle()
-                    .fill(Color.vnStatusSuccess)
-                    .frame(width: 8, height: 8)
-                    .accessibilityHidden(true)
+        Text(lastSyncText)
+            .font(.vnDisplay(.caption))
+            .foregroundColor(.vnTextSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(VNSpacing.lg)
+            .background(Color.vnBackgroundPrimary.opacity(0.6))
+    }
 
-                Text(String(localized: "settings.microcms.connected"))
-                    .font(.vnFootnote)
-                    .foregroundColor(.vnTextPrimary)
-
-                Spacer()
-
-                Text("v2.4-stable")
-                    .font(.system(.caption2, design: .monospaced, weight: .bold))
-                    .padding(.horizontal, VNSpacing.sm)
-                    .padding(.vertical, VNSpacing.space2)
-                    .background(Color.vnAccentImperialGold.opacity(0.18))
-                    .foregroundColor(.vnOnGoldContainer)
-                    .clipShape(Capsule())
-            }
-
-            HStack(spacing: VNSpacing.sm) {
-                cmsStatPill(icon: "book.fill", text: String(format: String(localized: "settings.microcms.stat_prayers"), 48))
-                cmsStatPill(icon: "sparkles", text: String(format: String(localized: "settings.microcms.stat_holidays"), 12))
-                cmsStatPill(icon: "quote.opening", text: String(format: String(localized: "settings.microcms.stat_quotes"), 365))
-            }
-
-            Text(String(format: String(localized: "settings.microcms.last_sync"), lastSyncTimestamp))
-                .font(.caption2)
-                .foregroundColor(.vnTextSecondary)
-        }
-        .padding(VNSpacing.lg)
-        .background(Color.vnBackgroundPrimary.opacity(0.6))
+    private var lastSyncText: String {
+        guard lastSyncAt > 0 else { return String(localized: "settings.microcms.never_synced") }
+        let when = Date(timeIntervalSince1970: lastSyncAt).formatted(date: .abbreviated, time: .shortened)
+        return String(format: String(localized: "settings.microcms.last_sync"), when)
     }
 
     @ViewBuilder
@@ -305,7 +272,7 @@ public struct CalendarSettingsView: View {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         rowLabel(icon: "quote.opening", tint: .vnAccentGoldText, title: String(localized: "settings.daily.quote"))
                         Text(String(localized: "settings.daily.quote_desc"))
-                            .font(.caption)
+                            .font(.vnDisplay(.caption))
                             .foregroundColor(.vnTextSecondary)
                             .padding(.leading, settingsSubtitleLeadingInset)
                     }
@@ -338,12 +305,12 @@ public struct CalendarSettingsView: View {
                         rowLabel(icon: "globe.asia.australia.fill", tint: .vnAccentHeritageRed, title: String(localized: "settings.timezone.lunar"))
                         Spacer()
                         Text("GMT+7")
-                            .font(.footnote.weight(.bold))
+                            .font(.vnDisplay(.footnote, weight: .bold))
                             .foregroundColor(.vnAccentGoldText)
                     }
 
                     Text(String(localized: "settings.timezone.astronomy_desc"))
-                        .font(.caption)
+                        .font(.vnDisplay(.caption))
                         .foregroundColor(.vnTextSecondary)
                         .lineSpacing(3)
                         .padding(.top, VNSpacing.space2)
@@ -354,25 +321,9 @@ public struct CalendarSettingsView: View {
     }
 
     // MARK: - Helper UI Components
-    private func cmsStatPill(icon: String, text: String) -> some View {
-        HStack(spacing: VNSpacing.xs) {
-            Image(systemName: icon)
-                .font(.caption2)
-                .foregroundColor(.vnOnGoldContainer)
-                .accessibilityHidden(true)
-            Text(text)
-                .font(.caption2.weight(.medium))
-                .foregroundColor(.vnOnGoldContainer)
-        }
-        .padding(.horizontal, VNSpacing.sm)
-        .padding(.vertical, VNSpacing.xs)
-        .background(Color.vnGoldContainer.opacity(0.5))
-        .clipShape(Capsule())
-    }
-
     private func sectionHeader(title: String) -> some View {
         Text(title)
-            .font(.caption2.weight(.medium))
+            .font(.vnDisplay(.caption2, weight: .medium))
             .tracking(0.7)
             .foregroundColor(.vnOnGoldContainer)
             .padding(.horizontal, VNSpacing.xs)
@@ -387,7 +338,7 @@ public struct CalendarSettingsView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
         )
     }
 
@@ -405,7 +356,7 @@ public struct CalendarSettingsView: View {
                         .stroke(tint.opacity(0.22), lineWidth: VNBorderWidth.regular)
                 )
             Text(title)
-                .font(.callout)
+                .font(.vnDisplay(.callout))
                 .foregroundColor(.vnTextPrimary)
                 .minimumScaleFactor(0.8)
         }
@@ -422,13 +373,7 @@ public struct CalendarSettingsView: View {
 
         Task {
             do {
-                await container.syncProverbs()
-                try await container.holidayRepository.synchronizeRemoteContent()
-
-                let formatter = DateFormatter()
-                formatter.dateFormat = "HH:mm, dd/MM"
-                let nowStr = formatter.string(from: Date())
-                lastSyncTimestamp = String(format: String(localized: "settings.microcms.last_sync_default"), nowStr)
+                try await container.syncRemoteContent()
                 withAnimation(reduceMotion ? nil : .smooth) {
                     syncStatusBanner = String(localized: "settings.microcms.sync_done")
                 }

@@ -37,6 +37,11 @@ public actor MicroCMSClient {
         }
     }
 
+    /// Callers whose persistence fails after a 200 must drop the ETag, otherwise the next sync gets a permanent 304.
+    public func clearETag(endpoint: String) {
+        defaults.removeObject(forKey: "microcms_etag_\(endpoint)")
+    }
+
     public func fetchList<T: Decodable & Sendable>(
         endpoint: String,
         limit: Int = 100

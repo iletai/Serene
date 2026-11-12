@@ -82,10 +82,10 @@ public struct FamilyHierarchyView: View {
         HStack(spacing: VNSpacing.sm) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("family.title")
-                    .font(.system(.headline, design: .serif).weight(.bold))
+                    .font(.vnDisplay(.headline, weight: .bold))
                     .foregroundColor(Color.vnAccentDeepPrimary)
                 Text("family.subtitle")
-                    .font(.caption2)
+                    .font(.vnDisplay(.caption2))
                     .foregroundColor(.vnTextSecondary)
             }
 
@@ -140,12 +140,12 @@ public struct FamilyHierarchyView: View {
                 .accessibilityHidden(true)
 
             Text("family.locked_title")
-                .font(.system(.title2, design: .serif).weight(.semibold))
+                .font(.vnDisplay(.title2, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
 
             Text("family.locked_body")
-                .font(.subheadline)
+                .font(.vnDisplay(.subheadline))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(VNSpacing.xs)
@@ -167,7 +167,7 @@ public struct FamilyHierarchyView: View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             HStack {
                 Text("family.eyebrow")
-                    .font(.caption2.weight(.bold))
+                    .font(.vnDisplay(.caption2, weight: .bold))
                     .tracking(0.66)
                     .foregroundColor(.vnAccentGoldText)
 
@@ -177,7 +177,7 @@ public struct FamilyHierarchyView: View {
                     Text(String(format: String(localized: "family.count_ancestors"), vm.reminders.count))
                         .contentTransition(.numericText())
                         .animation(reduceMotion ? nil : .snappy, value: vm.reminders.count)
-                        .font(.caption2.weight(.semibold))
+                        .font(.vnDisplay(.caption2, weight: .semibold))
                         .foregroundColor(.vnOnGoldContainer)
                         .padding(.horizontal, VNSpacing.sm)
                         .padding(.vertical, VNSpacing.xs)
@@ -202,12 +202,12 @@ public struct FamilyHierarchyView: View {
                 .accessibilityHidden(true)
 
             Text("family.empty_title")
-                .font(.system(.title2, design: .serif).weight(.semibold))
+                .font(.vnDisplay(.title2, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
 
             Text("family.empty_body")
-                .font(.subheadline)
+                .font(.vnDisplay(.subheadline))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(VNSpacing.xs)
@@ -224,7 +224,7 @@ public struct FamilyHierarchyView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
         )
         .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
         .padding(.horizontal, VNSpacing.screenMargin)
@@ -279,12 +279,12 @@ public struct FamilyHierarchyView: View {
         } label: {
             HStack(spacing: VNSpacing.sm) {
                 Text(group.generationRank)
-                    .font(.caption2.weight(.bold))
+                    .font(.vnDisplay(.caption2, weight: .bold))
                     .tracking(0.66)
                     .foregroundColor(.vnAccentGoldText)
 
                 Text(group.generationTitle)
-                    .font(.system(.headline, design: .serif).weight(.bold))
+                    .font(.vnDisplay(.headline, weight: .bold))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
@@ -292,7 +292,7 @@ public struct FamilyHierarchyView: View {
                 Spacer()
 
                 Text(String(format: String(localized: "family.group_count"), group.members.count))
-                    .font(.caption.weight(.medium))
+                    .font(.vnDisplay(.caption, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                     .contentTransition(.numericText())
                     .vnAnimation(VNAnimation.layout, value: group.members.count)
@@ -321,7 +321,7 @@ public struct FamilyHierarchyView: View {
     private func generationRail(rank: String) -> some View {
         VStack(spacing: VNSpacing.sm) {
             Text(FamilyMemberGroup.badgeText(fromRank: rank))
-                .font(.system(.footnote, design: .serif).weight(.bold))
+                .font(.vnDisplay(.footnote, weight: .bold))
                 .foregroundColor(.vnAccentHeritageRed)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
@@ -395,7 +395,7 @@ public struct FamilyHierarchyView: View {
                 VNSealBadge.gio(size: .small)
             } else {
                 Text("family.seal_toc")
-                    .font(.system(.footnote, design: .serif).weight(.bold))
+                    .font(.vnDisplay(.footnote, weight: .bold))
                     .foregroundColor(Color.vnAccentGoldText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -406,13 +406,13 @@ public struct FamilyHierarchyView: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.xs) {
                 Text(member.title)
-                    .font(.system(.subheadline, design: .serif).weight(.semibold))
+                    .font(.vnDisplay(.subheadline, weight: .semibold))
                     .foregroundColor(.vnTextPrimary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(memberSubtitle(member))
-                    .font(.caption)
+                    .font(.vnDisplay(.caption))
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
@@ -439,7 +439,7 @@ public struct FamilyHierarchyView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
         )
         .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
     }

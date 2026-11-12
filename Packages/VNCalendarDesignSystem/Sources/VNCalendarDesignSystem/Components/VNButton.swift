@@ -1,11 +1,11 @@
 import SwiftUI
 
 public enum VNButtonVariant: Sendable {
-    case primary      // Đỏ Son Đậm (#A0220B) nền đặc, chữ trắng
-    case secondary    // Vải Xô / Nền cấp 2 viền mộc hairline
-    case tertiary     // Nền trong suốt, chữ đỏ hoặc mực nho
-    case gold         // Vàng Hoàng Cúc (#C69214) cho Pro / Lễ Tiết
-    case destructive  // Đỏ Huyết Dụ cảnh báo
+    case primary      // Đỏ Lồng Đèn nền đặc, chữ vnOnAccent
+    case secondary    // Nền cấp 2, viền vnBorderStrong
+    case tertiary     // Nền trong suốt, chữ đỏ, không có lip
+    case gold         // Vàng Hoa Mai cho Pro / Lễ Tiết, chữ mực cố định
+    case destructive  // Đỏ cảnh báo
 }
 
 public enum VNButtonSize: Sendable {
@@ -27,9 +27,9 @@ public enum VNButtonSize: Sendable {
 
     public var horizontalPadding: CGFloat {
         switch self {
-        case .small: return VNSpacing.md
+        case .small: return 14
         case .medium: return VNSpacing.xl
-        case .large: return VNSpacing.xxl
+        case .large: return 28
         }
     }
 
@@ -60,38 +60,39 @@ public struct VNButtonStyle: ButtonStyle {
     }
 
     public func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size.textStyle, design: .serif, weight: .semibold))
+        let isPressed = configuration.isPressed
+        return configuration.label
+            .font(.vnDisplay(size.textStyle, weight: .bold))
             .foregroundColor(foregroundColor)
             .padding(.horizontal, size.horizontalPadding)
             .frame(maxWidth: isFullWidth ? .infinity : nil)
             .frame(minHeight: size.minHeight)
+            .background(backgroundColor(isPressed: isPressed), in: Capsule())
+            .overlay(Capsule().strokeBorder(borderColor, lineWidth: borderWidth))
+            // The pill drops onto its lip when pressed; tertiary shrinks instead.
+            .offset(y: hasLip && isPressed && !reduceMotion ? VNShadow.lip.y : 0)
+            .scaleEffect(!hasLip && isPressed && !reduceMotion ? 0.95 : 1.0)
+            .background(alignment: .top) {
+                if hasLip {
+                    Capsule().fill(VNShadow.lip.color).offset(y: VNShadow.lip.y)
+                }
+            }
+            .padding(.bottom, hasLip ? VNShadow.lip.y : 0)
             .contentShape(Rectangle().inset(by: -size.hitOutset))
-            .background(backgroundColor(isPressed: configuration.isPressed))
-            .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-            .overlay(
-                RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                    .strokeBorder(borderColor, lineWidth: borderWidth)
-            )
-            .shadow(
-                color: shadowColor,
-                radius: VNShadow.folio.radius,
-                x: VNShadow.folio.x,
-                y: VNShadow.folio.y
-            )
-            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.97 : 1.0)
             .animation(
-                reduceMotion ? VNAnimation.reduced : (configuration.isPressed ? VNAnimation.pressDown : VNAnimation.press),
-                value: configuration.isPressed
+                reduceMotion ? VNAnimation.reduced : (isPressed ? VNAnimation.pressDown : VNAnimation.press),
+                value: isPressed
             )
     }
+
+    private var hasLip: Bool { variant != .tertiary }
 
     private var foregroundColor: Color {
         switch variant {
         case .primary, .destructive:
             return .vnOnAccent
         case .gold:
-            // Fixed dark ink: gold fill is light in both modes (6.9:1 light, 10.3:1 dark)
+            // Fixed dark ink: gold fill is light in both modes (11:1)
             return .vnDeepCalligraphicInk
         case .secondary:
             return .vnTextPrimary
@@ -105,7 +106,7 @@ public struct VNButtonStyle: ButtonStyle {
         case .primary:
             return isPressed ? Color.vnAccentHeritageRed.opacity(0.85) : Color.vnAccentHeritageRed
         case .secondary:
-            return isPressed ? Color.vnBackgroundTertiary : Color.clear
+            return isPressed ? Color.vnBackgroundTertiary : Color.vnBackgroundSecondary
         case .tertiary:
             return isPressed ? Color.vnAccentRedSurface : Color.clear
         case .gold:
@@ -120,7 +121,7 @@ public struct VNButtonStyle: ButtonStyle {
         case .primary, .gold, .destructive:
             return Color.clear
         case .secondary:
-            return Color.vnBorderSubtle
+            return Color.vnBorderStrong
         case .tertiary:
             return Color.clear
         }
@@ -129,20 +130,9 @@ public struct VNButtonStyle: ButtonStyle {
     private var borderWidth: CGFloat {
         switch variant {
         case .secondary:
-            return VNBorderWidth.hairline
+            return VNBorderWidth.regular
         default:
             return 0
-        }
-    }
-
-    private var shadowColor: Color {
-        switch variant {
-        case .primary:
-            return Color.vnAccentHeritageRed.opacity(0.15)
-        case .gold:
-            return Color.vnAccentImperialGold.opacity(0.15)
-        default:
-            return Color.clear
         }
     }
 }
@@ -183,7 +173,7 @@ public struct VNButton: View {
                 HStack(spacing: VNSpacing.sm) {
                     if let icon = icon {
                         Image(systemName: icon)
-                            .font(.system(size.textStyle, weight: .bold))
+                            .font(.vnDisplay(size.textStyle, weight: .bold))
                     }
                     Text(title)
                         .lineLimit(1)

@@ -55,8 +55,9 @@ struct AnNienApp: App {
                 .task {
                     // Initial permissions & background synchronization
                     _ = try? await container.notificationEngine.requestAuthorization()
-                    try? await container.holidayRepository.synchronizeRemoteContent()
-                    await container.syncProverbs()
+                    if await ContentSyncPolicy.autoSyncAllowed() {
+                        try? await container.syncRemoteContent()
+                    }
                     if let reminders = try? await container.reminderRepository.fetchAllReminders() {
                         try? await container.notificationEngine.pruneAndSchedule(reminders: reminders)
                     }
@@ -65,7 +66,7 @@ struct AnNienApp: App {
                 }
                 .appUpdateSheet(
                     action: $updateAction,
-                    accentColor: Color.vnAccentImperialGold
+                    accentColor: Color.vnCinnabarLacquerRed
                 )
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {

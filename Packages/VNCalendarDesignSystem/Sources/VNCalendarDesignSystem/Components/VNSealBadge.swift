@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// Traditional Vietnamese debossed wax seal (Ấn Triện) component.
-/// Embodies the "Vietnamese Lunar Editorial" aesthetic with authentic cinnabar and gold pigments.
+/// Ấn Triện: a solid cinnabar stamp with a pale inner ring, tilted -3°, that stamps in on first appear.
 public struct VNSealBadge: View {
     public enum Shape: Sendable, Equatable {
         case square
@@ -26,12 +25,12 @@ public struct VNSealBadge: View {
             switch self {
             case .small: 9
             case .medium: 11
-            case .large: 13
+            case .large: 14
             }
         }
 
-        /// Canonical 40x40 seal square (DESIGN §4). Only the medium square enforces this frame.
-        public static let canonicalSquareSize: CGFloat = 40
+        /// Canonical 44x44 seal square. Only the medium square enforces this frame.
+        public static let canonicalSquareSize: CGFloat = 44
 
         public var paddingHorizontal: CGFloat {
             switch self {
@@ -92,10 +91,13 @@ public struct VNSealBadge: View {
         VNSealBadge(text: String(localized: "ds.seal.tet"), shape: .pill, color: .cinnabarGold, size: size)
     }
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var stampCount = 0
+
     private var backgroundColor: Color {
         switch color {
         case .cinnabarWhite, .cinnabarGold, .vermilionDarkGold:
-            Color.vnBackgroundPrimary
+            Color.vnAccentHeritageRed
         case .custom(let background, _, _):
             background
         }
@@ -104,18 +106,9 @@ public struct VNSealBadge: View {
     private var foregroundColor: Color {
         switch color {
         case .cinnabarWhite, .cinnabarGold, .vermilionDarkGold:
-            Color.vnAccentHeritageRed
+            Color.vnOnAccent
         case .custom(_, let foreground, _):
             foreground
-        }
-    }
-
-    private var borderColor: Color {
-        switch color {
-        case .cinnabarWhite, .cinnabarGold, .vermilionDarkGold:
-            Color.vnAccentHeritageRed
-        case .custom(_, _, let border):
-            border ?? Color.clear
         }
     }
 
@@ -123,10 +116,10 @@ public struct VNSealBadge: View {
         HStack(spacing: VNSpacing.xs) {
             if let icon {
                 Image(systemName: icon)
-                    .font(.system(size: size.fontSize - 1, weight: .bold))
+                    .font(.vnDisplay(size: size.fontSize - 1, weight: .heavy))
             }
             Text(text)
-                .font(.system(size: size.fontSize, weight: .bold, design: .serif))
+                .font(.vnDisplay(size: size.fontSize, weight: .heavy))
                 .tracking(0.6)
         }
         .foregroundColor(foregroundColor)
@@ -138,45 +131,59 @@ public struct VNSealBadge: View {
         )
         .background(backgroundColor)
         .clipShape(SealBadgeShape(shape: shape))
-        .overlay(shapeStroke)
-        .overlay(insetRing)
+        .overlay(innerRing)
+        .overlay(customBorder)
         .shadow(
-            color: Color.vnAccentHeritageRed.opacity(0.15),
+            color: VNShadow.card.color,
             radius: VNShadow.card.radius,
             x: VNShadow.card.x,
             y: VNShadow.card.y
         )
+        .rotationEffect(.degrees(-3))
+        .keyframeAnimator(initialValue: StampFrame(), trigger: stampCount) { content, frame in
+            content
+                .scaleEffect(frame.scale)
+                .rotationEffect(.degrees(frame.extraAngle))
+                .opacity(frame.opacity)
+        } keyframes: { [reduceMotion] _ in
+            Self.stampKeyframes(reduceMotion: reduceMotion)
+        }
+        .onAppear { stampCount += 1 }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: String(localized: "ds.seal.a11y_label"), text))
     }
 
-    /// Canonical seal: 2pt outer border on the medium square, 1pt elsewhere (DESIGN §4).
-    private var shapeStroke: some View {
-        SealBadgeShape(shape: shape)
-            .stroke(borderColor,
-                    lineWidth: isCanonicalSquare ? VNBorderWidth.focus : VNBorderWidth.regular)
+    /// Stamp: lands from 190% and -18° (extra -15° on top of the resting -3°), rebounds, rests. 0.52s.
+    /// Reduce Motion: fade only.
+    @KeyframesBuilder<StampFrame>
+    private nonisolated static func stampKeyframes(reduceMotion: Bool) -> some Keyframes<StampFrame> {
+        KeyframeTrack(\.scale) {
+            LinearKeyframe(reduceMotion ? 1 : 1.9, duration: 0)
+            CubicKeyframe(reduceMotion ? 1 : 0.9, duration: 0.29)
+            SpringKeyframe(reduceMotion ? 1 : 1.05, duration: 0.12)
+            SpringKeyframe(1, duration: 0.11)
+        }
+        KeyframeTrack(\.extraAngle) {
+            LinearKeyframe(reduceMotion ? 0 : -15, duration: 0)
+            CubicKeyframe(0, duration: 0.29)
+        }
+        KeyframeTrack(\.opacity) {
+            LinearKeyframe(0, duration: 0)
+            LinearKeyframe(1, duration: 0.15)
+        }
     }
 
-    /// Inset ring: `inset 0 0 0 1px rgba(160,34,11,0.4)` from `.seal-shadow`.
+    /// Pale inner ring: 1.5pt vnOnAccent at 55%, inset 3pt, the edge of the carved stone.
+    private var innerRing: some View {
+        SealBadgeShape(shape: shape, inset: 3)
+            .stroke(foregroundColor.opacity(0.55), lineWidth: VNBorderWidth.regular)
+    }
+
+    /// Only `.custom` seals take an outer border; the cinnabar presets are solid.
     @ViewBuilder
-    private var insetRing: some View {
-        switch shape {
-        case .square:
-            Rectangle()
-                .inset(by: 1)
-                .stroke(Color.vnAccentHeritageRed.opacity(0.4), lineWidth: VNBorderWidth.regular)
-        case .rounded(let radius):
-            RoundedRectangle(cornerRadius: max(0, radius - 1))
-                .inset(by: 1)
-                .stroke(Color.vnAccentHeritageRed.opacity(0.4), lineWidth: VNBorderWidth.regular)
-        case .pill:
-            Capsule()
-                .inset(by: 1)
-                .stroke(Color.vnAccentHeritageRed.opacity(0.4), lineWidth: VNBorderWidth.regular)
-        case .circle:
-            Circle()
-                .inset(by: 1)
-                .stroke(Color.vnAccentHeritageRed.opacity(0.4), lineWidth: VNBorderWidth.regular)
+    private var customBorder: some View {
+        if case .custom(_, _, let border?) = color {
+            SealBadgeShape(shape: shape).stroke(border, lineWidth: VNBorderWidth.regular)
         }
     }
 
@@ -185,15 +192,24 @@ public struct VNSealBadge: View {
     }
 }
 
+/// Resting values; the stamp keyframes jump away from these and settle back.
+struct StampFrame: Sendable {
+    var scale: CGFloat = 1
+    var extraAngle: Double = 0
+    var opacity: Double = 1
+}
+
 private struct SealBadgeShape: Shape {
     let shape: VNSealBadge.Shape
+    var inset: CGFloat = 0
 
-    func path(in rect: CGRect) -> Path {
-        switch shape {
+    func path(in fullRect: CGRect) -> Path {
+        let rect = fullRect.insetBy(dx: inset, dy: inset)
+        return switch shape {
         case .square:
-            Path(rect)
+            Path(roundedRect: rect, cornerRadius: max(0, VNCornerRadius.micro - inset))
         case .rounded(let cornerRadius):
-            Path(roundedRect: rect, cornerRadius: cornerRadius)
+            Path(roundedRect: rect, cornerRadius: max(0, cornerRadius - inset))
         case .pill:
             Path(roundedRect: rect, cornerRadius: rect.height / 2)
         case .circle:

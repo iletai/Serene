@@ -73,7 +73,7 @@ public struct OmniSearchView: View {
                     .accessibilityHidden(true)
 
                 TextField("", text: $boundVM.searchText, prompt: Text("search.field_prompt"))
-                    .font(.subheadline)
+                    .font(.vnDisplay(.subheadline))
                     .foregroundColor(.vnTextPrimary)
                     .focused($isSearchFocused)
                     .submitLabel(.search)
@@ -121,13 +121,13 @@ public struct OmniSearchView: View {
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                     .overlay(
                         RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                            .stroke(Color.vnAccentImperialGold.opacity(0.22), lineWidth: VNBorderWidth.regular)
+                            .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
                     )
 
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
                     HStack(spacing: VNSpacing.sm) {
                         Text("search.quick_parser_badge")
-                            .font(.caption2.weight(.medium))
+                            .font(.vnDisplay(.caption2, weight: .medium))
                             .tracking(0.7)
                             .foregroundColor(.vnOnGoldContainer)
                             .padding(.horizontal, VNSpacing.sm)
@@ -137,13 +137,13 @@ public struct OmniSearchView: View {
                     }
 
                     Text(parsed.label)
-                        .font(.callout.weight(.semibold))
+                        .font(.vnDisplay(.callout, weight: .semibold))
                         .foregroundColor(.vnTextPrimary)
                         .minimumScaleFactor(0.8)
 
                     if let conv = vm.resolvedConvertedDateText {
                         Text(conv)
-                            .font(.footnote)
+                            .font(.vnDisplay(.footnote))
                             .foregroundColor(.vnAccentHeritageRed)
                     }
 
@@ -169,7 +169,7 @@ public struct OmniSearchView: View {
             }
         } label: {
             Label("search.create_reminder", systemImage: "plus.circle.fill")
-                .font(.footnote.weight(.semibold))
+                .font(.vnDisplay(.footnote, weight: .semibold))
                 .foregroundColor(.vnAccentDeepPrimary)
                 .frame(minHeight: VNSize.minTapTarget)
                 .contentShape(Rectangle())
@@ -182,7 +182,7 @@ public struct OmniSearchView: View {
     private func resultsList(vm: OmniSearchViewModel) -> some View {
         VStack(spacing: VNSpacing.sm) {
             Text("search.results_section_header")
-                .font(.caption2.weight(.medium))
+                .font(.vnDisplay(.caption2, weight: .medium))
                 .tracking(0.7)
                 .foregroundColor(.vnOnGoldContainer)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -229,12 +229,12 @@ public struct OmniSearchView: View {
 
                 VStack(alignment: .leading, spacing: VNSpacing.xs) {
                     Text(title)
-                        .font(.callout.weight(.semibold))
+                        .font(.vnDisplay(.callout, weight: .semibold))
                         .foregroundColor(.vnTextPrimary)
                         .minimumScaleFactor(0.8)
 
                     Text(detail)
-                        .font(.footnote)
+                        .font(.vnDisplay(.footnote))
                         .foregroundColor(.vnTextSecondary)
                         .lineLimit(2)
                 }
@@ -251,7 +251,7 @@ public struct OmniSearchView: View {
             .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                    .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                    .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
             )
             .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
     }

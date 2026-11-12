@@ -26,7 +26,7 @@ struct ReminderHeaderView: View {
             allPadding: VNSpacing.cardPadding,
             cornerRadius: VNCornerRadius.card,
             backgroundColor: Color.vnBackgroundSecondary,
-            borderColor: Color.vnAccentImperialGold.opacity(0.28),
+            borderColor: Color.vnBorderSubtle,
             shadow: Self.folioShadow
         ) {
             VStack(alignment: .leading, spacing: VNSpacing.sm) {
@@ -43,14 +43,14 @@ struct ReminderHeaderView: View {
                 }
 
                 Text(isEditing ? String(localized: "reminder.title_edit") : String(localized: "reminder.title_add"))
-                    .font(.system(.title, design: .serif, weight: .semibold))
+                    .font(.vnDisplay(.title, weight: .semibold))
                     .foregroundColor(.vnTextPrimary)
                     .minimumScaleFactor(0.8)
                     .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                     .accessibilityAddTraits(.isHeader)
 
                 Text("reminder.subtitle")
-                    .font(.system(.footnote, design: .serif))
+                    .font(.vnDisplay(.footnote))
                     .italic()
                     .foregroundColor(.vnTextSecondary)
 
@@ -65,7 +65,7 @@ struct ReminderHeaderView: View {
     private var datePreview: some View {
         HStack(alignment: .center, spacing: VNSpacing.md) {
             Text("\(solarDate.day)")
-                .font(.system(size: numeralSize, weight: .light))
+                .font(.vnDisplay(size: numeralSize, weight: .light))
                 .foregroundColor(.vnTextPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
@@ -77,7 +77,7 @@ struct ReminderHeaderView: View {
                     .tracking(0.66)
                     .foregroundColor(.vnAccentGoldText)
                 Text(String(format: String(localized: "reminder.preview_lunar_date"), lunarDate.day, lunarDate.month))
-                    .font(.system(.subheadline, design: .serif, weight: .bold))
+                    .font(.vnDisplay(.subheadline, weight: .bold))
                     .tracking(0.28)
                     .foregroundColor(.vnAccentHeritageRed)
                     .lineLimit(1)

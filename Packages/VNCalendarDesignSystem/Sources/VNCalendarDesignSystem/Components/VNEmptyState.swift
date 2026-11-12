@@ -76,14 +76,14 @@ public struct VNEmptyState: View {
             .accessibilityHidden(true)
 
             Text(title)
-                .font(.system(size: 18, weight: .bold, design: .serif))
+                .font(.vnDisplay(size: 18, weight: .bold))
                 .foregroundColor(.vnTextPrimary)
                 .multilineTextAlignment(.center)
                 .vnAppear(delay: 0.05)
 
             if let quote {
                 Text(quote)
-                    .font(.system(size: 13, design: .serif))
+                    .font(.vnDisplay(size: 13))
                     .italic()
                     .multilineTextAlignment(.center)
                     .foregroundColor(.vnTextSecondary)
@@ -101,7 +101,7 @@ public struct VNEmptyState: View {
                                 .accessibilityHidden(true)
                         }
                         Text(ctaLabel)
-                            .font(.system(size: 14, weight: .bold, design: .serif))
+                            .font(.vnDisplay(size: 14, weight: .bold))
                     }
                     .foregroundColor(.vnOnAccent)
                     .padding(.horizontal, VNSpacing.xl)

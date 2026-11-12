@@ -49,7 +49,7 @@ public struct VNYearCalendarView: View {
     private func miniMonthCard(_ monthModel: VNYearMonthModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text(monthModel.monthName)
-                .font(.system(.footnote, design: .serif).weight(.bold))
+                .font(.vnDisplay(.footnote, weight: .bold))
                 .foregroundColor(.vnTextPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
@@ -90,7 +90,7 @@ public struct VNYearCalendarView: View {
                 .frame(maxWidth: .infinity, minHeight: 18)
                 .background(
                     isSelected ? Color.vnAccentHeritageRed :
-                    (day.isToday ? Color.vnAccentImperialGold.opacity(0.35) : Color.clear)
+                    (day.isToday ? Color.vnAccentRedSurface : Color.clear)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.micro))
                 .overlay(alignment: .bottom) {

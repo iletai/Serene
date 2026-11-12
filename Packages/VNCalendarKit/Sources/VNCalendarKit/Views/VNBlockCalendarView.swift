@@ -97,7 +97,7 @@ public struct VNBlockCalendarView: View {
             Spacer()
 
             Text("calendar.block.header_title")
-                .font(.system(size: 11, weight: .bold, design: .serif))
+                .font(.vnDisplay(size: 11, weight: .bold))
                 .foregroundColor(.vnOnAccent)
                 .tracking(2.0)
 
@@ -116,7 +116,7 @@ public struct VNBlockCalendarView: View {
     private func blocSolarSection(for model: VNCalendarDayModel) -> some View {
         VStack(spacing: VNSpacing.space2) {
             Text(model.weekdayName.uppercased())
-                .font(.system(size: 16, weight: .bold, design: .serif))
+                .font(.vnDisplay(size: 16, weight: .bold))
                 .foregroundColor(isWeekend(model.weekdayName) ? .vnAccentHeritageRed : .vnTextSecondary)
                 .tracking(1.2)
                 .padding(.top, VNSpacing.sm)
@@ -127,7 +127,7 @@ public struct VNBlockCalendarView: View {
                 .frame(height: 76)
 
             Text(String(format: String(localized: "calendar.block.solar_month_year"), model.solarMonth, model.solarYear))
-                .font(.system(size: 13, weight: .medium))
+                .font(.vnDisplay(size: 13, weight: .medium))
                 .foregroundColor(.vnTextSecondary)
         }
     }
@@ -136,7 +136,7 @@ public struct VNBlockCalendarView: View {
         VStack(spacing: VNSpacing.xs) {
             HStack(spacing: VNSpacing.sm) {
                 Text(lunarDayDisplay(for: model))
-                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .font(.vnDisplay(size: 24, weight: .bold))
                     .foregroundColor(.vnAccentHeritageRed)
 
                 if model.isFirstDayOfLunarMonth {
@@ -149,11 +149,11 @@ public struct VNBlockCalendarView: View {
             }
 
             Text(String(format: String(localized: "calendar.block.lunar_month_year"), model.lunarMonthName, model.lunarYearCanChi))
-                .font(.system(size: 14, weight: .semibold, design: .serif))
+                .font(.vnDisplay(size: 14, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
 
             Text(String(format: String(localized: "calendar.block.lunar_day_month_canchi"), model.lunarDayCanChi, model.lunarMonthCanChi))
-                .font(.system(size: 12, weight: .regular))
+                .font(.vnDisplay(size: 12, weight: .regular))
                 .foregroundColor(.vnTextSecondary)
         }
     }
@@ -162,7 +162,7 @@ public struct VNBlockCalendarView: View {
         HStack(spacing: VNSpacing.xs) {
             if let term = model.solarTermName {
                 Text(String(format: String(localized: "calendar.solar_term"), term))
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.vnDisplay(size: 11, weight: .semibold))
                     .foregroundColor(.vnAccentGoldText)
                     .padding(.horizontal, VNSpacing.sm)
                     .padding(.vertical, VNSpacing.xs)
@@ -171,7 +171,7 @@ public struct VNBlockCalendarView: View {
             }
 
             Text(model.zodiacStar.fullTitle)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.vnDisplay(size: 11, weight: .semibold))
                 .foregroundColor(model.isAuspiciousDay ? .vnStatusSuccess : .vnTextSecondary)
                 .padding(.horizontal, VNSpacing.sm)
                 .padding(.vertical, VNSpacing.xs)
@@ -179,7 +179,7 @@ public struct VNBlockCalendarView: View {
                 .clipShape(Capsule())
 
             Text(model.lunarOfficer.title)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.vnDisplay(size: 11, weight: .semibold))
                 .foregroundColor(.vnAccentHeritageRed)
                 .padding(.horizontal, VNSpacing.sm)
                 .padding(.vertical, VNSpacing.xs)
@@ -198,7 +198,7 @@ public struct VNBlockCalendarView: View {
                     .foregroundColor(.vnAccentHeritageRed)
 
                 Text("calendar.section.folk_quote")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.vnDisplay(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                     .tracking(0.6)
 
@@ -206,7 +206,7 @@ public struct VNBlockCalendarView: View {
             }
 
             Text(model.folkQuote.quote)
-                .font(.system(size: 14, weight: .medium, design: .serif).italic())
+                .font(.vnDisplay(size: 14, weight: .medium, italic: true))
                 .foregroundColor(.vnTextPrimary)
                 .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
@@ -214,7 +214,7 @@ public struct VNBlockCalendarView: View {
             HStack {
                 Spacer()
                 Text("— \(model.folkQuote.authorOrOrigin)")
-                    .font(.system(size: 11, weight: .regular, design: .serif))
+                    .font(.vnDisplay(size: 11, weight: .regular))
                     .foregroundColor(.vnTextSecondary)
             }
         }
@@ -257,10 +257,10 @@ public struct VNBlockCalendarView: View {
         HStack(spacing: VNSpacing.md) {
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("calendar.direction.joy_god")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.vnDisplay(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                 Text(model.joyGodDirection)
-                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .font(.vnDisplay(size: 13, weight: .semibold))
                     .foregroundColor(.vnAccentHeritageRed)
             }
 
@@ -269,10 +269,10 @@ public struct VNBlockCalendarView: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text("calendar.direction.wealth_god")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.vnDisplay(size: 10, weight: .bold))
                     .foregroundColor(.vnTextSecondary)
                 Text(model.wealthGodDirection)
-                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .font(.vnDisplay(size: 13, weight: .semibold))
                     .foregroundColor(.vnAccentGoldText)
             }
 
@@ -281,7 +281,7 @@ public struct VNBlockCalendarView: View {
             Button(action: onTapDetails) {
                 HStack(spacing: VNSpacing.xs) {
                     Text("calendar.action.view_details")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.vnDisplay(size: 12, weight: .medium))
                     Image(systemName: "chevron.right")
                         .font(.system(size: 10, weight: .bold))
                 }
@@ -294,12 +294,12 @@ public struct VNBlockCalendarView: View {
     private func auspiciousHoursSection(for model: VNCalendarDayModel) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text("calendar.section.auspicious_hours")
-                .font(.system(size: 10, weight: .bold))
+                .font(.vnDisplay(size: 10, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
             Text(auspiciousHoursText(for: model))
-                .font(.system(size: 12, weight: .medium))
+                .font(.vnDisplay(size: 12, weight: .medium))
                 .foregroundColor(.vnTextPrimary)
                 .lineSpacing(2)
         }
@@ -310,10 +310,10 @@ public struct VNBlockCalendarView: View {
             if !model.suitableActivities.isEmpty {
                 HStack(alignment: .top, spacing: VNSpacing.xs) {
                     Text("calendar.activities.suitable_prefix")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.vnDisplay(size: 11, weight: .bold))
                         .foregroundColor(.vnStatusSuccess)
                     Text(model.suitableActivities.prefix(3).joined(separator: ", "))
-                        .font(.system(size: 11, weight: .regular))
+                        .font(.vnDisplay(size: 11, weight: .regular))
                         .foregroundColor(.vnTextPrimary)
                 }
             }
@@ -321,10 +321,10 @@ public struct VNBlockCalendarView: View {
             if !model.tabooActivities.isEmpty {
                 HStack(alignment: .top, spacing: VNSpacing.xs) {
                     Text("calendar.activities.taboo_prefix")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.vnDisplay(size: 11, weight: .bold))
                         .foregroundColor(.vnStatusError)
                     Text(model.tabooActivities.prefix(3).joined(separator: ", "))
-                        .font(.system(size: 11, weight: .regular))
+                        .font(.vnDisplay(size: 11, weight: .regular))
                         .foregroundColor(.vnTextSecondary)
                 }
             }
@@ -337,7 +337,7 @@ public struct VNBlockCalendarView: View {
         HStack(spacing: VNSpacing.md) {
             Button(action: onPreviousDay) {
                 Label("calendar.action.prev_day", systemImage: "chevron.left")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.vnDisplay(size: 12, weight: .medium))
                     .foregroundColor(.vnTextPrimary)
                     .padding(.horizontal, VNSpacing.md)
                     .padding(.vertical, VNSpacing.sm)
@@ -354,7 +354,7 @@ public struct VNBlockCalendarView: View {
 
             Button(action: onSelectToday) {
                 Text("calendar.action.today_title")
-                    .font(.system(size: 12, weight: .semibold, design: .serif))
+                    .font(.vnDisplay(size: 12, weight: .semibold))
                     .foregroundColor(.vnAccentHeritageRed)
                     .padding(.horizontal, VNSpacing.lg)
                     .padding(.vertical, VNSpacing.sm)

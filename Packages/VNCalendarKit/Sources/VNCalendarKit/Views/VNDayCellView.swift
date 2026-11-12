@@ -5,6 +5,7 @@ public struct VNDayCellView: View, Equatable {
     public let dayModel: VNCalendarDayModel?
     public let isSelected: Bool
     public let isCurrentMonth: Bool
+    public let highlightMoon: Bool
     public let onSelect: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -15,29 +16,32 @@ public struct VNDayCellView: View, Equatable {
         dayModel: VNCalendarDayModel?,
         isSelected: Bool,
         isCurrentMonth: Bool = true,
+        highlightMoon: Bool = true,
         onSelect: @escaping () -> Void
     ) {
         self.dayModel = dayModel
         self.isSelected = isSelected
         self.isCurrentMonth = isCurrentMonth
+        self.highlightMoon = highlightMoon
         self.onSelect = onSelect
     }
 
     nonisolated public static func == (lhs: VNDayCellView, rhs: VNDayCellView) -> Bool {
         lhs.dayModel == rhs.dayModel &&
         lhs.isSelected == rhs.isSelected &&
-        lhs.isCurrentMonth == rhs.isCurrentMonth
+        lhs.isCurrentMonth == rhs.isCurrentMonth &&
+        lhs.highlightMoon == rhs.highlightMoon
     }
 
     public var body: some View {
         VStack(spacing: VNSpacing.space2) {
             if let model = dayModel {
                 Text("\(model.solarDay)")
-                    .font(.system(size: solarFontSize, weight: solarWeight))
+                    .font(.vnDisplay(size: solarFontSize, weight: solarWeight))
                     .foregroundColor(solarColor)
 
                 Text(model.lunarDayText)
-                    .font(.system(size: lunarFontSize, weight: lunarWeight))
+                    .font(.vnDisplay(size: lunarFontSize, weight: lunarWeight))
                     .italic()
                     .foregroundColor(lunarColor)
 
@@ -86,11 +90,11 @@ public struct VNDayCellView: View, Equatable {
     }
 
     private var isFirstLunarDay: Bool {
-        isCurrentMonth && dayModel?.isFirstDayOfLunarMonth == true
+        highlightMoon && isCurrentMonth && dayModel?.isFirstDayOfLunarMonth == true
     }
 
     private var isFullMoon: Bool {
-        isCurrentMonth && dayModel?.isFullMoonDay == true
+        highlightMoon && isCurrentMonth && dayModel?.isFullMoonDay == true
     }
 
     private var solarWeight: Font.Weight {
@@ -100,7 +104,7 @@ public struct VNDayCellView: View, Equatable {
 
     private var solarColor: Color {
         if isToday { return .vnOnAccent }
-        if isFullMoon { return .vnAccentImperialGold }
+        if isFullMoon { return .vnAccentGoldText }
         if isFirstLunarDay { return .vnAccentHeritageRed }
         if !isCurrentMonth { return .vnTextTertiary }
         return .vnTextPrimary
@@ -108,7 +112,7 @@ public struct VNDayCellView: View, Equatable {
 
     private var lunarColor: Color {
         if isToday { return .vnOnAccent }
-        if isFullMoon { return .vnAccentImperialGold }
+        if isFullMoon { return .vnAccentGoldText }
         if isFirstLunarDay { return .vnAccentHeritageRed }
         if !isCurrentMonth { return .vnTextTertiary.opacity(0.7) }
         return .vnTextSecondary

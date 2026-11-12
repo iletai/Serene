@@ -14,10 +14,10 @@ struct MemorialTimelineDivider: View {
                 Image(systemName: "sparkles")
                     .font(.caption2)
                     .accessibilityHidden(true)
-                    .foregroundColor(.vnAccentImperialGold)
+                    .foregroundColor(.vnAccentGoldText)
 
                 Text(title)
-                    .font(.system(.caption, design: .serif).weight(.semibold))
+                    .font(.vnDisplay(.caption, weight: .semibold))
                     .foregroundColor(.vnTextSecondary)
                     .lineLimit(1)
             }

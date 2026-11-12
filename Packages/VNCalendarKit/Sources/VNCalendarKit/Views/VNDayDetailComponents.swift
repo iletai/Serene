@@ -6,51 +6,56 @@ import VNCalendarDesignSystem
 
 struct VNDayEvaluationView: View {
     let dayModel: VNCalendarDayModel
+    let showSolarTermsAndTruc: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             HStack(spacing: VNSpacing.xs) {
                 Image(systemName: dayModel.isAuspiciousDay ? "sparkles" : "circle.circle")
-                    .foregroundColor(dayModel.isAuspiciousDay ? .vnAccentImperialGold : .vnTextSecondary)
+                    .foregroundColor(dayModel.isAuspiciousDay ? .vnAccentGoldText : .vnTextSecondary)
                     .font(.system(size: 14, weight: .semibold))
 
                 Text(dayModel.zodiacStar.fullTitle)
-                    .font(.system(size: 15, weight: .semibold, design: .serif))
+                    .font(.vnDisplay(size: 15, weight: .semibold))
                     .foregroundColor(dayModel.isAuspiciousDay ? .vnStatusSuccess : .vnTextPrimary)
 
                 Spacer()
 
-                Text(dayModel.lunarOfficer.title)
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.vnAccentHeritageRed)
-                    .padding(.horizontal, VNSpacing.sm)
-                    .padding(.vertical, VNSpacing.space2)
-                    .background(Color.vnAccentHeritageRed.opacity(0.1))
-                    .clipShape(Capsule())
+                if showSolarTermsAndTruc {
+                    Text(dayModel.lunarOfficer.title)
+                        .font(.vnDisplay(size: 12, weight: .bold))
+                        .foregroundColor(.vnAccentHeritageRed)
+                        .padding(.horizontal, VNSpacing.sm)
+                        .padding(.vertical, VNSpacing.space2)
+                        .background(Color.vnAccentHeritageRed.opacity(0.1))
+                        .clipShape(Capsule())
+                }
             }
 
-            Divider().background(Color.vnBorderSubtle)
+            if showSolarTermsAndTruc {
+                Divider().background(Color.vnBorderSubtle)
 
-            HStack(alignment: .top, spacing: VNSpacing.xs) {
-                Text("daydetail.officer.label")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.vnTextSecondary)
-
-                Text(dayModel.lunarOfficer.summary)
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(.vnTextPrimary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            if let term = dayModel.solarTermName {
                 HStack(alignment: .top, spacing: VNSpacing.xs) {
-                    Text("daydetail.solar_term.label")
-                        .font(.system(size: 13, weight: .semibold))
+                    Text("daydetail.officer.label")
+                        .font(.vnDisplay(size: 13, weight: .semibold))
                         .foregroundColor(.vnTextSecondary)
 
-                    Text(String(format: String(localized: "daydetail.solar_term.description"), term))
-                        .font(.system(size: 13, weight: .regular))
+                    Text(dayModel.lunarOfficer.summary)
+                        .font(.vnDisplay(size: 13, weight: .regular))
                         .foregroundColor(.vnTextPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if let term = dayModel.solarTermName {
+                    HStack(alignment: .top, spacing: VNSpacing.xs) {
+                        Text("daydetail.solar_term.label")
+                            .font(.vnDisplay(size: 13, weight: .semibold))
+                            .foregroundColor(.vnTextSecondary)
+
+                        Text(String(format: String(localized: "daydetail.solar_term.description"), term))
+                            .font(.vnDisplay(size: 13, weight: .regular))
+                            .foregroundColor(.vnTextPrimary)
+                    }
                 }
             }
         }
@@ -72,13 +77,13 @@ struct VNDayDirectionsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("daydetail.section.directions")
-                .font(.system(size: 11, weight: .bold))
+                .font(.vnDisplay(size: 11, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
             HStack(spacing: VNSpacing.md) {
                 directionPill(title: String(localized: "daydetail.direction.joy_god_explained"), direction: dayModel.joyGodDirection, color: .vnAccentHeritageRed)
-                directionPill(title: String(localized: "daydetail.direction.wealth_god_explained"), direction: dayModel.wealthGodDirection, color: .vnAccentImperialGold)
+                directionPill(title: String(localized: "daydetail.direction.wealth_god_explained"), direction: dayModel.wealthGodDirection, color: .vnAccentGoldText)
             }
         }
     }
@@ -90,10 +95,10 @@ struct VNDayDirectionsView: View {
                 .frame(width: 8, height: 8)
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(title)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.vnDisplay(size: 11, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
                 Text(direction)
-                    .font(.system(size: 14, weight: .bold, design: .serif))
+                    .font(.vnDisplay(size: 14, weight: .bold))
                     .foregroundColor(color)
             }
         }
@@ -112,7 +117,7 @@ struct VNDayActivitiesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("daydetail.section.activities")
-                .font(.system(size: 11, weight: .bold))
+                .font(.vnDisplay(size: 11, weight: .bold))
                 .foregroundColor(.vnTextSecondary)
                 .tracking(0.5)
 
@@ -153,11 +158,11 @@ struct VNDayActivitiesView: View {
 
             VStack(alignment: .leading, spacing: VNSpacing.space2) {
                 Text(label)
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.vnDisplay(size: 12, weight: .bold))
                     .foregroundColor(color)
 
                 Text(content)
-                    .font(.system(size: 12, weight: .regular))
+                    .font(.vnDisplay(size: 12, weight: .regular))
                     .foregroundColor(contentColor)
             }
         }

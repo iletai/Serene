@@ -106,7 +106,7 @@ public struct PrayerDetailView: View {
             .overlay(alignment: .bottom) {
                 if showCopiedAlert {
                     Text("prayers.copied_toast")
-                        .font(.footnote.weight(.semibold))
+                        .font(.vnDisplay(.footnote, weight: .semibold))
                         .foregroundColor(.vnOnAccent)
                         .padding(.horizontal, VNSpacing.lg)
                         .padding(.vertical, VNSpacing.sm)
@@ -158,7 +158,7 @@ public struct PrayerDetailView: View {
                     .foregroundColor(.vnAccentGoldText)
                     .accessibilityHidden(true)
                 Text(prayer.occasion)
-                    .font(.footnote.weight(.medium))
+                    .font(.vnDisplay(.footnote, weight: .medium))
                     .foregroundColor(.vnTextSecondary)
             }
         }
@@ -169,10 +169,10 @@ public struct PrayerDetailView: View {
     private var offeringsCard: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
             Text("prayers.offerings_title")
-                .font(.system(.headline, design: .serif, weight: .semibold))
+                .font(.vnDisplay(.headline, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
             Text("prayers.offerings_subtitle")
-                .font(.caption2)
+                .font(.vnDisplay(.caption2))
                 .foregroundColor(.vnTextSecondary)
 
             VNRowDivider()
@@ -199,7 +199,7 @@ public struct PrayerDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
         )
         .shadow(color: folioShadow.color, radius: folioShadow.radius, x: folioShadow.x, y: folioShadow.y)
     }
@@ -280,13 +280,13 @@ public struct PrayerDetailView: View {
     private var prayerTextCard: some View {
         VStack(alignment: .leading, spacing: VNSpacing.md) {
             Text("prayers.prayer_text_title")
-                .font(.system(.headline, design: .serif, weight: .semibold))
+                .font(.vnDisplay(.headline, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
 
             VNRowDivider()
 
             Text(interpolatedPrayerText)
-                .font(.system(size: fontSize, weight: .medium, design: .serif))
+                .font(.vnDisplay(size: fontSize, weight: .medium))
                 .foregroundColor(.vnTextPrimary)
                 .lineSpacing(6)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -297,7 +297,7 @@ public struct PrayerDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
         .overlay(
             RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnAccentImperialGold.opacity(0.28), lineWidth: VNBorderWidth.regular)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
         )
         .shadow(color: folioShadow.color, radius: folioShadow.radius, x: folioShadow.x, y: folioShadow.y)
     }
@@ -310,11 +310,11 @@ public struct PrayerDetailView: View {
     private func notesCard(_ notes: String) -> some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
             Text("prayers.notes_title")
-                .font(.system(.headline, design: .serif, weight: .semibold))
+                .font(.vnDisplay(.headline, weight: .semibold))
                 .foregroundColor(.vnTextPrimary)
 
             Text(notes)
-                .font(.caption)
+                .font(.vnDisplay(.caption))
                 .foregroundColor(.vnTextSecondary)
                 .lineSpacing(3)
         }

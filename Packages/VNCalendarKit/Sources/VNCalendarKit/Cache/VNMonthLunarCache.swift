@@ -78,10 +78,14 @@ public final class VNMonthLunarCache: @unchecked Sendable {
         batchInsert(calculatedCells)
     }
 
-    public func computeWeekDays(around date: Date, reminders: [ReminderEvent] = []) -> [VNCalendarDayModel] {
+    public func computeWeekDays(
+        around date: Date,
+        reminders: [ReminderEvent] = [],
+        startsOnSunday: Bool = false
+    ) -> [VNCalendarDayModel] {
         let weekday = calendar.component(.weekday, from: date)
-        let mondayOffset = (weekday == 1) ? 6 : (weekday - 2)
-        guard let monday = calendar.date(byAdding: .day, value: -mondayOffset, to: date) else { return [] }
+        let startOffset = startsOnSunday ? weekday - 1 : ((weekday == 1) ? 6 : (weekday - 2))
+        guard let monday = calendar.date(byAdding: .day, value: -startOffset, to: date) else { return [] }
 
         var days: [VNCalendarDayModel] = []
         var currentDate = monday

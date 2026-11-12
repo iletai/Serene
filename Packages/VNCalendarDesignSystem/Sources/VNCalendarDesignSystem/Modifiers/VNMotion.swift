@@ -46,7 +46,7 @@ public extension View {
 
     /// Staggered fade + slide-up entrance. Use `delay: Double(index) * 0.05` for stagger.
     /// Only for small, non-scrolling groups (headers, empty states, cards on first load).
-    func vnAppear(delay: Double = 0, offset: CGFloat = 12) -> some View {
+    func vnAppear(delay: Double = 0, offset: CGFloat = 16) -> some View {
         modifier(VNAppearModifier(delay: delay, offset: offset))
     }
 
