@@ -1,4 +1,6 @@
-- Bản miễn phí hiển thị quảng cáo; gói Pro tắt hoàn toàn quảng cáo.
-- Xem quảng cáo có tặng thưởng để thêm tối đa 5 ngày nhớ ngoài 5 ngày miễn phí.
-- Cập nhật chính sách bảo mật và trang hỗ trợ.
+- Giao diện mới "Phố Đèn Lồng": đỏ lồng đèn, vàng hoa mai, xanh lá dong và xanh Hội An; chế độ tối mang sắc đêm trăng.
+- Phông chữ Be Vietnam Pro hiển thị tiếng Việt rõ dấu, đồng nhất trên toàn ứng dụng.
+- Nút bấm, ấn triện và chuyển động phản hồi sinh động hơn khi chạm.
+- Tăng độ tương phản chữ cho ngày Rằm, giờ hoàng đạo và tiện ích màn hình chính.
+- Cài đặt lịch (chế độ xem mặc định, ngày bắt đầu tuần, Rằm & Mùng 1, giờ hoàng đạo, tiết khí, đồng bộ qua Wi-Fi) nay áp dụng ngay.
 - Cải thiện hiệu năng và độ ổn định.
