@@ -2,102 +2,19 @@ name: Deploy - TestFlight Beta
 
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['v*']
   workflow_dispatch:
-
-concurrency:
-  group: deploy-testflight-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   gate:
-    name: Lint & Test
-    runs-on: macos-15
-    timeout-minutes: 30
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: Select latest stable Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-      - name: Setup Ruby and Bundler
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-          bundler-cache: true
-      - name: Install Tooling
-        run: |
-          which xcodegen || brew install xcodegen
-          which swiftlint || brew install swiftlint
-          which xcbeautify || brew install xcbeautify
-      - name: SwiftLint Verification
-        run: swiftlint --strict --quiet
-      - name: Generate Xcode Project
-        run: xcodegen generate
-      - name: Run Unit & Integration Tests
-        run: set -o pipefail && bundle exec fastlane test 2>&1 | xcbeautify --renderer github-actions
-
-  deploy-testflight:
-    name: Build & Distribute TestFlight
+    uses: iletai/ios-shared/.github/workflows/ios-ci.yml@main
+    with:
+      xcconfig-secrets: MICROCMS_API_KEY
+    secrets: inherit
+  beta:
     needs: gate
-    runs-on: macos-15
-    timeout-minutes: 45
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Select latest stable Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-
-      - name: Setup Ruby and Bundler
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-          bundler-cache: true
-
-      - name: Install Tooling
-        run: which xcodegen || brew install xcodegen
-
-      - name: Generate Xcode Project
-        run: xcodegen generate
-
-      - name: Setup SSH for Match Git Repository
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.MATCH_SSH_KEY }}
-
-      - name: Deploy to TestFlight via Fastlane
-        run: bundle exec fastlane beta
-        env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_CONTENT_BASE64: ${{ secrets.ASC_KEY_CONTENT_BASE64 }}
-          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_ITC_TEAM_ID: ${{ secrets.APPLE_ITC_TEAM_ID }}
-          FASTLANE_KEYCHAIN_PASSWORD: ${{ secrets.FASTLANE_KEYCHAIN_PASSWORD }}
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          RELEASE_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
-          RELEASE_NOTES_FILE: fastlane/metadata/vi/release_notes.txt
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Verify IPA Was Produced
-        run: |
-          test -s build/AnNien-Beta.ipa || { echo "::error::build/AnNien-Beta.ipa missing"; exit 1; }
-          ls -lh build/AnNien-Beta.ipa
-
-      - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AnNien-Beta-${{ github.sha }}
-          path: build/AnNien-Beta.ipa
-          retention-days: 14
+    uses: iletai/ios-shared/.github/workflows/ios-testflight.yml@main
+    with:
+      # Config/Secrets.xcconfig (gitignored), read by Shared.xcconfig -> App/Info.plist
+      xcconfig-secrets: MICROCMS_API_KEY
+    secrets: inherit
