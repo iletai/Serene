@@ -215,6 +215,8 @@ platform :ios do
       skip_screenshots: true,
       skip_metadata: ENV['SKIP_METADATA'] == 'true',
       app_review_information: app_review_info,
+      # Source of truth for age rating; AdMob requires "advertising": true (Guideline 2.3.6)
+      app_rating_config_path: "fastlane/app_rating_config.json",
       run_precheck_before_submit: false,
       precheck_include_in_app_purchases: false,
       submit_for_review: options[:submit_for_review] || false,
