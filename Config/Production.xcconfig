@@ -17,3 +17,6 @@ ADMOB_BANNER_UNIT_ID = ca-app-pub-4751845849553335/2128878342
 ADMOB_INTERSTITIAL_UNIT_ID = ca-app-pub-4751845849553335/5944000276
 ADMOB_REWARDED_UNIT_ID = ca-app-pub-4751845849553335/9815796673
 ADMOB_NATIVE_UNIT_ID = ca-app-pub-4751845849553335/3737860528
+
+// App Store page for AppUpdateKit force/optional update ($() keeps // from starting a comment).
+APP_STORE_URL = https:/$()/apps.apple.com/app/id6822020896
