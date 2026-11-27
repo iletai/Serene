@@ -184,7 +184,7 @@ public struct MainTabView: View {
                     .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextSecondary)
                     .scaleEffect(isSelected ? 1.08 : 1.0)
                     .contentTransition(.symbolEffect(.replace))
-                    .symbolEffect(.bounce, value: reduceMotion ? false : isSelected)
+                    .vnTabBounce(active: isSelected)
 
                 Text(tab.title)
                     .font(.vnDisplay(.caption2, weight: isSelected ? .bold : .medium))

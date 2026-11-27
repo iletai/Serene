@@ -317,6 +317,9 @@ public struct DataBackupSettingsView: View {
     @Environment(AppContainer.self) private var container
     @Environment(AppRouter.self) private var router
     @State private var viewModel: SettingsViewModel?
+    /// Flipped on tap to replay the row glyph motion (`spin-once` / `nudge`).
+    @State private var refreshSpin = false
+    @State private var exportNudge = false
 
     public init() {}
 
@@ -334,6 +337,7 @@ public struct DataBackupSettingsView: View {
 
                     VNGroupCard {
                         Button {
+                            refreshSpin.toggle()
                             vm.syncContent()
                         } label: {
                             VNListRow(
@@ -345,12 +349,14 @@ public struct DataBackupSettingsView: View {
                                     ProgressView().scaleEffect(0.8)
                                 }
                             }
+                            .iconEffect(.spinOnce, trigger: refreshSpin)
                         }
                         .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
 
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
                         Button {
+                            exportNudge.toggle()
                             Task { present(await vm.exportJSON()) }
                         } label: {
                             VNListRow(
@@ -358,12 +364,14 @@ public struct DataBackupSettingsView: View {
                                 iconTint: .vnAccentSky,
                                 title: String(localized: "settings.data.export_json")
                             )
+                            .iconEffect(.nudge, trigger: exportNudge)
                         }
                         .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
 
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
                         Button {
+                            exportNudge.toggle()
                             Task { present(await vm.exportICS()) }
                         } label: {
                             VNListRow(
@@ -371,6 +379,7 @@ public struct DataBackupSettingsView: View {
                                 iconTint: .vnAccentSky,
                                 title: String(localized: "settings.data.export_ics")
                             )
+                            .iconEffect(.nudge, trigger: exportNudge)
                         }
                         .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
 
