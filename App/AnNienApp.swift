@@ -17,6 +17,15 @@ struct AnNienApp: App {
     @State private var scheduleTask: Task<Void, Never>?
     @State private var updateAction: AppUpdateAction = .none
     @State private var deepLinks = DeepLinkCenter.shared
+    @AppStorage("onboarding.completed") private var onboardingCompleted = false
+    /// Under UI tests the walkthrough would cover the screen being driven, so it is never shown.
+    private let skipsOnboarding: Bool = {
+        #if DEV
+        UITestSupport.isActive
+        #else
+        false
+        #endif
+    }()
 
     init() {
         // Must be set before launch finishes so a cold-start notification tap is delivered.
@@ -44,6 +53,13 @@ struct AnNienApp: App {
         }
     }
 
+    private var showsOnboarding: Binding<Bool> {
+        Binding(
+            get: { !onboardingCompleted && !skipsOnboarding },
+            set: { if !$0 { onboardingCompleted = true } }
+        )
+    }
+
     var body: some Scene {
         WindowGroup {
             MainTabView(pendingDeepLink: $deepLinks.pendingAction)
@@ -52,9 +68,21 @@ struct AnNienApp: App {
                 .onOpenURL { deepLinks.open($0) }
                 .preferredColorScheme(preferredScheme)
                 .environment(\.locale, selectedLocale)
+                .fullScreenCover(isPresented: showsOnboarding) {
+                    OnboardingView(viewModel: OnboardingViewModel(
+                        requestNotifications: { (try? await container.notificationEngine.requestAuthorization()) ?? false },
+                        onFinish: { onboardingCompleted = true }
+                    ))
+                    // Covers do not pick up modifiers applied after the presenting view's own.
+                    .preferredColorScheme(preferredScheme)
+                    .environment(\.locale, selectedLocale)
+                }
                 .task {
-                    // Initial permissions & background synchronization
-                    _ = try? await container.notificationEngine.requestAuthorization()
+                    // Initial permissions & background synchronization. While onboarding is up it owns the
+                    // notification prompt (page 3); the prompt then falls back to this launch-time call.
+                    if onboardingCompleted || skipsOnboarding {
+                        _ = try? await container.notificationEngine.requestAuthorization()
+                    }
                     if await ContentSyncPolicy.autoSyncAllowed() {
                         try? await container.syncRemoteContent()
                     }
