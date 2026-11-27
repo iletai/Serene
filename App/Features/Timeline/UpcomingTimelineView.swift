@@ -171,7 +171,7 @@ public struct UpcomingTimelineView: View {
                         onDelete: { vm.delete($0) }
                     )
 
-                    // Free-tier native ad keeps its spot around the third row.
+                    // Free-tier native ad sits after the first month section.
                     if index == 0, ads?.canShowAds == true {
                         NativeAdCard()
                     }

@@ -120,10 +120,6 @@ final class UpcomingTimelineViewModel {
         }
     }
 
-    var urgentMemorial: ReminderEvent? {
-        reminders.first { $0.category == .deathAnniversary || $0.category == .ancestral }
-    }
-
     func countdownText(for reminder: ReminderEvent) -> String {
         reminder.countdownText(relativeTo: Date(), calendar: calendar)
     }

@@ -8467,23 +8467,6 @@
         }
       }
     },
-    "timeline.ancestor_eyebrow": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IN MEMORY OF ANCESTORS"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "KÍNH NHỚ TỔ TIÊN"
-          }
-        }
-      }
-    },
     "timeline.add_new": {
       "extractionState": "manual",
       "localizations": {
@@ -8535,23 +8518,6 @@
         }
       }
     },
-    "timeline.events_count": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld events"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld sự kiện"
-          }
-        }
-      }
-    },
     "timeline.search_placeholder": {
       "extractionState": "manual",
       "localizations": {
@@ -8582,57 +8548,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Xóa tìm kiếm"
-          }
-        }
-      }
-    },
-    "timeline.calendar_type_lunar": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lunar"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Âm Lịch"
-          }
-        }
-      }
-    },
-    "timeline.calendar_type_solar": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solar"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dương Lịch"
-          }
-        }
-      }
-    },
-    "timeline.upcoming_section_divider": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UPCOMING LIST"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DANH SÁCH TIẾP THEO"
           }
         }
       }
@@ -10564,13 +10479,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "lunar month %@"
+            "value": "%@"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "tháng %@ âm lịch"
+            "value": "%@ âm lịch"
           }
         }
       }
