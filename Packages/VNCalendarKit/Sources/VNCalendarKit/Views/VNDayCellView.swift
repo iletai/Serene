@@ -9,7 +9,8 @@ public struct VNDayCellView: View, Equatable {
     public let onSelect: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @ScaledMetric(relativeTo: .body) private var solarFontSize: CGFloat = 14
+    @ScaledMetric(relativeTo: .body) private var numeralSize: CGFloat = 34
+    @ScaledMetric(relativeTo: .body) private var solarFontSize: CGFloat = 19
     @ScaledMetric(relativeTo: .caption2) private var lunarFontSize: CGFloat = 10
 
     public init(
@@ -38,28 +39,29 @@ public struct VNDayCellView: View, Equatable {
             if let model = dayModel {
                 Text("\(model.solarDay)")
                     .font(.vnDisplay(size: solarFontSize, weight: solarWeight))
-                    .foregroundColor(solarColor)
+                    .monospacedDigit()
+                    .foregroundColor(numeralColor)
+                    .frame(width: numeralSize, height: numeralSize)
+                    .background(numeralBackground, in: Circle())
 
                 Text(model.lunarDayText)
                     .font(.vnDisplay(size: lunarFontSize, weight: lunarWeight))
-                    .italic()
+                    .monospacedDigit()
                     .foregroundColor(lunarColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
-                indicatorDot
+                indicatorDots
             } else {
                 Spacer(minLength: 0)
             }
         }
-        .padding(.vertical, VNSpacing.xs)
         .frame(maxWidth: .infinity)
-        .frame(minHeight: 44)
-        .background(backgroundColor)
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                .strokeBorder(borderColor, lineWidth: borderWidth)
-        )
-        .opacity(isCurrentMonth ? 1.0 : 0.35)
+        .frame(minHeight: 60, alignment: .top)
+        .padding(.top, VNSpacing.xs)
+        .background(cellBackground)
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
+        .opacity(isCurrentMonth ? 1.0 : 0.4)
         .animation(reduceMotion ? nil : VNAnimation.cellSelection, value: isSelected)
         .contentShape(Rectangle())
         .accessibilityElement(children: .ignore)
@@ -68,21 +70,25 @@ public struct VNDayCellView: View, Equatable {
         .onTapRelease(perform: onSelect)
     }
 
-    // MARK: - Indicator Dot (Hoàng Đạo gold / Giỗ red)
+    // MARK: - Indicator Dots (Giỗ red / Hoàng Đạo gold)
 
-    @ViewBuilder
-    private var indicatorDot: some View {
-        if dayModel?.hasAncestorDeathAnniversary == true {
-            Circle()
-                .fill(isToday ? Color.vnOnAccent : Color.vnAccentHeritageRed)
-                .frame(width: 4, height: 4)
-        } else if dayModel?.isAuspiciousDay == true {
-            Circle()
-                .fill(Color.vnAccentImperialGold)
-                .frame(width: 4, height: 4)
-        } else {
-            Color.clear.frame(width: 4, height: 4)
+    private var indicatorDots: some View {
+        HStack(spacing: 3) {
+            if dayModel?.hasAncestorDeathAnniversary == true {
+                dot(Color.vnAccentHeritageRed)
+            }
+            if dayModel?.isAuspiciousDay == true {
+                dot(Color.vnAccentImperialGold)
+            }
+            if dayModel?.hasAncestorDeathAnniversary != true && dayModel?.isAuspiciousDay != true {
+                Color.clear.frame(width: 5, height: 5)
+            }
         }
+        .frame(height: 5)
+    }
+
+    private func dot(_ color: Color) -> some View {
+        Circle().fill(color).frame(width: 5, height: 5)
     }
 
     private var isToday: Bool {
@@ -98,51 +104,41 @@ public struct VNDayCellView: View, Equatable {
     }
 
     private var solarWeight: Font.Weight {
-        if isToday || isFirstLunarDay { return .bold }
-        return .medium
+        if isToday || isSelected || isFirstLunarDay || isFullMoon { return .semibold }
+        return .regular
     }
 
-    private var solarColor: Color {
-        if isToday { return .vnOnAccent }
-        if isFullMoon { return .vnAccentGoldText }
-        if isFirstLunarDay { return .vnAccentHeritageRed }
+    /// Selected numeral sits on a dark disc; today alone is Hội An blue ink.
+    private var numeralColor: Color {
+        if isSelected { return isToday ? .vnOnAccent : .vnBackgroundSecondary }
+        if isToday { return .vnAccentSky }
         if !isCurrentMonth { return .vnTextTertiary }
         return .vnTextPrimary
     }
 
+    private var numeralBackground: Color {
+        if isSelected { return isToday ? .vnAccentSky : .vnTextPrimary }
+        return .clear
+    }
+
     private var lunarColor: Color {
-        if isToday { return .vnOnAccent }
+        if isSelected { return isToday ? .vnOnAccent : .vnTextSecondary }
         if isFullMoon { return .vnAccentGoldText }
-        if isFirstLunarDay { return .vnAccentHeritageRed }
-        if !isCurrentMonth { return .vnTextTertiary.opacity(0.7) }
+        if isFirstLunarDay { return .vnAccentSky }
+        if !isCurrentMonth { return .vnTextTertiary }
         return .vnTextSecondary
     }
 
     private var lunarWeight: Font.Weight {
-        if isToday || isFirstLunarDay || isFullMoon { return .bold }
-        return .regular
+        if isFirstLunarDay || isFullMoon { return .bold }
+        return .medium
     }
 
-    private var backgroundColor: Color {
-        if isToday { return .vnAccentHeritageRed }
-        if isSelected { return .vnBackgroundSecondary }
+    private var cellBackground: Color {
+        if isSelected { return Color.vnAccentSky.opacity(0.10) }
         if isFullMoon { return .vnAccentGoldSurface }
-        if isFirstLunarDay { return .vnAccentRedSurface }
+        if isFirstLunarDay { return .vnAccentSkySurface }
         return .clear
-    }
-
-    private var borderColor: Color {
-        if isToday { return .clear }
-        if isFullMoon { return .vnAccentImperialGold }
-        if isFirstLunarDay { return .vnAccentHeritageRed }
-        if isSelected { return .vnAccentDeepPrimary }
-        return .clear
-    }
-
-    private var borderWidth: CGFloat {
-        if isToday { return 0 }
-        if isFullMoon || isFirstLunarDay || isSelected { return VNBorderWidth.hairline }
-        return 0
     }
 
     private var accessibilityText: String {

@@ -43,14 +43,14 @@ public struct VNCalendarHeaderView: View {
 
             VStack(spacing: VNSpacing.space2) {
                 Text(headerTitle)
-                    .font(.vnDisplay(size: 19, weight: .bold))
-                    .foregroundColor(.vnTextPrimary)
+                    .font(.vnDisplay(size: 26, weight: .bold))
+                    .foregroundColor(.vnAccentSky)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.6)
 
                 if let subtitle = headerSubtitle {
                     Text(subtitle)
-                        .font(.vnDisplay(size: 11, weight: .medium))
+                        .font(.vnDisplay(size: 12, weight: .medium))
                         .foregroundColor(.vnTextSecondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)

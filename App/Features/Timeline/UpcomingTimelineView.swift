@@ -10,24 +10,22 @@ public struct UpcomingTimelineView: View {
     @State private var viewModel: UpcomingTimelineViewModel?
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    // The floating tab pill overlays the scroll view without a safe-area inset; it grows with Dynamic Type.
 
     public init() {}
 
     private var activeViewModel: UpcomingTimelineViewModel {
         if let existing = viewModel { return existing }
-        let vm = UpcomingTimelineViewModel(
+        return UpcomingTimelineViewModel(
             reminderRepository: container.reminderRepository,
             scheduleReminderUseCase: container.scheduleReminderUseCase,
             evaluateFeatureGateUseCase: container.evaluateFeatureGateUseCase
         )
-        return vm
     }
 
     public var body: some View {
         @Bindable var vm = activeViewModel
         ScrollView {
-            VStack(alignment: .leading, spacing: VNSpacing.md) {
+            VStack(alignment: .leading, spacing: VNSpacing.lg) {
                 headerSection(vm: vm)
                 searchBarSection(vm: vm)
                 MemorialFilterPills(
@@ -39,6 +37,7 @@ public struct UpcomingTimelineView: View {
                 .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 contentSection(vm: vm)
             }
+            .padding(.top, VNSpacing.sm)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
         .task {
@@ -70,81 +69,57 @@ public struct UpcomingTimelineView: View {
         router.present(sheet: .ritual(title: reminder.title))
     }
 
-    // MARK: - Header Section
-    @ViewBuilder
+    // MARK: - Header
+
     private func headerSection(vm: UpcomingTimelineViewModel) -> some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            HStack {
-                HStack(spacing: VNSpacing.xs) {
-                    Image(systemName: "flame.fill")
-                        .font(.caption2)
-                        .accessibilityHidden(true)
-                        .foregroundColor(.vnAccentHeritageRed)
-                    Text("timeline.ancestor_eyebrow")
-                        .font(.vnDisplay(.caption2, weight: .bold))
-                        .tracking(1.0)
-                        .foregroundColor(.vnAccentHeritageRed)
-                }
-                .padding(.horizontal, VNSpacing.sm)
-                .padding(.vertical, VNSpacing.xs)
-                .background(Color.vnAccentRedSurface)
-                .clipShape(Capsule())
+        HStack(alignment: .center, spacing: VNSpacing.md) {
+            VStack(alignment: .leading, spacing: VNSpacing.space2) {
+                Text("timeline.eyebrow_range")
+                    .font(.vnDisplay(.caption2, weight: .semibold))
+                    .tracking(0.9)
+                    .foregroundColor(.vnAccentSky)
 
-                Spacer()
-
-                VNButton(String(localized: "timeline.add_new"), icon: "plus", variant: .primary, size: .small) {
-                    createReminder(vm: vm)
-                }
+                Text("timeline.page_title")
+                    .font(.vnDisplay(.largeTitle, weight: .heavy))
+                    .foregroundColor(.vnTextPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .accessibilityAddTraits(.isHeader)
             }
 
-            HStack(alignment: .lastTextBaseline) {
-                VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                    Text("timeline.title")
-                        .font(.vnDisplay(.title, weight: .bold))
-                        .foregroundColor(.vnTextPrimary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
+            Spacer(minLength: 0)
 
-                    Text("timeline.subtitle")
-                        .font(.vnDisplay(.footnote))
-                        .italic()
-                        .foregroundColor(.vnTextSecondary)
-                }
-
-                Spacer()
-
-                if !vm.reminders.isEmpty {
-                    Text(String(format: String(localized: "timeline.events_count"), vm.reminders.count))
-                        .font(.vnDisplay(.caption2, weight: .semibold))
-                        .foregroundColor(.vnAccentHeritageRed)
-                        .padding(.horizontal, VNSpacing.sm)
-                        .padding(.vertical, VNSpacing.xs)
-                        .background(Color.vnAccentRedSurface)
-                        .clipShape(Capsule())
-                    .contentTransition(.numericText())
-                    .animation(reduceMotion ? nil : .snappy, value: vm.reminders.count)
-                }
+            Button {
+                createReminder(vm: vm)
+            } label: {
+                Image(systemName: "plus")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.vnAccentSky)
+                    .frame(width: VNSize.iconButton, height: VNSize.iconButton)
+                    .background(Color.vnBackgroundSecondary, in: Circle())
+                    .overlay(Circle().stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline))
+                    .frame(minWidth: VNSize.minTapTarget, minHeight: VNSize.minTapTarget)
+                    .contentShape(Rectangle())
             }
-            .padding(.top, VNSpacing.space2)
+            .buttonStyle(.plain)
+            .accessibilityLabel("timeline.add_new")
         }
         .padding(.horizontal, VNSpacing.screenMargin)
-        .padding(.top, VNSpacing.md)
-        // Same cap as the Calendar header: keeps the title readable instead of filling the screen at XXXL.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 
     // MARK: - Search Bar
-    @ViewBuilder
+
     private func searchBarSection(vm: UpcomingTimelineViewModel) -> some View {
         @Bindable var boundVM = vm
-        HStack(spacing: VNSpacing.sm) {
+        return HStack(spacing: VNSpacing.sm) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.vnTextSecondary)
                 .font(.subheadline)
                 .accessibilityHidden(true)
 
             TextField("timeline.search_placeholder", text: $boundVM.searchQuery)
-                .font(.vnDisplay(.footnote))
+                .font(.vnDisplay(.subheadline))
 
             if !vm.searchQuery.isEmpty {
                 Button {
@@ -161,19 +136,19 @@ public struct UpcomingTimelineView: View {
             }
         }
         .padding(.horizontal, VNSpacing.md)
-        .padding(.vertical, VNSpacing.md)
         .frame(minHeight: VNSize.minTapTarget)
         .background(Color.vnBackgroundSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.card)
+            RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous)
                 .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
         )
         .padding(.horizontal, VNSpacing.screenMargin)
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 
-    // MARK: - Main Content Area
+    // MARK: - Content
+
     @ViewBuilder
     private func contentSection(vm: UpcomingTimelineViewModel) -> some View {
         if vm.filteredReminders.isEmpty {
@@ -185,68 +160,24 @@ public struct UpcomingTimelineView: View {
                 ctaIcon: "plus.circle.fill",
                 onCTA: { createReminder(vm: vm) }
             )
-                .padding(.horizontal, VNSpacing.screenMargin)
+            .padding(.horizontal, VNSpacing.screenMargin)
         } else {
-            VStack(alignment: .leading, spacing: VNSpacing.md) {
-                if vm.searchQuery.isEmpty && vm.selectedFilter == .all, let hero = vm.urgentMemorial {
-                    let monthStr = String(format: "%02d", hero.month)
-                    let calTypeStr = hero.dateType == .lunar ? String(localized: "timeline.calendar_type_lunar") : String(localized: "timeline.calendar_type_solar")
-                    let dateText = "\(hero.day)/\(monthStr) \(calTypeStr)"
-
-                    MemorialHeroCard(
-                        reminder: hero,
-                        dateText: dateText,
-                        countdownText: vm.countdownText(for: hero),
-                        onQuickRitual: { showRitual(hero) },
-                        onEdit: { edit(hero) }
+            VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
+                ForEach(Array(vm.sections.enumerated()), id: \.element.id) { index, section in
+                    TimelineMonthSectionView(
+                        section: section,
+                        onEdit: edit,
+                        onViewRitual: showRitual,
+                        onDelete: { vm.delete($0) }
                     )
 
-                    MemorialTimelineDivider(title: String(localized: "timeline.upcoming_section_divider"))
-                }
-
-                ForEach(Array(vm.filteredReminders.enumerated()), id: \.element.id) { index, reminder in
-                    if index == 2, ads?.canShowAds == true { NativeAdCard() }
-                    let monthStr = String(format: "%02d", reminder.month)
-                    let calTypeStr = reminder.dateType == .lunar ? String(localized: "timeline.calendar_type_lunar") : String(localized: "timeline.calendar_type_solar")
-                    let dateText = "\(reminder.day)/\(monthStr) \(calTypeStr)"
-                    let countdown = vm.countdownText(for: reminder)
-
-                    MemorialTimelineCard(
-                        reminder: reminder,
-                        dateText: dateText,
-                        countdownText: countdown,
-                        onViewRitual: { showRitual(reminder) },
-                        onEdit: { edit(reminder) },
-                        onDelete: { vm.delete(reminder) }
-                    )
-                    .modifier(TimelineCardAppear(index: index, reduceMotion: reduceMotion))
+                    // Free-tier native ad keeps its spot around the third row.
+                    if index == 0, ads?.canShowAds == true {
+                        NativeAdCard()
+                    }
                 }
             }
             .padding(.horizontal, VNSpacing.screenMargin)
         }
-    }
-}
-
-// MARK: - Card appear
-
-/// Staggered fade-up for the first few cards only; later cards just fade in as they scroll into view.
-private struct TimelineCardAppear: ViewModifier {
-    private static let staggeredCount = 8
-    let index: Int
-    let reduceMotion: Bool
-    @State private var appeared = false
-
-    func body(content: Content) -> some View {
-        content
-            .opacity(appeared || reduceMotion ? 1 : 0)
-            .offset(y: appeared || reduceMotion ? 0 : 12)
-            .onAppear {
-                guard !appeared else { return }
-                guard index < Self.staggeredCount else {
-                    appeared = true
-                    return
-                }
-                withAnimation(.smooth(duration: 0.4).delay(Double(index) * 0.05)) { appeared = true }
-            }
     }
 }

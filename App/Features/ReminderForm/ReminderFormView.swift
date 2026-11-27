@@ -111,12 +111,8 @@ public struct ReminderFormView: View {
     @ViewBuilder
     private func notesSection(vm: ReminderFormViewModel) -> some View {
         @Bindable var boundVM = vm
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            Text("reminder.notes_extra_header")
-                .font(.vnDisplay(.caption2, weight: .bold))
-                .tracking(0.5)
-                .foregroundColor(.vnTextTertiary)
-                .accessibilityAddTraits(.isHeader)
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
+            VNGroupHeader(String(localized: "reminder.notes_extra_header"))
 
             TextField("reminder.notes_placeholder", text: $boundVM.note, axis: .vertical)
                 .font(.vnDisplay(.subheadline))

@@ -14,7 +14,6 @@ public struct PaywallView: View {
     @State private var adUnavailable = false
     @State private var viewModel: PaywallViewModel?
     @State private var legalLinksService = LegalLinksService.shared
-    @ScaledMetric(relativeTo: .caption2) private var badgeSize: CGFloat = VNSize.iconBadge
 
     public init() {}
 
@@ -80,47 +79,104 @@ public struct PaywallView: View {
     // MARK: - Subviews
 
     private var hero: some View {
-        VStack(spacing: VNSpacing.md) {
-            VNSealBadge.gio(size: .large)
-                .padding(.top, VNSpacing.xl)
+        VStack(spacing: VNSpacing.sm) {
+            Image(systemName: "crown.fill")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundColor(.vnAccentImperialGold)
+                .padding(.bottom, VNSpacing.xs)
+                .accessibilityHidden(true)
 
             Text("paywall.title")
                 .font(.vnTitleHero)
-                .foregroundColor(.vnAccentDeepPrimary)
+                .foregroundColor(.vnOnAccent)
                 .multilineTextAlignment(.center)
                 .minimumScaleFactor(0.8)
                 .accessibilityAddTraits(.isHeader)
 
             Text("paywall.subtitle")
                 .font(.vnBody)
-                .foregroundColor(.vnTextSecondary)
+                .foregroundColor(.vnOnAccent.opacity(0.85))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, VNSpacing.screenMargin)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, VNSpacing.xxl)
+        .background(
+            LinearGradient(
+                colors: [Color.vnAccentHeritageRed, Color.vnAccentDeepPrimary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+        .padding(.horizontal, VNSpacing.screenMargin)
+        .padding(.top, VNSpacing.md)
     }
 
-    private static let featureKeys: [LocalizedStringKey] = [
-        "paywall.feature.unlimited_reminders",
-        "paywall.feature.cloudkit_sync",
-        "paywall.feature.heritage_mode",
-        "paywall.feature.pro_widgets",
-        "paywall.feature.ics_export"
-    ]
+    private struct Benefit: Identifiable {
+        let id: String
+        let icon: String
+        let tint: Color
+        let title: String
+        let subtitle: String
+    }
+
+    private var benefits: [Benefit] {
+        [
+            Benefit(
+                id: "ads",
+                icon: "megaphone.slash.fill",
+                tint: .vnAccentHeritageRed,
+                title: String(localized: "paywall.benefit.ads.title"),
+                subtitle: String(localized: "paywall.benefit.ads.desc")
+            ),
+            Benefit(
+                id: "reminders",
+                icon: "infinity",
+                tint: .vnAccentSky,
+                title: String(localized: "paywall.benefit.reminders.title"),
+                subtitle: String(localized: "paywall.benefit.reminders.desc")
+            ),
+            Benefit(
+                id: "icloud",
+                icon: "icloud.fill",
+                tint: .vnAccentJade,
+                title: String(localized: "paywall.benefit.icloud.title"),
+                subtitle: String(localized: "paywall.benefit.icloud.desc")
+            ),
+            Benefit(
+                id: "widgets",
+                icon: "rectangle.on.rectangle",
+                tint: .vnAccentGoldText,
+                title: String(localized: "paywall.benefit.widgets.title"),
+                subtitle: String(localized: "paywall.benefit.widgets.desc")
+            ),
+            Benefit(
+                id: "heritage",
+                icon: "person.3.sequence.fill",
+                tint: .vnTextTertiary,
+                title: String(localized: "paywall.benefit.heritage.title"),
+                subtitle: String(localized: "paywall.benefit.heritage.desc")
+            )
+        ]
+    }
 
     private var featureList: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.md) {
-            ForEach(Array(Self.featureKeys.enumerated()), id: \.offset) { index, key in
-                featureRow(icon: "checkmark", title: key)
-                    .modifier(PaywallRowAppear(index: index, reduceMotion: reduceMotion))
+        VNGroupCard {
+            ForEach(Array(benefits.enumerated()), id: \.element.id) { index, benefit in
+                if index > 0 {
+                    VNRowDivider(leadingInset: VNSpacing.cardPadding)
+                }
+                VNListRow(
+                    icon: benefit.icon,
+                    iconTint: benefit.tint,
+                    title: benefit.title,
+                    subtitle: benefit.subtitle,
+                    showsChevron: false
+                )
+                .modifier(PaywallRowAppear(index: index, reduceMotion: reduceMotion))
             }
         }
-        .padding(VNSpacing.cardPadding)
-        .background(Color.vnBackgroundSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
-                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
-        )
         .padding(.horizontal, VNSpacing.screenMargin)
     }
 
@@ -241,33 +297,17 @@ public struct PaywallView: View {
         .disabled(url == nil)
     }
 
-    private func featureRow(icon: String, title: LocalizedStringKey) -> some View {
-        HStack(alignment: .top, spacing: VNSpacing.md) {
-            Image(systemName: "checkmark")
-                .font(.caption2.weight(.bold))
-                .foregroundColor(.vnOnGoldContainer)
-                .accessibilityHidden(true)
-                .frame(width: badgeSize, height: badgeSize)
-                .background(Color.vnGoldContainer.opacity(0.5))
-                .clipShape(Circle())
-
-            Text(title)
-                .font(.vnHeadline)
-                .foregroundColor(.vnTextPrimary)
-        }
-        .accessibilityElement(children: .combine)
-    }
-
     private func productCard(product: Product, vm: PaywallViewModel) -> some View {
         let isSelected = (vm.selectedProductID == product.id)
         return Button(
             action: { vm.selectedProductID = product.id },
             label: {
-                HStack {
+                HStack(spacing: VNSpacing.md) {
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
                         HStack {
                             Text(product.displayName)
                                 .font(.vnHeadline)
+                                .fontWeight(.bold)
                                 .foregroundColor(.vnTextPrimary)
                             if hasFreeTrial(product) {
                                 Text("paywall.trial_badge")
@@ -283,23 +323,31 @@ public struct PaywallView: View {
                         Text(product.description)
                             .font(.vnCaption2)
                             .foregroundColor(.vnTextSecondary)
+                            .lineLimit(2)
                     }
-                    Spacer()
+                    Spacer(minLength: VNSpacing.sm)
                     Text(product.displayPrice)
                         .font(.vnHeadline)
                         .fontWeight(.bold)
-                        .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnTextPrimary)
+                        .foregroundColor(isSelected ? .vnAccentGoldText : .vnTextPrimary)
+                    radioIndicator(isSelected)
                 }
                 .padding(VNSpacing.cardPadding)
-                .background(isSelected ? Color.vnAccentRedSurface : Color.vnBackgroundSecondary)
+                .background(isSelected ? Color.vnAccentGoldSurface : Color.vnBackgroundSecondary)
                 .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
                         .stroke(
-                            isSelected ? Color.vnAccentHeritageRed : Color.vnBorderSubtle,
+                            isSelected ? Color.vnAccentGoldText : Color.vnBorderSubtle,
                             lineWidth: isSelected ? VNBorderWidth.active : VNBorderWidth.regular
                         )
                 )
+                .overlay(alignment: .topTrailing) {
+                    if isPopularPlan(product) {
+                        popularBadge
+                            .offset(x: -VNSpacing.md, y: -10)
+                    }
+                }
                 .scaleEffect(isSelected && !reduceMotion ? 1.015 : 1)
                 .animation(reduceMotion ? nil : .bouncy(duration: 0.35, extraBounce: 0.1), value: isSelected)
             }
@@ -307,6 +355,33 @@ public struct PaywallView: View {
         .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
         .sensoryFeedback(.selection, trigger: isSelected) { _, new in new }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private func radioIndicator(_ isSelected: Bool) -> some View {
+        Circle()
+            .strokeBorder(
+                isSelected ? Color.vnAccentGoldText : Color.vnTextTertiary,
+                lineWidth: isSelected ? 6 : VNBorderWidth.regular
+            )
+            .frame(width: 22, height: 22)
+            .accessibilityHidden(true)
+    }
+
+    private var popularBadge: some View {
+        Text("paywall.plan.popular")
+            .font(.vnCaption2)
+            .fontWeight(.bold)
+            .textCase(.uppercase)
+            .tracking(0.6)
+            .foregroundColor(.vnOnGoldContainer)
+            .padding(.horizontal, VNSpacing.sm)
+            .padding(.vertical, VNSpacing.space2)
+            .background(Color.vnAccentImperialGold)
+            .clipShape(Capsule())
+    }
+
+    private func isPopularPlan(_ product: Product) -> Bool {
+        product.subscription?.subscriptionPeriod.unit == .year
     }
 
     private func ctaButtonTitle(vm: PaywallViewModel) -> LocalizedStringKey {

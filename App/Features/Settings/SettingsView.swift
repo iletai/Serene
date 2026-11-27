@@ -31,12 +31,15 @@ public struct SettingsView: View {
 
     public var body: some View {
         ScrollView {
-            VStack(spacing: VNSpacing.sectionGap) {
+            VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
+                profileGroup
                 membershipCard
-                navigationMenuList
+                commonSection
+                infoSection
+                footer
             }
             .padding(.horizontal, VNSpacing.screenMargin)
-            .padding(.top, VNSpacing.xl)
+            .padding(.top, VNSpacing.md)
             .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
@@ -46,104 +49,186 @@ public struct SettingsView: View {
         }
     }
 
-    // MARK: - Membership Banner Card
-    private var membershipCard: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            VNSectionLabel(String(localized: "settings.membership.header"))
-            VNGroupCard {
-                HStack {
+    // MARK: - Profile
+
+    private var profileGroup: some View {
+        VNGroupCard {
+            Button { router.push(.about) } label: {
+                HStack(spacing: VNSpacing.md) {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundColor(.vnOnAccent)
+                        .frame(width: 56, height: 56)
+                        .background(Color.vnAccentHeritageRed)
+                        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+                        .accessibilityHidden(true)
+
                     VStack(alignment: .leading, spacing: VNSpacing.space2) {
-                        let proTitle = String(localized: "settings.membership.pro_title")
-                        let freeTitle = String(localized: "settings.membership.free_title")
-                        Text(isPro ? proTitle : freeTitle)
-                            .font(.vnDisplay(.callout, weight: .semibold))
+                        Text("settings.profile.name")
+                            .font(.vnDisplay(.headline, weight: .bold))
                             .foregroundColor(.vnTextPrimary)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.8)
-                        let proSubtitle = String(localized: "settings.membership.pro_subtitle")
-                        let freeSubtitle = String(localized: "settings.membership.free_subtitle")
-                        Text(isPro ? proSubtitle : freeSubtitle)
-                            .font(.vnDisplay(.caption))
+                        Text("settings.profile.tagline")
+                            .font(.vnDisplay(.footnote))
                             .foregroundColor(.vnTextSecondary)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.8)
+                        Text(verbatim: "\(String(localized: "settings.about.version")) \(Bundle.main.appVersionDescription)")
+                            .font(.vnDisplay(.caption2))
+                            .foregroundColor(.vnTextTertiary)
                     }
-                    Spacer()
-                    if !isPro {
-                        VNButton(String(localized: "settings.action.upgrade"), variant: .primary, size: .small) {
-                            router.present(sheet: .paywall)
-                        }
-                    } else {
-                        Image(systemName: "checkmark.seal.fill")
-                            .foregroundColor(.vnAccentHeritageRed)
-                            .accessibilityHidden(true)
-                    }
+
+                    Spacer(minLength: VNSpacing.xs)
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundColor(.vnTextTertiary)
+                        .accessibilityHidden(true)
                 }
                 .padding(.horizontal, VNSpacing.cardPadding)
                 .padding(.vertical, VNSpacing.md)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+        }
+    }
+
+    // MARK: - Membership Banner Card
+    private var membershipCard: some View {
+        VNGroupCard {
+            HStack(spacing: VNSpacing.md) {
+                VStack(alignment: .leading, spacing: VNSpacing.space2) {
+                    let proTitle = String(localized: "settings.membership.pro_title")
+                    let freeTitle = String(localized: "settings.membership.free_title")
+                    Text(isPro ? proTitle : freeTitle)
+                        .font(.vnDisplay(.callout, weight: .semibold))
+                        .foregroundColor(.vnTextPrimary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                    let proSubtitle = String(localized: "settings.membership.pro_subtitle")
+                    let freeSubtitle = String(localized: "settings.membership.free_subtitle")
+                    Text(isPro ? proSubtitle : freeSubtitle)
+                        .font(.vnDisplay(.caption))
+                        .foregroundColor(.vnTextSecondary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                }
+                Spacer(minLength: VNSpacing.xs)
+                if !isPro {
+                    VNButton(String(localized: "settings.action.upgrade"), variant: .primary, size: .small) {
+                        router.present(sheet: .paywall)
+                    }
+                } else {
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundColor(.vnAccentHeritageRed)
+                        .accessibilityHidden(true)
+                }
+            }
+            .padding(.horizontal, VNSpacing.cardPadding)
+            .padding(.vertical, VNSpacing.md)
+        }
+    }
+
+    // MARK: - Chung
+
+    private var commonSection: some View {
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
+            VNGroupHeader(String(localized: "settings.group.common"))
+
+            VNGroupCard {
+                Button { router.push(.appearanceLanguage) } label: {
+                    VNListRow(
+                        icon: "paintpalette.fill",
+                        iconTint: .vnAccentSky,
+                        title: String(localized: "settings.display.title"),
+                        subtitle: nil
+                    ) {
+                        Text(themeLabel)
+                            .font(.vnDisplay(.footnote))
+                            .foregroundColor(.vnTextSecondary)
+                            .lineLimit(1)
+                    }
+                }
+                .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+
+                VNRowDivider(leadingInset: VNSpacing.cardPadding)
+
+                Button { router.push(.calendarSettings) } label: {
+                    VNListRow(
+                        icon: "calendar.badge.clock",
+                        iconTint: .vnAccentHeritageRed,
+                        title: String(localized: "settings.calendar.title"),
+                        subtitle: String(localized: "settings.calendar.subtitle")
+                    )
+                }
+                .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+                .accessibilityIdentifier("settings.calendarSettings")
+
+                VNRowDivider(leadingInset: VNSpacing.cardPadding)
+
+                Button { router.push(.dataBackup) } label: {
+                    VNListRow(
+                        icon: "arrow.clockwise.icloud.fill",
+                        iconTint: .vnAccentJade,
+                        title: String(localized: "settings.data.header"),
+                        subtitle: nil
+                    )
+                }
+                .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
             }
         }
     }
 
-    // MARK: - Navigation Menu List
-    private var navigationMenuList: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
-            // 1. Calendar & Astronomy Sub-menu
-            VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                VNSectionLabel(String(localized: "settings.timezone.header"))
-                VNGroupCard {
-                    Button { router.push(.calendarSettings) } label: {
-                        VNSettingsRow(icon: "calendar.badge.clock", title: String(localized: "settings.calendar.title"), subtitle: String(localized: "settings.calendar.subtitle_desc"), tint: .vnAccentHeritageRed)
-                    }
-                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
-                    .accessibilityIdentifier("settings.calendarSettings")
-                }
-            }
+    // MARK: - Thông tin
 
-            // 2. Appearance & Language Sub-menu
-            VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                VNSectionLabel(String(localized: "settings.appearance.header"))
-                VNGroupCard {
-                    Button { router.push(.appearanceLanguage) } label: {
-                        let modeSubtitle = appThemeAppearance == 1 ? String(localized: "settings.appearance.light") : (appThemeAppearance == 2 ? String(localized: "settings.appearance.dark") : String(localized: "settings.appearance.auto"))
-                        VNSettingsRow(icon: "paintpalette.fill", title: String(localized: "settings.appearance.mode"), subtitle: modeSubtitle, tint: .vnAccentGoldText)
-                    }
-                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
-                }
-            }
+    private var infoSection: some View {
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
+            VNGroupHeader(String(localized: "settings.group.info"))
 
-            // 3. Data & Sync Sub-menu
-            VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                VNSectionLabel(String(localized: "settings.data.header"))
-                VNGroupCard {
-                    Button { router.push(.dataBackup) } label: {
-                        VNSettingsRow(icon: "arrow.clockwise.icloud.fill", title: String(localized: "settings.data.header"), subtitle: String(localized: "settings.data.refresh"), tint: .vnStatusSuccess)
+            VNGroupCard {
+                Button { router.push(.about) } label: {
+                    VNListRow(
+                        icon: "info.circle.fill",
+                        iconTint: .vnTextSecondary,
+                        title: String(localized: "settings.about.version"),
+                        subtitle: nil
+                    ) {
+                        Text(Bundle.main.appVersionDescription)
+                            .font(.vnDisplay(.footnote))
+                            .foregroundColor(.vnTextSecondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
-                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
                 }
-            }
+                .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
 
-            // 4. Privacy Sub-menu
-            VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                VNSectionLabel(String(localized: "settings.privacy.header"))
-                VNGroupCard {
-                    Button { router.push(.privacySecurity) } label: {
-                        VNSettingsRow(icon: "lock.shield.fill", title: String(localized: "settings.privacy.zero_knowledge_title"), subtitle: String(localized: "settings.privacy.zero_knowledge_subtitle"), tint: .vnAccentDeepPrimary)
-                    }
-                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
-                }
-            }
+                VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
-            // 5. About Sub-menu
-            VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                VNSectionLabel(String(localized: "settings.about.header"))
-                VNGroupCard {
-                    Button { router.push(.about) } label: {
-                        VNSettingsRow(icon: "info.circle.fill", title: String(localized: "settings.about.version"), subtitle: Bundle.main.appVersionDescription, tint: .vnAccentGoldText)
-                    }
-                    .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+                Button { router.push(.privacySecurity) } label: {
+                    VNListRow(
+                        icon: "lock.shield.fill",
+                        iconTint: .vnAccentSky,
+                        title: String(localized: "settings.privacy.zero_knowledge_title"),
+                        subtitle: String(localized: "settings.privacy.zero_knowledge_subtitle")
+                    )
                 }
+                .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
             }
+        }
+    }
+
+    private var footer: some View {
+        VNGroupFooter(
+            String(
+                format: String(localized: "settings.footer.version_local_only"),
+                Bundle.main.appVersionDescription
+            ),
+            isCentered: true
+        )
+    }
+
+    private var themeLabel: String {
+        switch appThemeAppearance {
+        case 1: return String(localized: "settings.appearance.light")
+        case 2: return String(localized: "settings.appearance.dark")
+        default: return String(localized: "settings.appearance.auto")
         }
     }
 }
@@ -156,47 +241,70 @@ public struct AppearanceLanguageSettingsView: View {
 
     public var body: some View {
         ScrollView {
-            VStack(spacing: VNSpacing.sectionGap) {
-                // Theme Card
-                VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    VNSectionLabel(String(localized: "settings.appearance.header"))
-
-                    VStack(spacing: 0) {
-                        Picker(String(localized: "settings.appearance.mode"), selection: $appThemeAppearance) {
-                            Text(String(localized: "settings.appearance.auto")).tag(0)
-                            Text(String(localized: "settings.appearance.light")).tag(1)
-                            Text(String(localized: "settings.appearance.dark")).tag(2)
-                        }
-                        .pickerStyle(.inline)
-                        .padding(VNSpacing.cardPadding)
+            VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
+                VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                    VNGroupHeader(String(localized: "settings.appearance.header"))
+                    VNGroupCard {
+                        themeRow(0, title: String(localized: "settings.appearance.auto"))
+                        VNRowDivider(leadingInset: VNSpacing.cardPadding)
+                        themeRow(1, title: String(localized: "settings.appearance.light"))
+                        VNRowDivider(leadingInset: VNSpacing.cardPadding)
+                        themeRow(2, title: String(localized: "settings.appearance.dark"))
                     }
-                    .background(Color.vnBackgroundSecondary)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 }
 
-                // Language Card
-                VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    VNSectionLabel(String(localized: "settings.language.header"))
-
-                    VStack(spacing: 0) {
-                        Picker(String(localized: "settings.language.title"), selection: $appLanguage) {
-                            Text(String(localized: "settings.language.system")).tag("system")
-                            Text("Tiếng Việt").tag("vi")
-                            Text("English").tag("en")
-                        }
-                        .pickerStyle(.inline)
-                        .padding(VNSpacing.cardPadding)
+                VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                    VNGroupHeader(String(localized: "settings.language.header"))
+                    VNGroupCard {
+                        languageRow("system", title: String(localized: "settings.language.system"))
+                        VNRowDivider(leadingInset: VNSpacing.cardPadding)
+                        languageRow("vi", title: "Tiếng Việt")
+                        VNRowDivider(leadingInset: VNSpacing.cardPadding)
+                        languageRow("en", title: "English")
                     }
-                    .background(Color.vnBackgroundSecondary)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+                    VNGroupFooter(String(localized: "settings.language.footer"))
                 }
             }
             .padding(.horizontal, VNSpacing.screenMargin)
-            .padding(.top, VNSpacing.xl)
+            .padding(.top, VNSpacing.md)
             .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
-        .vnNavBar(title: String(localized: "settings.appearance.header"))
+        .vnNavBar(title: String(localized: "settings.display.title"))
+    }
+
+    private func themeRow(_ value: Int, title: String) -> some View {
+        Button {
+            appThemeAppearance = value
+        } label: {
+            VNListRow(title: title, showsChevron: false) {
+                if appThemeAppearance == value {
+                    Image(systemName: "checkmark")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(.vnAccentSky)
+                        .accessibilityHidden(true)
+                }
+            }
+        }
+        .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+        .accessibilityAddTraits(appThemeAppearance == value ? [.isSelected] : [])
+    }
+
+    private func languageRow(_ value: String, title: String) -> some View {
+        Button {
+            appLanguage = value
+        } label: {
+            VNListRow(title: title, showsChevron: false) {
+                if appLanguage == value {
+                    Image(systemName: "checkmark")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(.vnAccentSky)
+                        .accessibilityHidden(true)
+                }
+            }
+        }
+        .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
+        .accessibilityAddTraits(appLanguage == value ? [.isSelected] : [])
     }
 }
 
@@ -216,52 +324,67 @@ public struct DataBackupSettingsView: View {
         let vm = activeViewModel
         ScrollView {
             VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
-                VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    VNSectionLabel(String(localized: "settings.data.header"))
+                VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                    VNGroupHeader(String(localized: "settings.data.header"))
 
-                    VStack(spacing: 0) {
+                    VNGroupCard {
                         Button {
                             vm.syncContent()
                         } label: {
-                            actionRow(String(localized: "settings.data.refresh"), icon: "arrow.triangle.2.circlepath") {
-                                if vm.isSyncingContent { ProgressView().scaleEffect(0.8) }
+                            VNListRow(
+                                icon: "arrow.triangle.2.circlepath",
+                                iconTint: .vnAccentJade,
+                                title: String(localized: "settings.data.refresh")
+                            ) {
+                                if vm.isSyncingContent {
+                                    ProgressView().scaleEffect(0.8)
+                                }
                             }
                         }
-                        .buttonStyle(.vnRowPress)
+                        .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
 
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
                         Button {
                             Task { present(await vm.exportJSON()) }
                         } label: {
-                            actionRow(String(localized: "settings.data.export_json"), icon: "square.and.arrow.up") { EmptyView() }
+                            VNListRow(
+                                icon: "square.and.arrow.up",
+                                iconTint: .vnAccentSky,
+                                title: String(localized: "settings.data.export_json")
+                            )
                         }
-                        .buttonStyle(.vnRowPress)
+                        .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
 
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
 
                         Button {
                             Task { present(await vm.exportICS()) }
                         } label: {
-                            actionRow(String(localized: "settings.data.export_ics"), icon: "calendar.badge.plus") { EmptyView() }
+                            VNListRow(
+                                icon: "calendar.badge.plus",
+                                iconTint: .vnAccentSky,
+                                title: String(localized: "settings.data.export_ics")
+                            )
                         }
-                        .buttonStyle(.vnRowPress)
+                        .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
 
                         if let msg = vm.backupStatusMessage {
                             VNRowDivider()
                             Text(msg)
                                 .font(.vnDisplay(.caption))
                                 .foregroundColor(.vnStatusSuccess)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal, VNSpacing.cardPadding)
                                 .padding(.vertical, VNSpacing.sm)
                         }
                     }
-                    .background(Color.vnBackgroundSecondary)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+
+                    VNGroupFooter(String(localized: "settings.data.footer_local_only"))
                 }
             }
             .padding(.horizontal, VNSpacing.screenMargin)
-            .padding(.top, VNSpacing.xl)
+            .padding(.top, VNSpacing.md)
             .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
@@ -271,24 +394,6 @@ public struct DataBackupSettingsView: View {
                 viewModel = activeViewModel
             }
         }
-    }
-
-    private func actionRow<Trailing: View>(
-        _ title: String,
-        icon: String,
-        @ViewBuilder trailing: () -> Trailing
-    ) -> some View {
-        HStack {
-            Label(title, systemImage: icon)
-                .font(.vnDisplay(.callout))
-                .foregroundColor(.vnTextPrimary)
-            Spacer()
-            trailing()
-        }
-        .padding(.horizontal, VNSpacing.cardPadding)
-        .padding(.vertical, VNSpacing.md)
-        .frame(minHeight: VNSize.minTapTarget)
-        .contentShape(Rectangle())
     }
 
     private func present(_ outcome: SettingsViewModel.ExportOutcome?) {
@@ -304,8 +409,8 @@ public struct PrivacySecuritySettingsView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
-                VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    VNSectionLabel(String(localized: "settings.privacy.header"))
+                VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                    VNGroupHeader(String(localized: "settings.privacy.header"))
 
                     VStack(alignment: .leading, spacing: VNSpacing.md) {
                         Text(String(localized: "settings.privacy.zero_knowledge_title"))
@@ -317,13 +422,14 @@ public struct PrivacySecuritySettingsView: View {
                             .foregroundColor(.vnTextSecondary)
                             .lineSpacing(4)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(VNSpacing.cardPadding)
                     .background(Color.vnBackgroundSecondary)
                     .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 }
             }
             .padding(.horizontal, VNSpacing.screenMargin)
-            .padding(.top, VNSpacing.xl)
+            .padding(.top, VNSpacing.md)
             .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
@@ -335,20 +441,18 @@ public struct AboutSettingsView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
-                VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                    VNSectionLabel(String(localized: "settings.about.header"))
+                VStack(alignment: .leading, spacing: VNSpacing.sm) {
+                    VNGroupHeader(String(localized: "settings.about.header"))
 
-                    VStack(spacing: 0) {
+                    VNGroupCard {
                         infoRow(String(localized: "settings.about.version"), value: Bundle.main.appVersionDescription)
                         VNRowDivider(leadingInset: VNSpacing.cardPadding)
                         infoRow(String(localized: "settings.about.copyright"), value: "An Niên • iletai")
                     }
-                    .background(Color.vnBackgroundSecondary)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
                 }
             }
             .padding(.horizontal, VNSpacing.screenMargin)
-            .padding(.top, VNSpacing.xl)
+            .padding(.top, VNSpacing.md)
             .padding(.bottom, VNSpacing.xxl)
         }
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
@@ -380,4 +484,3 @@ public struct ShareSheet: UIViewControllerRepresentable {
 
     public func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
-
