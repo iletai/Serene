@@ -174,16 +174,9 @@ struct VNDayActivitiesView: View {
 /// Fade-up reveal for the sheet's sections; index-based delay stays short so the sheet never feels slow.
 private struct VNSheetSectionAppear: ViewModifier {
     let index: Int
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var appeared = false
 
     func body(content: Content) -> some View {
-        content
-            .opacity(appeared || reduceMotion ? 1 : 0)
-            .offset(y: appeared || reduceMotion ? 0 : 10)
-            .onAppear {
-                withAnimation(.smooth(duration: 0.35).delay(0.08 + Double(index) * 0.04)) { appeared = true }
-            }
+        content.vnAppear(delay: 0.08 + Double(index) * 0.04, offset: 10)
     }
 }
 

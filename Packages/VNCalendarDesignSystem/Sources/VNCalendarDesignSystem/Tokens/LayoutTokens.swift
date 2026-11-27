@@ -26,6 +26,9 @@ public enum VNSize {
     public static let buttonSmall: CGFloat = 36
     public static let buttonMedium: CGFloat = 46
     public static let buttonLarge: CGFloat = 56
+    /// Inset-group row height and its leading colour tile (prototype `.row` / `.ico`).
+    public static let listRow: CGFloat = 52
+    public static let listRowIcon: CGFloat = 30
 }
 
 public enum VNLayout {

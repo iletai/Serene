@@ -12,13 +12,7 @@ struct ReminderTitleSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text(String(localized: "reminderForm.title.header"))
-                .font(.vnDisplay(.caption2, weight: .medium))
-                .tracking(0.66)
-                .foregroundColor(.vnAccentGoldText)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
-                .accessibilityAddTraits(.isHeader)
+            VNGroupHeader(String(localized: "reminderForm.title.header"))
 
             VNCard(
                 allPadding: VNSpacing.cardPadding,

@@ -40,6 +40,7 @@ enum MemorialFilterTab: CaseIterable, Identifiable {
 struct MemorialFilterPills: View {
     @Binding var selectedTab: MemorialFilterTab
     let countForTab: (MemorialFilterTab) -> Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -50,7 +51,7 @@ struct MemorialFilterPills: View {
 
                     Button(
                         action: {
-                            withAnimation(.easeInOut(duration: 0.15)) {
+                            withAnimation(reduceMotion ? VNAnimation.reduced : VNAnimation.selection) {
                                 selectedTab = tab
                             }
                         },

@@ -22,13 +22,7 @@ struct ReminderDatePickerCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("reminder.date_header")
-                .font(.vnDisplay(.caption2, weight: .medium))
-                .tracking(0.66)
-                .foregroundColor(.vnAccentGoldText)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
-                .accessibilityAddTraits(.isHeader)
+            VNGroupHeader(String(localized: "reminder.date_header"))
 
             VNCard(
                 allPadding: VNSpacing.cardPadding,

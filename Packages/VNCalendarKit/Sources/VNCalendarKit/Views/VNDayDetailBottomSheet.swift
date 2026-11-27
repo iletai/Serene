@@ -129,44 +129,17 @@ public struct VNDayDetailBottomSheet: View {
         }
     }
 
-    // MARK: - Auspicious Hours Grid
+    // MARK: - Auspicious Hours Dial
     private var auspiciousHoursSection: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("daydetail.section.auspicious_hours")
-                .font(.vnDisplay(.caption2, weight: .bold))
-                .foregroundColor(.vnTextSecondary)
-                .tracking(0.5)
+            VNGroupHeader(String(localized: "daydetail.section.auspicious_hours"))
 
-            let columns = [
-                GridItem(.flexible(), spacing: VNSpacing.sm),
-                GridItem(.flexible(), spacing: VNSpacing.sm),
-                GridItem(.flexible(), spacing: VNSpacing.sm)
-            ]
-
-            LazyVGrid(columns: columns, spacing: VNSpacing.sm) {
-                ForEach(dayModel.auspiciousHours, id: \.self) { branch in
-                    HStack(spacing: VNSpacing.xs) {
-                        Circle()
-                            .fill(Color.vnAccentImperialGold)
-                            .frame(width: VNSpacing.xs, height: VNSpacing.xs)
-
-                        Text("\(branch.vietnameseName) (\(branch.timeRange))")
-                            .font(.vnDisplay(.caption2, weight: .medium))
-                            .foregroundColor(.vnTextPrimary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, VNSpacing.sm)
-                    .padding(.horizontal, VNSpacing.xs)
-                    .background(Color.vnBackgroundSecondary)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                            .stroke(Color.vnBorderSubtle.opacity(0.6), lineWidth: VNBorderWidth.hairline)
-                    )
-                }
-            }
+            VNHourDialCard(auspiciousHours: dayModel.auspiciousHours)
+                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous)
+                        .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
+                )
         }
     }
 
@@ -212,10 +185,7 @@ public struct VNDayDetailBottomSheet: View {
     // MARK: - Family Events
     private var familyEventsSection: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("daydetail.section.family_events")
-                .font(.vnDisplay(.caption2, weight: .bold))
-                .foregroundColor(.vnTextSecondary)
-                .tracking(0.5)
+            VNGroupHeader(String(localized: "daydetail.section.family_events"))
 
             if dayModel.anniversaries.isEmpty {
                 HStack(spacing: VNSpacing.sm) {
@@ -267,20 +237,20 @@ public struct VNDayDetailBottomSheet: View {
         }
     }
 
-    // MARK: - Action Button
+    // MARK: - Action Row
     private var actionButton: some View {
-        Button(
-            action: onAddReminder,
-            label: {
-                Label("daydetail.action.add_anniversary", systemImage: "plus")
-                    .font(.vnDisplay(.subheadline, weight: .semibold))
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: VNSize.minTapTarget)
-                    .background(Color.vnAccentHeritageRed)
-                    .foregroundColor(.vnOnAccent)
-                    .clipShape(Capsule())
+        Button(action: onAddReminder) {
+            VNGroupCard {
+                VNListRow(
+                    icon: "plus",
+                    iconTint: .vnAccentSky,
+                    title: String(localized: "daydetail.action.add_anniversary"),
+                    showsChevron: false
+                )
             }
-        )
+        }
+        .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
         .padding(.top, VNSpacing.xs)
+        .accessibilityAddTraits(.isButton)
     }
 }

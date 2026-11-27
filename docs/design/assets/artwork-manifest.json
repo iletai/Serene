@@ -1,0 +1,672 @@
+{
+  "schemaVersion": 1,
+  "source": "docs/assets/design.html",
+  "note": "Prototype loads raster as assets/art/<name>.jpg; JPG copies are provided for that path. sky-shade is NOT baked in.",
+  "moonFormula": {
+    "viewBox": "0 0 24 24",
+    "r": 10,
+    "cx": 12,
+    "cy": 12,
+    "p": "(lDay - 1) / 29.53",
+    "c": "cos(2*pi*p)",
+    "waxing": "p < 0.5",
+    "rx": "r * |c|",
+    "litPath": "M cx,cy-r  A r r 0 0 (waxing?1:0) cx,cy+r  A rx r 0 0 ((c>0)==waxing?0:1) cx,cy-r Z",
+    "lDay1": "no lit path (new moon)",
+    "recommendation": "parametric Shape in SwiftUI (any size, any lDay incl. leap/short months); the 30 SVGs are reference renders"
+  },
+  "assets": [
+    {
+      "id": "season.spring",
+      "file": "seasons/spring.png",
+      "kind": "raster",
+      "size": "1000x1500",
+      "usedBy": [
+        "#today sky-img / art-panel via setArt(seasonOf)",
+        ".cal banner-img",
+        "onboarding .art-panel"
+      ],
+      "swiftUseHint": "Asset \"Season/spring\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "season.spring.jpg",
+      "file": "seasons/spring.jpg",
+      "kind": "raster",
+      "size": "1000x1500",
+      "usedBy": [
+        "#today sky-img / art-panel via setArt(seasonOf)",
+        ".cal banner-img",
+        "onboarding .art-panel"
+      ],
+      "swiftUseHint": "Asset \"Season/spring\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "season.summer",
+      "file": "seasons/summer.png",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "setArt(seasonOf) May-Jul",
+        "holidayArt case summer (thieu-nhi) .hol-art > img",
+        "ADS art:summer .ad-thumb/.it-art"
+      ],
+      "swiftUseHint": "Asset \"Season/summer\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "season.summer.jpg",
+      "file": "seasons/summer.jpg",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "setArt(seasonOf) May-Jul",
+        "holidayArt case summer (thieu-nhi) .hol-art > img",
+        "ADS art:summer .ad-thumb/.it-art"
+      ],
+      "swiftUseHint": "Asset \"Season/summer\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "season.autumn",
+      "file": "seasons/autumn.png",
+      "kind": "raster",
+      "size": "1000x1217",
+      "usedBy": [
+        "setArt(seasonOf) Aug-Oct",
+        "ADS art:autumn .ad-card-art (1000x1217)"
+      ],
+      "swiftUseHint": "Asset \"Season/autumn\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "season.autumn.jpg",
+      "file": "seasons/autumn.jpg",
+      "kind": "raster",
+      "size": "1000x1217",
+      "usedBy": [
+        "setArt(seasonOf) Aug-Oct",
+        "ADS art:autumn .ad-card-art (1000x1217)"
+      ],
+      "swiftUseHint": "Asset \"Season/autumn\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "season.winter",
+      "file": "seasons/winter.png",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "setArt(seasonOf) Nov-Jan"
+      ],
+      "swiftUseHint": "Asset \"Season/winter\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "season.winter.jpg",
+      "file": "seasons/winter.jpg",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "setArt(seasonOf) Nov-Jan"
+      ],
+      "swiftUseHint": "Asset \"Season/winter\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "season.lantern",
+      "file": "seasons/lantern.png",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "setArt(seasonOf) lunar 8/8-8/20",
+        "paywall hero img (line ~3932)",
+        "welcome card img (line ~4081)",
+        "ADS art:lantern"
+      ],
+      "swiftUseHint": "Asset \"Season/lantern\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "season.lantern.jpg",
+      "file": "seasons/lantern.jpg",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "setArt(seasonOf) lunar 8/8-8/20",
+        "paywall hero img (line ~3932)",
+        "welcome card img (line ~4081)",
+        "ADS art:lantern"
+      ],
+      "swiftUseHint": "Asset \"Season/lantern\"; .resizable().scaledToFill() + overlay LinearGradient sky-shade (#0B1433 .58/.10@34%/.16@62%/.80); animation kenburns 26s scale 1.02->1.14 autoreverses; Reduce Motion: static"
+    },
+    {
+      "id": "holiday-photo.tet",
+      "file": "holidays/tet.png",
+      "kind": "raster",
+      "size": "1000x663",
+      "usedBy": [
+        "holidayArt case tet (tet-nd) + PETALS",
+        ".hol-art > img"
+      ],
+      "swiftUseHint": "Asset \"Holiday/tet\"; scaledToFill; kenburns 24s; petal-fall overlay: 10 petals 10x8 #FFD24D (every 3rd #FF9FB2), fall 34x240 rotate 360, 5s+k*0.4s"
+    },
+    {
+      "id": "holiday-photo.tet.jpg",
+      "file": "holidays/tet.jpg",
+      "kind": "raster",
+      "size": "1000x663",
+      "usedBy": [
+        "holidayArt case tet (tet-nd) + PETALS",
+        ".hol-art > img"
+      ],
+      "swiftUseHint": "Asset \"Holiday/tet\"; scaledToFill; kenburns 24s; petal-fall overlay: 10 petals 10x8 #FFD24D (every 3rd #FF9FB2), fall 34x240 rotate 360, 5s+k*0.4s"
+    },
+    {
+      "id": "holiday-photo.flowers",
+      "file": "holidays/flowers.png",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "holidayArt case flowers (phu-nu-qt, phu-nu-vn)",
+        ".hol-art > img"
+      ],
+      "swiftUseHint": "Asset \"Holiday/flowers\"; scaledToFill; kenburns 24s"
+    },
+    {
+      "id": "holiday-photo.flowers.jpg",
+      "file": "holidays/flowers.jpg",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "holidayArt case flowers (phu-nu-qt, phu-nu-vn)",
+        ".hol-art > img"
+      ],
+      "swiftUseHint": "Asset \"Holiday/flowers\"; scaledToFill; kenburns 24s"
+    },
+    {
+      "id": "holiday-photo.books",
+      "file": "holidays/books.png",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "holidayArt case books (nha-giao)",
+        ".hol-art > img"
+      ],
+      "swiftUseHint": "Asset \"Holiday/books\"; scaledToFill; kenburns 24s"
+    },
+    {
+      "id": "holiday-photo.books.jpg",
+      "file": "holidays/books.jpg",
+      "kind": "raster",
+      "size": "1000x667",
+      "usedBy": [
+        "holidayArt case books (nha-giao)",
+        ".hol-art > img"
+      ],
+      "swiftUseHint": "Asset \"Holiday/books\"; scaledToFill; kenburns 24s"
+    },
+    {
+      "id": "drum",
+      "file": "drum.svg",
+      "kind": "template",
+      "size": "200x200",
+      "usedBy": [
+        "drumSVG(): .sky-motif .banner-motif .art-motif .evc-motif .card-motif .strip-motif .pw-motif .wc-motif .pc-motif .it-motif .sac-motif .pp-motif .empty-motif .hol-drum"
+      ],
+      "swiftUseHint": "Asset \"Motif/Drum\" Preserve Vector Data, Render As Template; .foregroundStyle(gold) .opacity(.3-.5); animation drum-turn: rotationEffect 360deg linear 90s repeatForever; Reduce Motion: static"
+    },
+    {
+      "id": "moon.01",
+      "file": "moon/moon-01.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.02",
+      "file": "moon/moon-02.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.03",
+      "file": "moon/moon-03.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.04",
+      "file": "moon/moon-04.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.05",
+      "file": "moon/moon-05.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.06",
+      "file": "moon/moon-06.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.07",
+      "file": "moon/moon-07.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.08",
+      "file": "moon/moon-08.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.09",
+      "file": "moon/moon-09.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.10",
+      "file": "moon/moon-10.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.11",
+      "file": "moon/moon-11.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.12",
+      "file": "moon/moon-12.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.13",
+      "file": "moon/moon-13.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.14",
+      "file": "moon/moon-14.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.15",
+      "file": "moon/moon-15.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.16",
+      "file": "moon/moon-16.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.17",
+      "file": "moon/moon-17.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.18",
+      "file": "moon/moon-18.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.19",
+      "file": "moon/moon-19.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.20",
+      "file": "moon/moon-20.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.21",
+      "file": "moon/moon-21.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.22",
+      "file": "moon/moon-22.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.23",
+      "file": "moon/moon-23.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.24",
+      "file": "moon/moon-24.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.25",
+      "file": "moon/moon-25.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.26",
+      "file": "moon/moon-26.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.27",
+      "file": "moon/moon-27.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.28",
+      "file": "moon/moon-28.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.29",
+      "file": "moon/moon-29.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "moon.30",
+      "file": "moon/moon-30.svg",
+      "kind": "vector",
+      "size": "24x24",
+      "usedBy": [
+        "moonSVG(lDay,size): .bloc-moon .moon-card .art-inner .fn-gio"
+      ],
+      "swiftUseHint": "Prefer parametric MoonPhaseShape (formula in moonFormula); fills: dark #DDE3EF (dark mode #2A3350; on art rgba(255,255,255,.16)), lit #FFC21A, rim #0E1526 @.18 w.8; moon-glow 4.2s"
+    },
+    {
+      "id": "holiday.tet-dl",
+      "file": "holidays/tet-dl.svg",
+      "kind": "vector",
+      "size": "300x200",
+      "usedBy": [
+        "HOLIDAYS id tet-dl art:fireworks -> holidayArt() .hol-art"
+      ],
+      "swiftUseHint": "Asset \"Holiday/tet-dl\" Preserve Vector Data; bursts staggered 0.55s, 3.2s scale .1->1.15 fade; compose from holidays/fireworks-layer.svg; Reduce Motion: static (bursts at .8 opacity)"
+    },
+    {
+      "id": "holiday.dang",
+      "file": "holidays/dang.svg",
+      "kind": "vector",
+      "size": "300x200",
+      "usedBy": [
+        "HOLIDAYS id dang art:flag -> holidayArt() .hol-art"
+      ],
+      "swiftUseHint": "Asset \"Holiday/dang\" Preserve Vector Data; flag-wave 4.5s: skewY -1.6deg scaleX 1.03 anchor leading; Reduce Motion: static (bursts at .8 opacity)"
+    },
+    {
+      "id": "holiday.gio-to",
+      "file": "holidays/gio-to.svg",
+      "kind": "vector",
+      "size": "300x200",
+      "usedBy": [
+        "HOLIDAYS id gio-to art:drum -> holidayArt() .hol-art"
+      ],
+      "swiftUseHint": "Asset \"Holiday/gio-to\" Preserve Vector Data; drum-turn 90s on the drum layer only; Reduce Motion: static (bursts at .8 opacity)"
+    },
+    {
+      "id": "holiday.3004",
+      "file": "holidays/3004.svg",
+      "kind": "vector",
+      "size": "300x200",
+      "usedBy": [
+        "HOLIDAYS id 3004 art:flag -> holidayArt() .hol-art"
+      ],
+      "swiftUseHint": "Asset \"Holiday/3004\" Preserve Vector Data; flag-wave 4.5s: skewY -1.6deg scaleX 1.03 anchor leading; Reduce Motion: static (bursts at .8 opacity)"
+    },
+    {
+      "id": "holiday.0105",
+      "file": "holidays/0105.svg",
+      "kind": "vector",
+      "size": "300x200",
+      "usedBy": [
+        "HOLIDAYS id 0105 art:flag -> holidayArt() .hol-art"
+      ],
+      "swiftUseHint": "Asset \"Holiday/0105\" Preserve Vector Data; flag-wave 4.5s: skewY -1.6deg scaleX 1.03 anchor leading; Reduce Motion: static (bursts at .8 opacity)"
+    },
+    {
+      "id": "holiday.tbls",
+      "file": "holidays/tbls.svg",
+      "kind": "vector",
+      "size": "300x200",
+      "usedBy": [
+        "HOLIDAYS id tbls art:drum -> holidayArt() .hol-art"
+      ],
+      "swiftUseHint": "Asset \"Holiday/tbls\" Preserve Vector Data; drum-turn 90s on the drum layer only; Reduce Motion: static (bursts at .8 opacity)"
+    },
+    {
+      "id": "holiday.quoc-khanh",
+      "file": "holidays/quoc-khanh.svg",
+      "kind": "vector",
+      "size": "300x200",
+      "usedBy": [
+        "HOLIDAYS id quoc-khanh art:flagfire -> holidayArt() .hol-art"
+      ],
+      "swiftUseHint": "Asset \"Holiday/quoc-khanh\" Preserve Vector Data; flag-wave + bursts (screen blend) staggered 0.55s, 3.2s scale .1->1.15 fade; Reduce Motion: static (bursts at .8 opacity)"
+    },
+    {
+      "id": "holiday.qdnd",
+      "file": "holidays/qdnd.svg",
+      "kind": "vector",
+      "size": "300x200",
+      "usedBy": [
+        "HOLIDAYS id qdnd art:flag -> holidayArt() .hol-art"
+      ],
+      "swiftUseHint": "Asset \"Holiday/qdnd\" Preserve Vector Data; flag-wave 4.5s: skewY -1.6deg scaleX 1.03 anchor leading; Reduce Motion: static (bursts at .8 opacity)"
+    },
+    {
+      "id": "holiday.fireworks-layer",
+      "file": "holidays/fireworks-layer.svg",
+      "kind": "vector",
+      "size": "300x200",
+      "usedBy": [
+        "FIREWORKS_SVG (5 bursts)"
+      ],
+      "swiftUseHint": "Overlay layer for native burst animation; blend .screen on flag"
+    },
+    {
+      "id": "pattern.pattern-wave-light",
+      "file": "patterns/pattern-wave-light.svg",
+      "kind": "vector",
+      "size": "56x28",
+      "usedBy": [
+        ":root --pattern (art.css light)"
+      ],
+      "swiftUseHint": "Background tile: Image(...).resizable(resizingMode: .tile) or as a decorative overlay; colours/opacity baked per theme"
+    },
+    {
+      "id": "pattern.pattern-wave-dark",
+      "file": "patterns/pattern-wave-dark.svg",
+      "kind": "vector",
+      "size": "56x28",
+      "usedBy": [
+        ":root[data-theme=dark] --pattern"
+      ],
+      "swiftUseHint": "Background tile: Image(...).resizable(resizingMode: .tile) or as a decorative overlay; colours/opacity baked per theme"
+    },
+    {
+      "id": "pattern.cloud-light",
+      "file": "patterns/cloud-light.svg",
+      "kind": "vector",
+      "size": "160x80",
+      "usedBy": [
+        ":root --cloud (.page--inline .page-body, .sheet-head)"
+      ],
+      "swiftUseHint": "Background tile: Image(...).resizable(resizingMode: .tile) or as a decorative overlay; colours/opacity baked per theme"
+    },
+    {
+      "id": "pattern.lotus-light",
+      "file": "patterns/lotus-light.svg",
+      "kind": "vector",
+      "size": "120x120",
+      "usedBy": [
+        ":root --lotus"
+      ],
+      "swiftUseHint": "Background tile: Image(...).resizable(resizingMode: .tile) or as a decorative overlay; colours/opacity baked per theme"
+    },
+    {
+      "id": "pattern.cloud-dark",
+      "file": "patterns/cloud-dark.svg",
+      "kind": "vector",
+      "size": "160x80",
+      "usedBy": [
+        "dark --cloud"
+      ],
+      "swiftUseHint": "Background tile: Image(...).resizable(resizingMode: .tile) or as a decorative overlay; colours/opacity baked per theme"
+    },
+    {
+      "id": "pattern.lotus-dark",
+      "file": "patterns/lotus-dark.svg",
+      "kind": "vector",
+      "size": "120x120",
+      "usedBy": [
+        "dark --lotus"
+      ],
+      "swiftUseHint": "Background tile: Image(...).resizable(resizingMode: .tile) or as a decorative overlay; colours/opacity baked per theme"
+    },
+    {
+      "id": "pattern.pattern-wave-tree",
+      "file": "patterns/pattern-wave-tree.svg",
+      "kind": "vector",
+      "size": "56x28",
+      "usedBy": [
+        ".tree-canvas::before"
+      ],
+      "swiftUseHint": "Background tile: Image(...).resizable(resizingMode: .tile) or as a decorative overlay; colours/opacity baked per theme"
+    }
+  ]
+}

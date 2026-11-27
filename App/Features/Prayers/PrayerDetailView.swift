@@ -9,6 +9,7 @@ public struct PrayerDetailView: View {
     @State private var fontSize: CGFloat = 16
     @State private var isZenMode = false
     @State private var showCopiedAlert = false
+    @State private var bellRinging = false
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
 
     public init(prayer: Prayer) {
@@ -217,6 +218,7 @@ public struct PrayerDetailView: View {
                         .font(.vnCaption1)
                         .fontWeight(.bold)
                         .foregroundColor(.vnAccentGoldText)
+                        .vnRing(active: bellRinging)
                         .accessibilityHidden(true)
                     Text("prayers.bell")
                         .font(.vnCaption1)
@@ -344,6 +346,11 @@ public struct PrayerDetailView: View {
     }
 
     private func triggerBellChime() {
+        bellRinging = true
+        Task {
+            try? await Task.sleep(for: .milliseconds(900))
+            bellRinging = false
+        }
         VNHaptics.impact(.medium, enabled: hapticFeedbackEnabled)
     }
 }

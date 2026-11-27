@@ -6,7 +6,7 @@ CODE_SIGN_STYLE = Automatic
 SWIFT_VERSION = 6.0
 IPHONEOS_DEPLOYMENT_TARGET = 17.0
 TARGETED_DEVICE_FAMILY = 1
-MARKETING_VERSION = 1.0.2
+MARKETING_VERSION = 1.1.0
 CURRENT_PROJECT_VERSION = 1
 SWIFT_STRICT_CONCURRENCY = complete
 ENABLE_USER_SCRIPT_SANDBOXING = YES
@@ -17,10 +17,8 @@ INFOPLIST_KEY_CFBundleDisplayName = $(APP_DISPLAY_NAME)
 INFOPLIST_KEY_UILaunchScreen_Generation = YES
 INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
 INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
-// Inject microCMS read-only key into generated Info.plist (read by AppConfiguration).
+// microCMS read-only key, copied into App/Info.plist (INFOPLIST_KEY_ only accepts Apple-known keys).
 // Define MICROCMS_API_KEY in Config/Secrets.xcconfig (gitignored); see Secrets.xcconfig.example.
-INFOPLIST_KEY_MICROCMS_API_KEY = $(MICROCMS_API_KEY)
 // Single microCMS tenant (annien.microcms.io); override per env only when a
 // separate dev tenant exists. Parsed by AppConfiguration.
 MICROCMS_SERVICE_DOMAIN = annien
-INFOPLIST_KEY_MICROCMS_SERVICE_DOMAIN = $(MICROCMS_SERVICE_DOMAIN)

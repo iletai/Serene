@@ -15,6 +15,13 @@ import VNCalendarDomain
 ///   plus `reminderForm`, `holiday`, `ritual`.
 @MainActor
 enum UITestSupport {
+    /// True for any UI-test/snapshot launch; first-launch onboarding must not block those runs.
+    static var isActive: Bool {
+        let defaults = UserDefaults.standard
+        return defaults.bool(forKey: "UITestSeed") || defaults.string(forKey: "UITestRoute") != nil
+            || defaults.bool(forKey: "FASTLANE_SNAPSHOT")
+    }
+
     /// Seeded container when `-UITestSeed` is passed; nil means a normal launch.
     static func makeContainerIfRequested() -> AppContainer? {
         let defaults = UserDefaults.standard  // launch arguments land in the argument domain
@@ -60,7 +67,7 @@ enum UITestSupport {
     ]
 
     private static let sampleHoliday = Holiday(
-        id: "ui-test-tet",
+        id: "tet-nguyen-dan-1",
         title: "Tết Nguyên Đán",
         calendarType: .lunar,
         day: 1,
