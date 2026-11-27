@@ -42,5 +42,9 @@ public enum VNMotion {
         public static let spinSlow: Double = 14
         public static let twinkle: Double = 4
         public static let swing: Double = 4.4
+        public static let smoke: Double = 2.8
+        public static let nextGlow: Double = 2.6
+        /// `.pp-motif` drum turn
+        public static let drumTurn: Double = 90
     }
 }
