@@ -44,7 +44,11 @@ public struct ReminderFormView: View {
                         dateType: vm.dateType,
                         isLeapMonth: vm.isLeapMonth
                     )
+                    .vnRise(index: 0, baseDelay: 0.02)
+
                     ReminderCategoryGrid(selectedCategory: $vm.category)
+                        .vnRise(index: 1, baseDelay: 0.02)
+
                     ReminderTitleSection(
                         title: $vm.title,
                         relationship: $vm.relationship,
@@ -52,6 +56,8 @@ public struct ReminderFormView: View {
                         showsError: vm.showsTitleError,
                         errorMessage: Self.titleRequiredMessage
                     )
+                    .vnRise(index: 2, baseDelay: 0.02)
+
                     ReminderDatePickerCard(
                         dateType: $vm.dateType,
                         day: $vm.day,
@@ -59,6 +65,8 @@ public struct ReminderFormView: View {
                         year: $vm.year,
                         isLeapMonth: $vm.isLeapMonth
                     )
+                    .vnRise(index: 3, baseDelay: 0.02)
+
                     ReminderOffsetsCard(
                         notifyOnDay: $vm.notifyOnDay,
                         notify1DayBefore: $vm.notify1DayBefore,
@@ -67,8 +75,13 @@ public struct ReminderFormView: View {
                         notify14DaysBefore: $vm.notify14DaysBefore,
                         notify30DaysBefore: $vm.notify30DaysBefore
                     )
+                    .vnRise(index: 4, baseDelay: 0.02)
+
                     notesSection(vm: vm)
+                        .vnRise(index: 5, baseDelay: 0.02)
+
                     saveActionButton(vm: vm)
+                        .vnRise(index: 6, baseDelay: 0.02)
                 }
                 .padding(.horizontal, VNSpacing.screenMargin)
                 .padding(.top, VNSpacing.md)

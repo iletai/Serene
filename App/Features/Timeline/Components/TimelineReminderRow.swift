@@ -29,7 +29,7 @@ struct TimelineReminderRow: View {
         Button(action: onEdit) {
             content
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.vnRowPress)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityActions {

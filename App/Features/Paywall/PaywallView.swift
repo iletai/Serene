@@ -83,6 +83,7 @@ public struct PaywallView: View {
             Image(systemName: "crown.fill")
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundColor(.vnAccentImperialGold)
+                .vnCrownShine()
                 .padding(.bottom, VNSpacing.xs)
                 .accessibilityHidden(true)
 
@@ -111,6 +112,7 @@ public struct PaywallView: View {
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
         .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.top, VNSpacing.md)
+        .vnRise(distance: 18)
     }
 
     private struct Benefit: Identifiable {
@@ -174,7 +176,7 @@ public struct PaywallView: View {
                     subtitle: benefit.subtitle,
                     showsChevron: false
                 )
-                .modifier(PaywallRowAppear(index: index, reduceMotion: reduceMotion))
+                .vnRise(index: index, baseDelay: 0.12, stagger: 0.06)
             }
         }
         .padding(.horizontal, VNSpacing.screenMargin)
@@ -394,20 +396,5 @@ public struct PaywallView: View {
 
     private func hasFreeTrial(_ product: Product) -> Bool {
         product.subscription?.introductoryOffer?.paymentMode == .freeTrial
-    }
-}
-
-private struct PaywallRowAppear: ViewModifier {
-    let index: Int
-    let reduceMotion: Bool
-    @State private var appeared = false
-
-    func body(content: Content) -> some View {
-        content
-            .opacity(appeared || reduceMotion ? 1 : 0)
-            .offset(y: appeared || reduceMotion ? 0 : 8)
-            .onAppear {
-                withAnimation(.smooth(duration: 0.4).delay(0.15 + Double(index) * 0.06)) { appeared = true }
-            }
     }
 }

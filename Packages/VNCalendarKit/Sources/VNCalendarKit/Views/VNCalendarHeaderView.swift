@@ -9,6 +9,8 @@ public struct VNCalendarHeaderView: View {
     public let onNext: () -> Void
     public let onToday: () -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     public init(
         displayMode: VNCalendarDisplayMode = .month,
         monthDate: Date,
@@ -47,6 +49,8 @@ public struct VNCalendarHeaderView: View {
                     .foregroundColor(.vnAccentSky)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
+                    .contentTransition(.numericText())
+                    .vnAnimation(reduceMotion ? VNAnimation.reduced : VNAnimation.monthTransition, value: headerTitle)
 
                 if let subtitle = headerSubtitle {
                     Text(subtitle)
@@ -54,6 +58,8 @@ public struct VNCalendarHeaderView: View {
                         .foregroundColor(.vnTextSecondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
+                        .contentTransition(.opacity)
+                        .vnAnimation(reduceMotion ? VNAnimation.reduced : VNAnimation.monthTransition, value: subtitle)
                 }
             }
             .frame(maxWidth: .infinity)

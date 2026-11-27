@@ -32,6 +32,7 @@ struct ReminderCategoryGrid: View {
                         .font(.subheadline.weight(.bold))
                         .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnAccentGoldText)
                         .frame(width: iconBox, height: iconBox)
+                        .vnBeat(active: isSelected && cat == .wedding)
                         .accessibilityHidden(true)
                         .background(
                             RoundedRectangle(cornerRadius: VNCornerRadius.small)

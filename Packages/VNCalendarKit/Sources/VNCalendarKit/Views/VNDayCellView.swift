@@ -43,6 +43,7 @@ public struct VNDayCellView: View, Equatable {
                     .foregroundColor(numeralColor)
                     .frame(width: numeralSize, height: numeralSize)
                     .background(numeralBackground, in: Circle())
+                    .vnSelectionPulse(active: isSelected)
 
                 Text(model.lunarDayText)
                     .font(.vnDisplay(size: lunarFontSize, weight: lunarWeight))

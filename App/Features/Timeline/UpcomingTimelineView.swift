@@ -170,6 +170,7 @@ public struct UpcomingTimelineView: View {
                         onViewRitual: showRitual,
                         onDelete: { vm.delete($0) }
                     )
+                    .vnRise(index: index, baseDelay: 0.05, stagger: 0.05)
 
                     // Free-tier native ad sits after the first month section.
                     if index == 0, ads?.canShowAds == true {

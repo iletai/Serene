@@ -26,6 +26,7 @@ public struct CalendarSettingsView: View {
     @State private var isSyncing = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var syncStatusBanner: String?
+    @State private var spinSyncIcon = false
 
     public init() {}
 
@@ -50,14 +51,19 @@ public struct CalendarSettingsView: View {
         ScrollView {
             VStack(spacing: VNSpacing.sectionGap) {
                 headerSummaryBanner
+                    .vnRise(index: 0, baseDelay: 0.02)
 
                 calendarModesGroup
+                    .vnRise(index: 1, baseDelay: 0.02)
 
                 microCMSSyncGroup
+                    .vnRise(index: 2, baseDelay: 0.02)
 
                 dailyCustomizationGroup
+                    .vnRise(index: 3, baseDelay: 0.02)
 
                 astronomicalTimezoneGroup
+                    .vnRise(index: 4, baseDelay: 0.02)
             }
             .padding(.horizontal, VNSpacing.screenMargin)
             .padding(.top, VNSpacing.xl)
@@ -241,6 +247,7 @@ public struct CalendarSettingsView: View {
                 } else {
                     Image(systemName: "arrow.triangle.2.circlepath")
                         .font(.footnote.weight(.bold))
+                        .vnSpinOnce(trigger: spinSyncIcon)
                         .accessibilityHidden(true)
                     Text(String(localized: "settings.microcms.sync_now"))
                         .font(.vnFootnote)
@@ -370,6 +377,7 @@ public struct CalendarSettingsView: View {
     private func handleSyncMicroCMSNow() {
         guard !isSyncing else { return }
         isSyncing = true
+        spinSyncIcon.toggle()
 
         Task {
             do {

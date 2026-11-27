@@ -46,21 +46,18 @@ public struct VNAdviceTipCard: View {
     }
 
     public let card: Model
+    /// Position in the carousel; staggers the icon pop by 70ms like the prototype.
+    public let index: Int
 
-    public init(card: Model) {
+    public init(card: Model, index: Int = 0) {
         self.card = card
+        self.index = index
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            Image(systemName: card.icon)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(card.tone.foreground)
-                .frame(width: 40, height: 40)
-                .background(card.tone.background)
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
+            iconTile
                 .padding(.bottom, VNSpacing.xs)
-                .accessibilityHidden(true)
 
             Text(card.kicker.uppercased())
                 .font(.vnDisplay(.caption2, weight: .semibold))
@@ -88,5 +85,47 @@ public struct VNAdviceTipCard: View {
                 .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
         )
         .accessibilityElement(children: .combine)
+    }
+
+    // MARK: - Animated icon (`.ico` + `ico-pop`, `glow`, per-icon idle motion)
+
+    private var iconTile: some View {
+        ZStack {
+            Circle()
+                .fill(card.tone.foreground.opacity(0.35))
+                .frame(width: 28, height: 28)
+                .vnGlowPulse()
+
+            animatedIcon
+        }
+        .frame(width: 40, height: 40)
+        .background(card.tone.background)
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
+        .vnIconPop(delay: Double(index) * 0.07)
+        .accessibilityHidden(true)
+    }
+
+    /// Each advice symbol keeps its own short idle beat, as in the prototype:
+    /// star twinkles, leaf sways, sun turns slowly, moon bobs.
+    @ViewBuilder
+    private var animatedIcon: some View {
+        switch card.icon {
+        case "star.fill":
+            baseIcon.vnTwinkle()
+        case "leaf.fill":
+            baseIcon.vnSway(anchor: .bottomLeading)
+        case "sun.max.fill":
+            baseIcon.vnSpinSlow()
+        case "moon.stars.fill":
+            baseIcon.vnBob()
+        default:
+            baseIcon
+        }
+    }
+
+    private var baseIcon: some View {
+        Image(systemName: card.icon)
+            .font(.system(size: 18, weight: .semibold))
+            .foregroundColor(card.tone.foreground)
     }
 }

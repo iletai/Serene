@@ -33,10 +33,15 @@ public struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
                 profileGroup
+                    .vnRise(index: 0, baseDelay: 0.02)
                 membershipCard
+                    .vnRise(index: 1, baseDelay: 0.02)
                 commonSection
+                    .vnRise(index: 2, baseDelay: 0.02)
                 infoSection
+                    .vnRise(index: 3, baseDelay: 0.02)
                 footer
+                    .vnRise(index: 4, baseDelay: 0.02)
             }
             .padding(.horizontal, VNSpacing.screenMargin)
             .padding(.top, VNSpacing.md)

@@ -64,6 +64,7 @@ public struct TodayDashboardCard: View {
             x: VNShadow.folio.x,
             y: VNShadow.folio.y
         )
+        .vnRise(distance: 18)
         .accessibilityElement(children: .combine)
     }
 
@@ -141,6 +142,7 @@ public struct TodayDashboardCard: View {
     private var moonTile: some View {
         VStack(spacing: VNSpacing.space2) {
             VNMoonPhaseView(lunarDay: currentLunarDate.day, size: 40)
+                .vnMoonGlow()
                 .padding(.bottom, VNSpacing.xs)
 
             Text("\(currentLunarDate.day)")
@@ -257,8 +259,9 @@ public struct TodayDashboardCard: View {
             VNGroupHeader(String(localized: "today.advice_section_header"))
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: VNSpacing.md) {
-                    ForEach(adviceCards) { card in
-                        VNAdviceTipCard(card: card)
+                    ForEach(Array(adviceCards.enumerated()), id: \.element.id) { index, card in
+                        VNAdviceTipCard(card: card, index: index)
+                            .vnRise(index: index, baseDelay: 0.08, stagger: 0.06)
                     }
                 }
             }
