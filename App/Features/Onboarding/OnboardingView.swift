@@ -17,15 +17,15 @@ struct OnboardingView: View {
             // Native paging gives the swipe gesture; `push` easing and Reduce Motion are applied below.
             TabView(selection: $viewModel.index) {
                 OnboardingIntroPage(
-                    title: String(localized: "onboarding.page1.title"), message: String(localized: "onboarding.page1.body")
+                    season: .autumn, title: String(localized: "onboarding.page1.title"), message: String(localized: "onboarding.page1.body")
                 ) { OnboardingMoonArt() }
                     .tag(0)
                 OnboardingIntroPage(
-                    title: String(localized: "onboarding.page2.title"), message: String(localized: "onboarding.page2.body")
+                    season: .spring, title: String(localized: "onboarding.page2.title"), message: String(localized: "onboarding.page2.body")
                 ) { OnboardingBlocArt() }
                     .tag(1)
                 OnboardingIntroPage(
-                    title: String(localized: "onboarding.page3.title"), message: String(localized: "onboarding.page3.body")
+                    season: .summer, title: String(localized: "onboarding.page3.title"), message: String(localized: "onboarding.page3.body")
                 ) { OnboardingReminderArt() }
                     .tag(2)
                 OnboardingPreferencesPage().tag(3)
@@ -95,6 +95,7 @@ struct OnboardingView: View {
 
 /// Pages 1-3: artwork, title and one supporting line, centred.
 private struct OnboardingIntroPage<Art: View>: View {
+    let season: ArtSeason
     let title: String
     let message: String
     @ViewBuilder let art: Art
@@ -102,7 +103,7 @@ private struct OnboardingIntroPage<Art: View>: View {
     var body: some View {
         ScrollView {
             VStack(spacing: VNSpacing.lg) {
-                OnboardingArtPanel(height: 260) { art }
+                ArtPanel(season: season, height: 260) { art }
                     .padding(.horizontal, VNSpacing.screenMargin)
                     .accessibilityHidden(true)
                 OnboardingHeading(title: title, message: message)

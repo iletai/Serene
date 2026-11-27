@@ -46,5 +46,15 @@ public enum VNMotion {
         public static let nextGlow: Double = 2.6
         /// `.pp-motif` drum turn
         public static let drumTurn: Double = 90
+        /// `kenburns` on season art panels / hero images (full cycle is twice this: alternate)
+        public static let kenBurns: Double = 26
+        /// `kenburns` on holiday art and the paywall hero
+        public static let kenBurnsHoliday: Double = 24
+        /// `flag-wave`
+        public static let flagWave: Double = 4.5
+        /// `burst`
+        public static let burst: Double = 3.2
+        /// Stagger between fireworks (`--d: k * .55s`)
+        public static let burstStagger: Double = 0.55
     }
 }

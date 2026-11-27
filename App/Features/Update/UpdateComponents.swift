@@ -2,8 +2,8 @@ import SwiftUI
 import AppUpdateKit
 import VNCalendarDesignSystem
 
-/// Icon hero. Mirrors design.html art-panel motion: slow drum-turn ring + pulsing glow.
-/// Both loops are skipped under Reduce Motion.
+/// Icon hero on the lantern art panel (design.html `.force-hero .art-panel`): photo drift and drum turn
+/// come from `ArtPanel`; all loops are skipped under Reduce Motion.
 struct UpdateHero: View {
     let kind: ForceUpdateViewModel.Kind
 
@@ -24,19 +24,14 @@ struct UpdateHero: View {
     }
 
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color.vnAccentImperialGold)
-                .blur(radius: 22)
-                .vnGlowPulse()
-            Circle()
-                .strokeBorder(tint.opacity(0.35), style: StrokeStyle(lineWidth: 2, dash: [3, 7]))
-                .vnSpinSlow(duration: 90)
+        ArtPanel(season: .lantern, height: 220) {
             Image(systemName: symbol)
-                .font(.system(size: 44, weight: .semibold))
-                .foregroundStyle(tint)
+                .font(.system(size: 36, weight: .semibold))
+                .foregroundStyle(Color.vnOnAccent)
+                .frame(width: 80, height: 80)
+                .background(tint, in: .rect(cornerRadius: 18, style: .continuous))
+                .shadow(color: .black.opacity(0.3), radius: 12, y: 8)
         }
-        .frame(width: 120, height: 120)
         .accessibilityHidden(true)
     }
 }

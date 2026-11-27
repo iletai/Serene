@@ -102,13 +102,16 @@ public struct PaywallView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, VNSpacing.xxl)
-        .background(
-            LinearGradient(
-                colors: [Color.vnAccentHeritageRed, Color.vnAccentDeepPrimary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
+        .background {
+            // design.html `.pw-hero`: lantern photo, sky-shade and a slowly turning drum motif.
+            ZStack(alignment: .topTrailing) {
+                Color.vnNight
+                ArtBackdrop(image: ArtSeason.lantern.assetName, duration: VNMotion.Loop.kenBurnsHoliday)
+                SkyShade()
+                DrumMotif(size: 280, opacity: 0.36)
+                    .offset(x: 84, y: 24)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card, style: .continuous))
         .padding(.horizontal, VNSpacing.screenMargin)
         .padding(.top, VNSpacing.md)

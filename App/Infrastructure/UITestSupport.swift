@@ -67,7 +67,7 @@ enum UITestSupport {
     ]
 
     private static let sampleHoliday = Holiday(
-        id: "ui-test-tet",
+        id: "tet-nguyen-dan-1",
         title: "Tết Nguyên Đán",
         calendarType: .lunar,
         day: 1,

@@ -124,9 +124,9 @@ struct FamilyTreeCanvas: View {
     // MARK: - Chrome
 
     private var canvasBackground: some View {
-        Color.vnNight.overlay(
-            LinearGradient(colors: [.clear, .black.opacity(0.45)], startPoint: .top, endPoint: .bottom)
-        )
+        Color.vnNight
+            .overlay(Image("Pattern/pattern-wave-tree").resizable(resizingMode: .tile).opacity(0.9))
+            .overlay(LinearGradient(colors: [.clear, .black.opacity(0.45)], startPoint: .top, endPoint: .bottom))
     }
 
     private var legend: some View {

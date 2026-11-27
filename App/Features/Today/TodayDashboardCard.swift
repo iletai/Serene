@@ -31,6 +31,14 @@ public struct TodayDashboardCard: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.md) {
+            TodaySkyBanner(
+                season: .of(
+                    solarMonth: currentSolarDate.month,
+                    lunarMonth: currentLunarDate.month,
+                    lunarDay: currentLunarDate.day
+                ),
+                eyebrow: weekdayTitle ?? ""
+            )
             blocCard
             TodayCardActions(onAddReminder: onAddReminder, onQuickSearch: onQuickSearch)
             if let memorial = upcomingMemorial {

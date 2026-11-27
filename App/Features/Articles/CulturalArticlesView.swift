@@ -316,23 +316,63 @@ public struct HolidayDetailSheet: View {
     @Environment(AppRouter.self) private var router
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
 
+    private var dateLine: String {
+        let calendarName = holiday.calendarType == .lunar ? String(localized: "articles.calendar_lunar_title") : String(localized: "articles.calendar_solar_title")
+        return String(format: String(localized: "articles.detail_date"), holiday.day, holiday.month, calendarName)
+    }
+
+    /// Prototype `.hol-banner` when the holiday has artwork (white text over art + shade); plain header otherwise.
+    @ViewBuilder
+    private var header: some View {
+        if let kind = HolidayArtKind(holiday: holiday) {
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                Text(dateLine)
+                    .font(.vnDisplay(.subheadline, weight: .bold))
+                    .foregroundStyle(Color.vnAccentImperialGold)
+                Text(holiday.title)
+                    .font(.vnTitleHero)
+                    .foregroundStyle(Color.vnOnAccent)
+                    .minimumScaleFactor(0.8)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+            }
+            .frame(maxWidth: .infinity, minHeight: 140, alignment: .bottomLeading)
+            .padding(VNSpacing.xl)
+            .background {
+                ZStack {
+                    HolidayArt(kind: kind)
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color(hex: 0x0B1433, alpha: 0.06), location: 0),
+                            .init(color: Color(hex: 0x0B1433, alpha: 0.35), location: 0.45),
+                            .init(color: Color(hex: 0x0B1433, alpha: 0.82), location: 1)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                }
+            }
+            .clipShape(.rect(cornerRadius: VNCornerRadius.card, style: .continuous))
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isHeader)
+        } else {
+            VStack(alignment: .leading, spacing: VNSpacing.xs) {
+                Text(dateLine)
+                    .font(.vnDisplay(.subheadline, weight: .bold))
+                    .foregroundColor(.vnAccentHeritageRed)
+                Text(holiday.title)
+                    .font(.vnTitleHero)
+                    .foregroundColor(.vnTextPrimary)
+                    .minimumScaleFactor(0.8)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+            }
+        }
+    }
+
     public var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
-                    // Header
-                    VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                        let calendarName = holiday.calendarType == .lunar ? String(localized: "articles.calendar_lunar_title") : String(localized: "articles.calendar_solar_title")
-                        Text(String(format: String(localized: "articles.detail_date"), holiday.day, holiday.month, calendarName))
-                            .font(.vnDisplay(.subheadline, weight: .bold))
-                            .foregroundColor(.vnAccentHeritageRed)
-
-                        Text(holiday.title)
-                            .font(.vnTitleHero)
-                            .foregroundColor(.vnTextPrimary)
-                            .minimumScaleFactor(0.8)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                    }
+                    header
 
                     VNRowDivider()
 

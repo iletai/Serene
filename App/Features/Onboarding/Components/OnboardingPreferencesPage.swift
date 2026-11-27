@@ -10,7 +10,7 @@ struct OnboardingPreferencesPage: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                OnboardingArtPanel(height: 120) {
+                ArtPanel(season: .winter, height: 120) {
                     Text(String(localized: "onboarding.page4.caption"))
                         .font(.vnDisplay(.footnote, weight: .semibold))
                         .foregroundStyle(Color.vnOnNight.opacity(0.92))

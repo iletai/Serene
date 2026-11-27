@@ -89,12 +89,8 @@ struct FamilyMemberProfileView: View {
 
     /// Prototype `.pp-motif`: a bronze-drum sun turning slowly behind the hero.
     private var motif: some View {
-        Image(systemName: "sun.max")
-            .font(.system(size: 120, weight: .ultraLight))
-            .foregroundColor(.vnAccentImperialGold.opacity(0.3))
-            .vnSpinSlow(duration: VNMotion.Loop.drumTurn)
-            .offset(x: 40, y: -40)
-            .accessibilityHidden(true)
+        DrumMotif(size: 170)
+            .offset(x: 50, y: -50)
     }
 
     private var closeButton: some View {
