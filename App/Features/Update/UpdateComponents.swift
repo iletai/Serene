@@ -5,10 +5,7 @@ import VNCalendarDesignSystem
 /// Icon hero. Mirrors design.html art-panel motion: slow drum-turn ring + pulsing glow.
 /// Both loops are skipped under Reduce Motion.
 struct UpdateHero: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let kind: ForceUpdateViewModel.Kind
-    @State private var glowing = false
-    @State private var turning = false
 
     private var symbol: String {
         switch kind {
@@ -31,22 +28,16 @@ struct UpdateHero: View {
             Circle()
                 .fill(Color.vnAccentImperialGold)
                 .blur(radius: 22)
-                .scaleEffect(glowing ? 1.15 : 0.9)
-                .opacity(glowing ? 0.8 : 0.35)
+                .vnGlowPulse()
             Circle()
                 .strokeBorder(tint.opacity(0.35), style: StrokeStyle(lineWidth: 2, dash: [3, 7]))
-                .rotationEffect(.degrees(turning ? 360 : 0))
+                .vnSpinSlow(duration: 90)
             Image(systemName: symbol)
                 .font(.system(size: 44, weight: .semibold))
                 .foregroundStyle(tint)
         }
         .frame(width: 120, height: 120)
         .accessibilityHidden(true)
-        .onAppear {
-            guard !reduceMotion, !turning else { return }
-            withAnimation(.easeInOut(duration: 2.1).repeatForever(autoreverses: true)) { glowing = true }
-            withAnimation(.linear(duration: 90).repeatForever(autoreverses: false)) { turning = true }
-        }
     }
 }
 
@@ -96,19 +87,5 @@ struct UpdateNotesSection: View {
         .padding(.horizontal, VNSpacing.lg)
         .padding(.vertical, VNSpacing.md)
         .accessibilityElement(children: .combine)
-    }
-}
-
-extension View {
-    /// Presents the update screen full-screen whenever `action` isn't `.none`.
-    /// A force update cannot be dismissed (no close button, swipe disabled).
-    func updateScreen(action: Binding<AppUpdateAction>, locale: Locale) -> some View {
-        fullScreenCover(isPresented: Binding(
-            get: { action.wrappedValue != .none },
-            set: { if !$0 { action.wrappedValue = .none } }
-        )) {
-            ForceUpdateView(viewModel: ForceUpdateViewModel(action: action.wrappedValue) { action.wrappedValue = .none })
-                .environment(\.locale, locale)
-        }
     }
 }

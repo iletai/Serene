@@ -29,8 +29,8 @@ final class ForceUpdateViewModel {
         }
     }
 
-    /// Only a forced update must keep the user on this screen.
-    var isDismissible: Bool { kind != .force }
+    /// Force update and maintenance both keep the user on this screen.
+    var isDismissible: Bool { !action.isBlocking }
 
     /// Store URL comes from the action (microCMS); maintenance carries none.
     var storeURL: URL? { action.storeURL }
