@@ -11271,6 +11271,210 @@
           }
         }
       }
+    },
+    "update.force.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update required"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cần cập nhật An Niên"
+          }
+        }
+      }
+    },
+    "update.force.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This version is no longer supported. Update An Niên to keep viewing the calendar and receiving reminders."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phiên bản này không còn được hỗ trợ. Hãy cập nhật An Niên để tiếp tục xem lịch và nhận lời nhắc."
+          }
+        }
+      }
+    },
+    "update.optional.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A new version is available"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Có phiên bản mới của An Niên"
+          }
+        }
+      }
+    },
+    "update.optional.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update to get the latest improvements."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cập nhật để dùng những cải tiến mới nhất."
+          }
+        }
+      }
+    },
+    "update.maintenance.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An Niên is under maintenance"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An Niên đang bảo trì"
+          }
+        }
+      }
+    },
+    "update.maintenance.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We will be back shortly. Please try again later."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chúng tôi sẽ sớm quay lại. Vui lòng thử lại sau."
+          }
+        }
+      }
+    },
+    "update.notes.header": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's new"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Có gì mới"
+          }
+        }
+      }
+    },
+    "update.notes.header.version": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's new in %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Có gì mới trong %@"
+          }
+        }
+      }
+    },
+    "update.notes.footer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your memorial dates and settings are kept after updating."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ngày nhớ và cài đặt của bạn được giữ nguyên sau khi cập nhật."
+          }
+        }
+      }
+    },
+    "update.action.update": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update now"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cập nhật ngay"
+          }
+        }
+      }
+    },
+    "update.action.later": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Later"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Để sau"
+          }
+        }
+      }
+    },
+    "update.action.close": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đóng"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

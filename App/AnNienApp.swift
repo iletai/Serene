@@ -92,10 +92,7 @@ struct AnNienApp: App {
                     await AppUpdateService.shared.check()
                     updateAction = AppUpdateService.shared.action
                 }
-                .appUpdateSheet(
-                    action: $updateAction,
-                    accentColor: Color.vnCinnabarLacquerRed
-                )
+                .updateScreen(action: $updateAction, locale: selectedLocale)
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
                         Task { await ads.start() }
