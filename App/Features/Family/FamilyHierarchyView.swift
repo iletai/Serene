@@ -21,14 +21,10 @@ public struct FamilyHierarchyView: View {
     @AppStorage("hapticFeedbackEnabled") private var hapticFeedbackEnabled = true
     @State private var viewModel: FamilyHierarchyViewModel?
     @State private var isCheckingGate = false
+    @State private var pendingReminder: ReminderEvent?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @ScaledMetric(relativeTo: .footnote) private var railBadgeScaled: CGFloat = 32
-    @ScaledMetric(relativeTo: .footnote) private var memberBadgeSize: CGFloat = VNSize.iconButton
 
     public init() {}
-
-    /// Capped so the rail never steals card width at large Dynamic Type.
-    private var railBadgeWidth: CGFloat { min(railBadgeScaled, VNSize.iconButton + VNSpacing.sm) }
 
     private var activeViewModel: FamilyHierarchyViewModel {
         if let existing = viewModel { return existing }
@@ -53,6 +49,25 @@ public struct FamilyHierarchyView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.vnBackgroundPrimary.ignoresSafeArea())
+        .sheet(
+            item: Binding(get: { vm.selectedMember }, set: { vm.selectedMember = $0 }),
+            onDismiss: openPendingReminder
+        ) { member in
+            FamilyMemberProfileView(
+                member: member,
+                info: vm.info(for: member),
+                memorialOrdinal: vm.memorialOrdinal(for: member),
+                onOpenReminder: {
+                    pendingReminder = member
+                    vm.selectedMember = nil
+                },
+                onClose: { vm.selectedMember = nil }
+            )
+            .presentationDetents([.fraction(0.82), .large])
+            .presentationDragIndicator(.visible)
+            .presentationCornerRadius(24)
+            .presentationBackground(Color.vnBackgroundPrimary)
+        }
         .task {
             if viewModel == nil {
                 viewModel = activeViewModel
@@ -74,6 +89,13 @@ public struct FamilyHierarchyView: View {
             case .requiresPro: router.present(sheet: .paywall)
             }
         }
+    }
+
+    /// The reminder form lives on the router's sheet, so it opens only once the profile sheet is gone.
+    private func openPendingReminder() {
+        guard let member = pendingReminder else { return }
+        pendingReminder = nil
+        router.present(sheet: .reminderForm(editing: member, initialDate: nil))
     }
 
     // MARK: - Top Bar
@@ -233,214 +255,59 @@ public struct FamilyHierarchyView: View {
     // MARK: - Genealogy Tree Section
     @ViewBuilder
     private func genealogyTreeSection(vm: FamilyHierarchyViewModel) -> some View {
-        let reduceMotion = reduceMotion // capture: scrollTransition closure is Sendable
-        return VStack(alignment: .leading, spacing: VNSpacing.sectionGap) {
-            ForEach(vm.groupedGenerations) { group in
-                generationBand(group, vm: vm)
-                    .scrollTransition(.animated(.smooth), axis: .vertical) { content, phase in
-                        content
-                            .opacity(reduceMotion || phase.isIdentity ? 1 : 0.4)
-                            .offset(y: reduceMotion ? 0 : phase.value * 12)
-                    }
-            }
-        }
-    }
-
-    // MARK: - Generation Band
-    @ViewBuilder
-    private func generationBand(_ group: FamilyMemberGroup, vm: FamilyHierarchyViewModel) -> some View {
-        HStack(alignment: .top, spacing: VNSpacing.sm) {
-            generationRail(rank: group.generationRank)
-
-            VStack(alignment: .leading, spacing: VNSpacing.sm) {
-                generationHeader(group, vm: vm)
-
-                if vm.isExpanded(group.id) {
-                    VStack(alignment: .leading, spacing: VNSpacing.sm) {
-                        ForEach(Array(group.members.enumerated()), id: \.element.id) { index, member in
-                            memberBranch(member)
-                                .vnAppear(delay: Double(min(index, 7)) * 0.05)
-                        }
-                    }
-                    .clipped()
-                    .vnTransition(.opacity.combined(with: .move(edge: .top)))
-                }
-            }
-        }
-        .padding(.horizontal, VNSpacing.screenMargin)
-    }
-
-    private func generationHeader(_ group: FamilyMemberGroup, vm: FamilyHierarchyViewModel) -> some View {
-        let expanded = vm.isExpanded(group.id)
-        return Button {
-            withAnimation(reduceMotion ? VNAnimation.reduced : VNAnimation.expand) {
-                vm.toggleGeneration(group.id)
-            }
-        } label: {
-            HStack(spacing: VNSpacing.sm) {
-                Text(group.generationRank)
-                    .font(.vnDisplay(.caption2, weight: .bold))
-                    .tracking(0.66)
+        let groups = vm.groupedGenerations
+        VStack(alignment: .leading, spacing: VNSpacing.md) {
+            VStack(alignment: .leading, spacing: VNSpacing.space2) {
+                VNGroupHeader(String(localized: "family.ring.title"))
+                Text(ringHint(vm: vm))
+                    .font(.vnDisplay(.footnote, weight: .medium))
                     .foregroundColor(.vnAccentGoldText)
-
-                Text(group.generationTitle)
-                    .font(.vnDisplay(.headline, weight: .bold))
-                    .foregroundColor(.vnTextPrimary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-
-                Spacer()
-
-                Text(String(format: String(localized: "family.group_count"), group.members.count))
-                    .font(.vnDisplay(.caption, weight: .medium))
-                    .foregroundColor(.vnTextSecondary)
-                    .contentTransition(.numericText())
-                    .vnAnimation(VNAnimation.layout, value: group.members.count)
-
-                Image(systemName: "chevron.down")
-                    .font(.caption.weight(.semibold))
-                    .foregroundColor(.vnTextTertiary)
-                    .rotationEffect(.degrees(expanded ? 0 : -90))
-                    .vnAnimation(VNAnimation.expand, value: expanded)
-                    .accessibilityHidden(true)
+                    .padding(.horizontal, VNSpacing.xs)
             }
-            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-            .frame(minHeight: VNSize.minTapTarget)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.vnPress)
-        .vnSelectionFeedback(trigger: expanded)
-        .accessibilityLabel("\(group.generationRank) \(group.generationTitle)")
-        .accessibilityValue(expanded
-            ? String(localized: "family.generation.expanded")
-            : String(localized: "family.generation.collapsed"))
-        .accessibilityHint(String(localized: "family.generation.toggle_hint"))
-        .accessibilityAddTraits(.isHeader)
-    }
+            .padding(.horizontal, VNSpacing.screenMargin)
 
-    private func generationRail(rank: String) -> some View {
-        VStack(spacing: VNSpacing.sm) {
-            Text(FamilyMemberGroup.badgeText(fromRank: rank))
-                .font(.vnDisplay(.footnote, weight: .bold))
-                .foregroundColor(.vnAccentHeritageRed)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .frame(width: railBadgeWidth, height: railBadgeWidth)
-                .background(Color.vnAccentRedSurface)
-                .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.micro))
-                .overlay(
-                    RoundedRectangle(cornerRadius: VNCornerRadius.micro)
-                        .stroke(Color.vnAccentHeritageRed.opacity(0.4), lineWidth: VNBorderWidth.hairline)
-                )
-                .accessibilityHidden(true)
-
-            Rectangle()
-                .fill(Color.vnAccentImperialGold.opacity(0.45))
-                .frame(width: VNBorderWidth.regular)
-                .frame(maxHeight: .infinity)
-                .accessibilityHidden(true)
-        }
-        .frame(width: railBadgeWidth)
-    }
-
-    @ViewBuilder
-    private func memberBranch(_ member: ReminderEvent) -> some View {
-        HStack(alignment: .top, spacing: VNSpacing.xs) {
-            Rectangle()
-                .fill(Color.vnAccentImperialGold.opacity(0.45))
-                .frame(width: VNSpacing.xs, height: VNBorderWidth.regular)
-                .padding(.top, VNSpacing.space32)
-                .accessibilityHidden(true)
-
-            Button {
-                VNHaptics.impact(enabled: hapticFeedbackEnabled)
-                router.present(sheet: .reminderForm(editing: member, initialDate: nil))
-            } label: {
-                memberCard(member: member)
-                    .frame(minHeight: VNSize.minTapTarget)
-                    .contentShape(Rectangle())
+            FamilyLunarRingView(
+                months: vm.ringMonths,
+                currentMonth: vm.currentLunarMonth,
+                nextMonth: vm.nextRingMonth,
+                highlightedMonth: vm.highlightedMonth
+            ) { month in
+                withAnimation(reduceMotion ? VNAnimation.reduced : VNMotion.Easing.card) { vm.toggleMonth(month) }
             }
-            .buttonStyle(VNCellPressButtonStyle(pressedScale: 0.98))
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel([member.title, member.relationship ?? ""].filter { !$0.isEmpty }.joined(separator: ", "))
-            .accessibilityValue("\(anniversaryText(member)), \(statusText(member))")
-            .accessibilityHint("family.a11y_edit_hint")
+            .vnRise(index: 1)
+
+            FamilyTreeCanvas(
+                groups: groups,
+                layout: FamilyTreeLayout(memberCounts: groups.map(\.members.count)),
+                emphasis: { member in
+                    switch vm.isHighlighted(member) {
+                    case nil: .normal
+                    case true?: .highlighted
+                    case false?: .dimmed
+                    }
+                },
+                info: { vm.info(for: $0) },
+                focusMemberID: vm.focusMemberID,
+                homeMemberID: vm.nextMemorial?.id,
+                onSelect: { member in
+                    VNHaptics.impact(enabled: hapticFeedbackEnabled)
+                    vm.selectedMember = member
+                }
+            )
+            .padding(.horizontal, VNSpacing.md)
+            .vnRise(index: 2)
+
+            Text("family.tree_tip")
+                .font(.vnDisplay(.footnote))
+                .foregroundColor(.vnTextSecondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, VNSpacing.screenMargin)
         }
     }
 
-    private func isWorshipped(_ member: ReminderEvent) -> Bool {
-        member.category == .deathAnniversary || member.category == .ancestral
-    }
-
-    private func anniversaryText(_ member: ReminderEvent) -> String {
-        String(format: String(localized: "family.member_date"), member.day, member.month, member.dateType == .lunar ? String(localized: "family.abbrev_lunar") : String(localized: "family.abbrev_solar"))
-    }
-
-    private func statusText(_ member: ReminderEvent) -> String {
-        isWorshipped(member) ? String(localized: "family.status_deceased") : String(localized: "family.status_living")
-    }
-
-    private func memberSubtitle(_ member: ReminderEvent) -> String {
-        var parts = [anniversaryText(member)]
-        if let rel = member.relationship, !rel.isEmpty { parts.insert(rel, at: 0) }
-        if let y = member.year { parts.append(String(format: String(localized: "family.member_year"), String(y))) }
-        return parts.joined(separator: " · ")
-    }
-
-    // MARK: - Member Card
-    private func memberCard(member: ReminderEvent) -> some View {
-        let isDeath = isWorshipped(member)
-        return HStack(alignment: .top, spacing: VNSpacing.sm) {
-            if member.category == .deathAnniversary {
-                VNSealBadge.gio(size: .small)
-            } else {
-                Text("family.seal_toc")
-                    .font(.vnDisplay(.footnote, weight: .bold))
-                    .foregroundColor(Color.vnAccentGoldText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .frame(width: memberBadgeSize, height: memberBadgeSize)
-                    .background(Color.vnBackgroundTertiary)
-                    .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
-            }
-
-            VStack(alignment: .leading, spacing: VNSpacing.xs) {
-                Text(member.title)
-                    .font(.vnDisplay(.subheadline, weight: .semibold))
-                    .foregroundColor(.vnTextPrimary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Text(memberSubtitle(member))
-                    .font(.vnDisplay(.caption))
-                    .foregroundColor(.vnTextSecondary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Text(statusText(member))
-                    .font(.vnCaption2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(isDeath ? .vnOnAccent : .vnTextSecondary)
-                    .padding(.horizontal, VNSpacing.sm)
-                    .padding(.vertical, VNSpacing.space2)
-                    .background(isDeath ? Color.vnAccentDeepPrimary : Color.vnBackgroundTertiary)
-                    .clipShape(Capsule())
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Image(systemName: "chevron.right")
-                .font(.caption2.weight(.semibold))
-                .foregroundColor(.vnTextTertiary)
-                .accessibilityHidden(true)
-        }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-        .padding(VNSpacing.cardPadding)
-        .background(Color.vnBackgroundSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.card))
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.card)
-                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.regular)
-        )
-        .shadow(color: VNShadow.folio.color, radius: VNShadow.folio.radius, x: VNShadow.folio.x, y: VNShadow.folio.y)
+    private func ringHint(vm: FamilyHierarchyViewModel) -> String {
+        guard let next = vm.nextMemorial else { return String(localized: "family.ring.hint") }
+        return String(format: String(localized: "family.ring.hint_next"), next.title, vm.info(for: next).countdownText)
     }
 }

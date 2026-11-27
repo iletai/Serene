@@ -2,17 +2,20 @@ import SwiftUI
 import TipKit
 import VNCalendarDomain
 import VNCalendarDesignSystem
+import VNCalendarKit
 import VNCalendarLunar
 
+/// Today's page, laid out as the prototype's "tờ lịch bloc": a blue month strip,
+/// a large solar numeral, the lunar block split into moon tile + almanac lines,
+/// then the auspicious-hour dial and the advice carousel.
 public struct TodayDashboardCard: View {
     public let details: DayCalendarDetails?
     public var onAddReminder: () -> Void
     public var onQuickSearch: () -> Void
     let upcomingMemorial: UpcomingMemorial?
-    @State private var showDetails = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @ScaledMetric(relativeTo: .largeTitle) private var solarNumeralSize: CGFloat = 52
-    @ScaledMetric(relativeTo: .title) private var lunarNumeralSize: CGFloat = 28
+    @ScaledMetric(relativeTo: .largeTitle) private var solarNumeralSize: CGFloat = 132
+    @ScaledMetric(relativeTo: .title) private var lunarNumeralSize: CGFloat = 44
 
     public init(
         details: DayCalendarDetails?,
@@ -26,6 +29,274 @@ public struct TodayDashboardCard: View {
         self.onQuickSearch = onQuickSearch
     }
 
+    public var body: some View {
+        VStack(alignment: .leading, spacing: VNSpacing.md) {
+            TodaySkyBanner(
+                season: .of(
+                    solarMonth: currentSolarDate.month,
+                    lunarMonth: currentLunarDate.month,
+                    lunarDay: currentLunarDate.day
+                ),
+                eyebrow: weekdayTitle ?? ""
+            )
+            blocCard
+            TodayCardActions(onAddReminder: onAddReminder, onQuickSearch: onQuickSearch)
+            if let memorial = upcomingMemorial {
+                memorialRow(memorial)
+            }
+            hoursSection
+            adviceSection
+        }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+    }
+
+    // MARK: - Bloc
+
+    private var blocCard: some View {
+        VStack(spacing: 0) {
+            blocStrip
+            solarBlock
+            lunarBlock
+            hoursLine
+            quoteLine
+        }
+        .background(Color.vnBackgroundSecondary)
+        .clipShape(RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: VNCard<EmptyView>.defaultCornerRadius, style: .continuous)
+                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
+        )
+        .shadow(
+            color: VNShadow.folio.color,
+            radius: VNShadow.folio.radius,
+            x: VNShadow.folio.x,
+            y: VNShadow.folio.y
+        )
+        .vnRise(distance: 18)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var blocStrip: some View {
+        HStack(spacing: VNSpacing.md) {
+            Text(String(format: String(localized: "today.bloc_strip"), currentSolarDate.month, currentSolarDate.year))
+            Spacer(minLength: VNSpacing.xs)
+            Text(weekdayTitle?.uppercased() ?? "")
+        }
+        .font(.vnDisplay(.footnote, weight: .semibold))
+        .tracking(1.0)
+        .foregroundColor(.vnOnAccent)
+        .padding(.horizontal, VNSpacing.xl)
+        .padding(.top, VNSpacing.xl)
+        .padding(.bottom, VNSpacing.md)
+        .frame(maxWidth: .infinity)
+        .background(Color.vnAccentSky)
+    }
+
+    private var solarBlock: some View {
+        VStack(spacing: VNSpacing.xs) {
+            Text("\(currentSolarDate.day)")
+                .font(.vnDisplay(size: solarNumeralSize, weight: .heavy))
+                .tracking(-4)
+                .monospacedDigit()
+                .foregroundColor(isRedLetterDay ? .vnAccentDeepPrimary : .vnAccentSky)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .contentTransition(.numericText())
+                .animation(dateAnimation, value: currentSolarDate.day)
+                .accessibilityLabel(String(format: String(localized: "today.solar_day_accessibility"), currentSolarDate.day))
+
+            if let tag = solarTag {
+                Text(tag.text)
+                    .font(.vnDisplay(.subheadline, weight: .semibold))
+                    .foregroundColor(tag.isFestival ? .vnAccentDeepPrimary : .vnAccentGoldText)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+            }
+        }
+        .padding(.horizontal, VNSpacing.xl)
+        .padding(.top, VNSpacing.md)
+        .padding(.bottom, VNSpacing.sm)
+        .frame(maxWidth: .infinity)
+    }
+
+    private var lunarBlock: some View {
+        HStack(alignment: .top, spacing: VNSpacing.lg) {
+            moonTile
+            almanacLines
+        }
+        .padding(.top, VNSpacing.lg)
+        .padding(.horizontal, VNSpacing.xl)
+        .overlay(alignment: .top) {
+            dashedDivider
+                .padding(.horizontal, VNSpacing.xl)
+        }
+    }
+
+    private var dashedDivider: some View {
+        Rectangle()
+            .fill(Color.vnBorderSubtle)
+            .frame(height: VNBorderWidth.hairline)
+            .mask(
+                HStack(spacing: 4) {
+                    ForEach(0..<40, id: \.self) { _ in
+                        Rectangle().frame(width: 5)
+                    }
+                }
+            )
+            .accessibilityHidden(true)
+    }
+
+    private var moonTile: some View {
+        VStack(spacing: VNSpacing.space2) {
+            VNMoonPhaseView(lunarDay: currentLunarDate.day, size: 40)
+                .vnMoonGlow()
+                .padding(.bottom, VNSpacing.xs)
+
+            Text("\(currentLunarDate.day)")
+                .font(.vnDisplay(size: lunarNumeralSize, weight: .bold))
+                .monospacedDigit()
+                .foregroundColor(currentLunarDate.day == 1 || currentLunarDate.day == 15 ? .vnAccentDeepPrimary : .vnTextPrimary)
+
+            Text(lunarMonthLabel)
+                .font(.vnDisplay(.footnote, weight: .medium))
+                .foregroundColor(.vnTextSecondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+        }
+        .frame(width: 104)
+        .padding(.vertical, VNSpacing.md)
+        .background(Color.vnBackgroundPrimary)
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
+    }
+
+    private var almanacLines: some View {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
+            Text("today.lunar_calendar_label")
+                .font(.vnDisplay(.caption2, weight: .semibold))
+                .tracking(1.0)
+                .foregroundColor(.vnTextSecondary)
+
+            Text(lunarDayName)
+                .font(.vnDisplay(.body, weight: .bold))
+                .foregroundColor(.vnTextPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(String(format: String(localized: "calendar.header.subtitle.year_canchi"), currentCanChi.year.description))
+                .font(.vnDisplay(.subheadline))
+                .foregroundColor(.vnTextPrimary)
+
+            Text(String(format: String(localized: "today.bloc_canchi"), currentCanChi.day.description, currentCanChi.month.description))
+                .font(.vnDisplay(.subheadline))
+                .foregroundColor(.vnTextPrimary)
+
+            Text(String(format: String(localized: "today.bloc_term_moon"), currentSolarTerm.vietnameseName, moonPhaseName))
+                .font(.vnDisplay(.subheadline))
+                .foregroundColor(.vnTextPrimary)
+
+            auspiciousPill
+                .padding(.top, VNSpacing.xs)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var auspiciousPill: some View {
+        HStack(spacing: VNSpacing.xs) {
+            Image(systemName: "star.fill")
+                .font(.system(size: 9, weight: .bold))
+                .accessibilityHidden(true)
+            Text(dayStar.isAuspicious ? LocalizedStringKey("today.auspicious") : LocalizedStringKey("today.inauspicious"))
+            Text(verbatim: "· \(dayStar.vietnameseName)")
+        }
+        .font(.vnDisplay(.caption2, weight: .semibold))
+        .tracking(0.6)
+        .foregroundColor(dayStar.isAuspicious ? .vnAccentGoldText : .vnTextSecondary)
+        .padding(.horizontal, VNSpacing.sm)
+        .padding(.vertical, VNSpacing.xs)
+        .background(dayStar.isAuspicious ? Color.vnAccentGoldSurface : Color.vnBackgroundTertiary)
+        .clipShape(Capsule())
+    }
+
+    private var hoursLine: some View {
+        VStack(alignment: .leading, spacing: VNSpacing.xs) {
+            Text("hero.auspicious_hours")
+                .font(.vnDisplay(.caption2, weight: .semibold))
+                .tracking(0.8)
+                .foregroundColor(.vnAccentSky)
+            Text(auspiciousHours.map(\.vietnameseName).joined(separator: " · "))
+                .font(.vnDisplay(.subheadline, weight: .semibold))
+                .foregroundColor(.vnTextPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, VNSpacing.lg)
+        .padding(.vertical, VNSpacing.md)
+        .background(Color.vnAccentSkySurface)
+        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small, style: .continuous))
+        .padding(.horizontal, VNSpacing.xl)
+        .padding(.top, VNSpacing.lg)
+    }
+
+    private var quoteLine: some View {
+        Text(quote.quote)
+            .font(.vnQuote)
+            .foregroundColor(.vnTextSecondary)
+            .multilineTextAlignment(.center)
+            .lineSpacing(3)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, VNSpacing.xl)
+            .padding(.top, VNSpacing.lg)
+            .padding(.bottom, VNSpacing.xl)
+    }
+
+    // MARK: - Hours + advice sections
+
+    private var hoursSection: some View {
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
+            VNGroupHeader(String(localized: "today.hours_section_header"))
+            VNGroupCard {
+                VNHourDialCard(auspiciousHours: auspiciousHours)
+            }
+        }
+    }
+
+    private var adviceSection: some View {
+        VStack(alignment: .leading, spacing: VNSpacing.sm) {
+            VNGroupHeader(String(localized: "today.advice_section_header"))
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: VNSpacing.md) {
+                    ForEach(Array(adviceCards.enumerated()), id: \.element.id) { index, card in
+                        VNAdviceTipCard(card: card, index: index)
+                            .vnRise(index: index, baseDelay: 0.08, stagger: 0.06)
+                    }
+                }
+            }
+            VNGroupFooter(String(localized: "today.advice_footer"))
+        }
+    }
+
+    private func memorialRow(_ memorial: UpcomingMemorial) -> some View {
+        VNGroupCard {
+            VNListRow(
+                icon: "flame.fill",
+                iconTint: .vnAccentHeritageRed,
+                title: memorial.title,
+                subtitle: String(localized: "today.upcoming_memorial_subtitle"),
+                showsChevron: false
+            ) {
+                Text(memorial.countdown)
+                    .font(.vnDisplay(.caption, weight: .semibold))
+                    .foregroundColor(.vnAccentDeepPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+        }
+    }
+
+    // MARK: - Derived content
+
     private var currentSolarDate: SolarDate {
         details?.solarDate ?? SolarDate(from: Date())
     }
@@ -38,10 +309,12 @@ public struct TodayDashboardCard: View {
         details?.canChi ?? LunarAstronomicalEngine.shared.computeCanChi(for: SolarDate(from: Date()))
     }
 
+    private var currentSolarTerm: SolarTerm {
+        details?.solarTerm ?? .dongChi
+    }
+
     private var dynamicDayBranch: EarthlyBranch {
-        if let d = details {
-            return d.canChi.day.branch
-        }
+        if let details { return details.canChi.day.branch }
         let now = SolarDate(from: Date())
         let jd = AstronomicalMath.julianDay(from: now)
         return EarthlyBranch(rawValue: (jd + 1) % 12) ?? .ty
@@ -59,35 +332,37 @@ public struct TodayDashboardCard: View {
         LunarOfficer.officer(monthBranch: monthBranch, dayBranch: dynamicDayBranch)
     }
 
-    // ponytail: day-stem element only; full Na Yin table when engine provides it.
-    private var dayElementName: String {
-        switch currentCanChi.day.stem {
-        case .giap, .at: String(localized: "today.element.wood")
-        case .binh, .dinh: String(localized: "today.element.fire")
-        case .mau, .ky: String(localized: "today.element.earth")
-        case .canh, .tan: String(localized: "today.element.metal")
-        case .nham, .quy: String(localized: "today.element.water")
-        }
+    private var auspiciousHours: [EarthlyBranch] {
+        EarthlyBranch.auspiciousHours(for: dynamicDayBranch)
     }
 
-    private var lunarMonthName: String {
+    private var lunarMonthLabel: String {
         let names: [LocalizedStringResource] = [
-            "today.lunar_month_1",
-            "today.lunar_month_2",
-            "today.lunar_month_3",
-            "today.lunar_month_4",
-            "today.lunar_month_5",
-            "today.lunar_month_6",
-            "today.lunar_month_7",
-            "today.lunar_month_8",
-            "today.lunar_month_9",
-            "today.lunar_month_10",
-            "today.lunar_month_11",
-            "today.lunar_month_12"
+            "today.lunar_month_1", "today.lunar_month_2", "today.lunar_month_3", "today.lunar_month_4",
+            "today.lunar_month_5", "today.lunar_month_6", "today.lunar_month_7", "today.lunar_month_8",
+            "today.lunar_month_9", "today.lunar_month_10", "today.lunar_month_11", "today.lunar_month_12"
         ]
         let month = currentLunarDate.month
-        guard month >= 1, month <= 12 else { return String(format: String(localized: "calendar.month_name_number"), month) }
-        return String(localized: names[month - 1])
+        guard month >= 1, month <= 12 else {
+            return String(format: String(localized: "calendar.month_name_number"), month)
+        }
+        let base = String(localized: names[month - 1]).lowercased()
+        return currentLunarDate.isLeapMonth ? "\(base) nhuận" : base
+    }
+
+    private var lunarDayName: String {
+        let month = lunarMonthLabel
+        if currentLunarDate.day == 1 {
+            return String(format: String(localized: "daydetail.header.mung_mot"), month)
+        }
+        if currentLunarDate.day == 15 {
+            return String(format: String(localized: "daydetail.header.ram_15"), month)
+        }
+        return String(format: String(localized: "daydetail.header.lunar_day"), currentLunarDate.day, month)
+    }
+
+    private var moonPhaseName: String {
+        VNMoonPhaseType.from(lunarDay: currentLunarDate.day).localizedName
     }
 
     private var gmt7Date: Date? {
@@ -109,313 +384,64 @@ public struct TodayDashboardCard: View {
         return formatter.string(from: date).capitalized
     }
 
-    private var weekOfYearText: String? {
-        guard let date = gmt7Date else { return nil }
+    private var isSunday: Bool {
+        guard let date = gmt7Date else { return false }
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = VNTime.vietnam
-        return String(format: String(localized: "today.week_of_year"), calendar.component(.weekOfYear, from: date))
+        return calendar.component(.weekday, from: date) == 1
     }
 
-    private var suitableText: String {
-        dayOfficer.suitableActivities.prefix(4).joined(separator: ", ")
+    private var festivalHoliday: Holiday? {
+        details?.holidays.first { $0.isNationalHoliday || $0.isTraditionHoliday }
     }
 
-    private var tabooText: String {
-        dayOfficer.tabooActivities.prefix(3).joined(separator: ", ")
+    private var isRedLetterDay: Bool {
+        isSunday || festivalHoliday != nil
     }
 
-    public var body: some View {
-        VStack(spacing: VNSpacing.md) {
-            VNCard(allPadding: VNSpacing.lg) {
-                VStack(alignment: .leading, spacing: VNSpacing.md) {
-                    heroHeader
-                    dateRow
-                    canChiLine
-                    if let memorial = upcomingMemorial {
-                        memorialRow(memorial)
-                    }
-                    detailsDisclosure
-                }
-            }
-
-            TodayCardActions(onAddReminder: onAddReminder, onQuickSearch: onQuickSearch)
-        }
+    private var solarTag: (text: String, isFestival: Bool)? {
+        if let festivalHoliday { return (festivalHoliday.title, true) }
+        return (String(format: String(localized: "calendar.solar_term"), currentSolarTerm.vietnameseName), false)
     }
 
-    // MARK: - Hero Header (Weekday + single auspicious badge)
-    private var heroHeader: some View {
-        // Side by side when it fits; stacked at large accessibility sizes.
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .center, spacing: VNSpacing.sm) {
-                weekdayText
-                Spacer(minLength: 0)
-                hoangDaoPill
-            }
-            VStack(alignment: .leading, spacing: VNSpacing.sm) {
-                weekdayText
-                hoangDaoPill
-            }
-        }
-        .accessibilityElement(children: .combine)
-    }
-
-    @ViewBuilder
-    private var weekdayText: some View {
-        if let title = weekdayTitle {
-            Text(title)
-                .font(.vnDisplay(.subheadline, weight: .semibold))
-                .foregroundColor(.vnTextSecondary)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
-                .contentTransition(.opacity)
-                .animation(dateAnimation, value: title)
-        }
-    }
-
-    private var hoangDaoPill: some View {
-        HStack(spacing: VNSpacing.xs) {
-            Image(systemName: "sun.max")
-                .font(.caption2.weight(.semibold))
-                .accessibilityHidden(true)
-            Text(dayStar.isAuspicious ? LocalizedStringKey("today.auspicious") : LocalizedStringKey("today.inauspicious"))
-                .font(.vnDisplay(.caption2, weight: .semibold))
-                .lineLimit(1)
-                .fixedSize()
-                .tracking(0.66)
-        }
-        .foregroundColor(.vnAccentDeepPrimary)
-        .padding(.horizontal, VNSpacing.sm)
-        .padding(.vertical, VNSpacing.xs)
-        .background(Color.vnAccentRedSurface)
-        .clipShape(Capsule())
-        .contentTransition(.opacity)
-        .animation(dateAnimation, value: dayStar.isAuspicious)
-    }
-
-    // MARK: - Solar + Lunar date (primary focus)
-    private var dateRow: some View {
-        HStack(alignment: .firstTextBaseline, spacing: VNSpacing.md) {
-            Text("\(currentSolarDate.day)")
-                .font(.vnDisplay(size: solarNumeralSize, weight: .light))
-                .foregroundColor(.vnTextPrimary)
-                .contentTransition(.numericText())
-                .animation(dateAnimation, value: currentSolarDate.day)
-                .accessibilityLabel(String(format: String(localized: "today.solar_day_accessibility"), currentSolarDate.day))
-
-            Spacer(minLength: 0)
-
-            VStack(alignment: .trailing, spacing: VNSpacing.space2) {
-                Text("common.date_type_lunar")
-                    .font(.vnDisplay(.caption2, weight: .medium))
-                    .foregroundColor(.vnAccentGoldText)
-                Text(String(format: String(localized: "today.lunar_day"), currentLunarDate.day))
-                    .font(.vnDisplay(size: lunarNumeralSize, weight: .semibold))
-                    .foregroundColor(.vnAccentHeritageRed)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                    .contentTransition(.numericText())
-                    .animation(dateAnimation, value: currentLunarDate.day)
-                Text(lunarMonthName)
-                    .font(.vnDisplay(.subheadline, weight: .semibold))
-                    .foregroundColor(.vnTextPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                    .contentTransition(.interpolate)
-                    .animation(dateAnimation, value: currentLunarDate.month)
-            }
-            .accessibilityElement(children: .combine)
-        }
+    private var quote: VNFolkQuote {
+        VNFolkQuotes.quote(for: DateKey(solarDate: currentSolarDate))
     }
 
     private var dateAnimation: Animation? {
         reduceMotion ? nil : .smooth(duration: 0.35)
     }
 
-    private var canChiLine: some View {
-        Text(String(format: String(localized: "today.canchi_line"), currentCanChi.day.description, currentCanChi.month.description, currentCanChi.year.description))
-            .font(.vnDisplay(.footnote, weight: .medium))
-            .foregroundColor(.vnTextSecondary)
-            .lineLimit(2)
-            .minimumScaleFactor(0.8)
-            .contentTransition(.opacity)
-            .animation(dateAnimation, value: currentCanChi.day.description)
-    }
-
-    private func memorialRow(_ memorial: UpcomingMemorial) -> some View {
-        HStack(spacing: VNSpacing.sm) {
-            Image(systemName: "flame")
-                .font(.footnote.weight(.semibold))
-                .foregroundColor(.vnAccentHeritageRed)
-                .accessibilityHidden(true)
-            Text(memorial.title)
-                .font(.vnDisplay(.subheadline, weight: .semibold))
-                .foregroundColor(.vnTextPrimary)
-                .lineLimit(1)
-            Spacer(minLength: VNSpacing.sm)
-            Text(memorial.countdown)
-                .font(.vnDisplay(.caption, weight: .semibold))
-                .foregroundColor(.vnAccentHeritageRed)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .contentTransition(.numericText())
-                .animation(dateAnimation, value: memorial.countdown)
-        }
-        .padding(VNSpacing.sm)
-        .background(Color.vnAccentRedSurface.opacity(0.6))
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-        .accessibilityElement(children: .combine)
-    }
-
-    // MARK: - Secondary info (collapsed by default)
-    private var detailsDisclosure: some View {
-        DisclosureGroup(isExpanded: $showDetails) {
-            VStack(alignment: .leading, spacing: VNSpacing.md) {
-                Text(detailsSummary)
-                    .font(.vnDisplay(.caption))
-                    .foregroundColor(.vnTextSecondary)
-                    .contentTransition(.opacity)
-                    .animation(dateAnimation, value: detailsSummary)
-                TodayHeroGuidance(
-                    hours: EarthlyBranch.auspiciousHours(for: dynamicDayBranch),
-                    suitable: suitableText,
-                    taboo: tabooText
-                )
-            }
-            .padding(.top, VNSpacing.sm)
-        } label: {
-            Text("today.details_title")
-                .font(.vnDisplay(.subheadline, weight: .semibold))
-                .foregroundColor(.vnTextPrimary)
-        }
-        .tint(.vnTextSecondary)
-        .animation(reduceMotion ? nil : VNAnimation.cardExpansion, value: showDetails)
-        .sensoryFeedback(.selection, trigger: showDetails)
-    }
-
-    private var detailsSummary: String {
-        [weekOfYearText, String(format: String(localized: "today.star_name"), dayStar.vietnameseName), String(format: String(localized: "today.element_summary"), dayElementName)]
-            .compactMap { $0 }
-            .joined(separator: " · ")
-    }
-}
-
-// MARK: - Giờ Hoàng Đạo strip + guidance panels
-
-private struct TodayHeroGuidance: View {
-    let hours: [EarthlyBranch]
-    let suitable: String
-    let taboo: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.md) {
-            hoursStrip
-            guidancePanels
-        }
-        .padding(.top, VNSpacing.sm)
-    }
-
-    private var hoursStrip: some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            HStack(spacing: VNSpacing.sm) {
-                Text("hero.auspicious_hours")
-                    .font(.vnDisplay(.caption2, weight: .semibold))
-                    .tracking(0.66)
-                    .foregroundColor(.vnTextSecondary)
-
-                Spacer(minLength: 0)
-
-                Text(String(format: String(localized: "today.auspicious_hours_count"), hours.count))
-                    .font(.vnDisplay(.caption2, weight: .medium))
-                    .foregroundColor(.vnAccentGoldText)
-            }
-            .accessibilityElement(children: .combine)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: VNSpacing.xs) {
-                    ForEach(hours, id: \.self) { branch in
-                        hourChip(for: branch)
-                    }
-                }
-            }
-        }
-    }
-
-    private func hourChip(for branch: EarthlyBranch) -> some View {
-        VStack(spacing: VNSpacing.space2) {
-            Text(branch.vietnameseName)
-                .font(.vnDisplay(.caption2, weight: .semibold))
-                .foregroundColor(.vnAccentDeepPrimary)
-
-            Text(hourRangeText(branch))
-                .font(.vnDisplay(.caption2))
-                .foregroundColor(.vnTextSecondary)
-        }
-        .padding(.horizontal, VNSpacing.sm)
-        .padding(.vertical, VNSpacing.sm)
-        .background(Color.vnBackgroundTertiary)
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                .stroke(Color.vnBorderSubtle, lineWidth: VNBorderWidth.hairline)
-        )
-        .accessibilityElement(children: .combine)
-    }
-
-    private func hourRangeText(_ branch: EarthlyBranch) -> String {
-        let parts = branch.timeRange.split(separator: "-")
-        guard parts.count == 2 else { return branch.timeRange }
-        return "\(parts[0])h - \(parts[1])h"
-    }
-
-    private var guidancePanels: some View {
-        HStack(alignment: .top, spacing: VNSpacing.sm) {
-            guidancePanel(
-                title: String(localized: "today.suitable_activities"),
-                icon: "checkmark.circle.fill",
-                tint: .vnAccentGoldText,
-                background: .vnAccentGoldSurface,
-                text: suitable
+    private var adviceCards: [VNAdviceTipCard.Model] {
+        let starTone: VNAdviceTipCard.Tone = dayStar.isAuspicious ? .ochre : .grey
+        let starTitle = dayStar.isAuspicious ? String(localized: "today.auspicious") : String(localized: "today.inauspicious")
+        let starText = dayStar.isAuspicious
+            ? String(localized: "today.advice.auspicious")
+            : String(localized: "today.advice.inauspicious")
+        return [
+            .init(tone: starTone, icon: "star.fill", kicker: String(localized: "today.advice.kicker_day"), title: starTitle, text: starText),
+            .init(
+                tone: .jade,
+                icon: "leaf.fill",
+                kicker: String(localized: "today.advice.kicker_officer"),
+                title: dayOfficer.name,
+                text: dayOfficer.summary
+            ),
+            .init(
+                tone: .ochre,
+                icon: "sun.max.fill",
+                kicker: String(localized: "today.advice.kicker_term"),
+                title: currentSolarTerm.vietnameseName,
+                text: String(localized: "today.advice.term_body")
+            ),
+            .init(
+                tone: .grey,
+                icon: "moon.stars.fill",
+                kicker: String(localized: "today.advice.kicker_canchi"),
+                title: String(format: String(localized: "today.bloc_canchi"), currentCanChi.day.description, currentCanChi.month.description),
+                text: String(format: String(localized: "calendar.header.subtitle.year_canchi"), currentCanChi.year.description)
             )
-
-            guidancePanel(
-                title: String(localized: "today.taboo_activities"),
-                icon: "xmark.circle.fill",
-                tint: .vnAccentHeritageRed,
-                background: .vnAccentRedSurface,
-                text: taboo
-            )
-        }
-    }
-
-    private func guidancePanel(title: String, icon: String, tint: Color, background: Color, text: String) -> some View {
-        VStack(alignment: .leading, spacing: VNSpacing.xs) {
-            HStack(spacing: VNSpacing.xs) {
-                Image(systemName: icon)
-                    .font(.footnote.weight(.semibold))
-                    .foregroundColor(tint)
-                    .accessibilityHidden(true)
-
-                Text(title)
-                    .font(.vnDisplay(.caption2, weight: .semibold))
-                    .foregroundColor(.vnTextPrimary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-            }
-
-            Text(text)
-                .font(.vnDisplay(.caption))
-                .foregroundColor(.vnTextPrimary)
-                .lineSpacing(2)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(VNSpacing.sm)
-        .background(background.opacity(0.6))
-        .clipShape(RoundedRectangle(cornerRadius: VNCornerRadius.small))
-        .overlay(
-            RoundedRectangle(cornerRadius: VNCornerRadius.small)
-                .stroke(Color.vnBorderSubtle.opacity(0.6), lineWidth: VNBorderWidth.hairline)
-        )
-        .accessibilityElement(children: .combine)
+        ]
     }
 }
 

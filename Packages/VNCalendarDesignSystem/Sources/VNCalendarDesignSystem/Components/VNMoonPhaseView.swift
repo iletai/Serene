@@ -48,6 +48,71 @@ public enum VNMoonPhaseType: String, Sendable, Codable, CaseIterable {
     }
 }
 
+/// Lit part of the moon for a lunar day (design.html `moonSVG`): a semicircle plus an elliptical terminator.
+/// Lunar day 1 (new moon) has no lit area. Works for any day, including 30-day months.
+public struct VNMoonPhaseShape: Shape {
+    public let lunarDay: Int
+    private static let samples = 64
+
+    public init(lunarDay: Int) {
+        self.lunarDay = lunarDay
+    }
+
+    public func path(in rect: CGRect) -> Path {
+        var path = Path()
+        guard lunarDay != 1 else { return path }
+        let phase = Double(lunarDay - 1) / 29.53
+        let cosine = cos(2 * .pi * phase)
+        let waxing = phase < 0.5
+        let radius = min(rect.width, rect.height) / 2
+        let centerX = rect.midX
+        let centerY = rect.midY
+        let limbSide: CGFloat = waxing ? 1 : -1
+        let terminatorSide: CGFloat = (cosine > 0) == waxing ? 1 : -1
+        let terminatorRadius = radius * abs(cosine)
+        path.move(to: CGPoint(x: centerX, y: centerY - radius))
+        for step in 1...Self.samples {
+            let angle = Double(step) / Double(Self.samples) * .pi
+            path.addLine(to: CGPoint(x: centerX + limbSide * radius * sin(angle), y: centerY - radius * cos(angle)))
+        }
+        for step in 1...Self.samples {
+            let angle = Double(step) / Double(Self.samples) * .pi
+            path.addLine(to: CGPoint(
+                x: centerX + terminatorSide * terminatorRadius * sin(angle),
+                y: centerY + radius * cos(angle)
+            ))
+        }
+        path.closeSubpath()
+        return path
+    }
+}
+
+/// Moon disc: dark side, lit phase, hairline rim. `onArt` uses the translucent white dark side meant for photo backgrounds.
+public struct VNMoonDisc: View {
+    public let lunarDay: Int
+    public let size: CGFloat
+    public let onArt: Bool
+
+    public init(lunarDay: Int, size: CGFloat, onArt: Bool = false) {
+        self.lunarDay = max(1, min(30, lunarDay))
+        self.size = size
+        self.onArt = onArt
+    }
+
+    public var body: some View {
+        ZStack {
+            Circle().fill(onArt ? Color.white.opacity(0.16) : Color(light: Color(hex: 0xDDE3EF), dark: Color(hex: 0x2A3350)))
+            VNMoonPhaseShape(lunarDay: lunarDay).fill(Color.vnAccentImperialGold)
+            Circle().strokeBorder(
+                Color(light: Color(hex: 0x0E1526, alpha: 0.18), dark: Color(hex: 0xF1F4FA, alpha: 0.16)),
+                lineWidth: max(0.5, size * 0.8 / 24)
+            )
+        }
+        .frame(width: size, height: size)
+        .accessibilityHidden(true)
+    }
+}
+
 public struct VNMoonPhaseView: View {
     public let lunarDay: Int
     public let size: CGFloat
@@ -76,21 +141,7 @@ public struct VNMoonPhaseView: View {
 
     public var body: some View {
         HStack(spacing: VNSpacing.xs) {
-            ZStack {
-                // Background disc tinted by phase: gold for full moon, neutral otherwise
-                Circle()
-                    .fill(isFullMoon ? Color.vnGoldContainer : Color.vnBackgroundTertiary)
-                    .frame(width: size, height: size)
-
-                // Moon icon based on phase
-                Image(systemName: moonSystemIcon)
-                    .font(.system(size: size * 0.82))
-                    .foregroundColor(isFullMoon ? Color.vnOnGoldContainer : Color.vnTextSecondary)
-                    .shadow(
-                        color: isFullMoon ? Color.vnAccentImperialGold.opacity(0.35) : Color.clear,
-                        radius: isFullMoon ? VNShadow.card.radius : 0
-                    )
-            }
+            VNMoonDisc(lunarDay: lunarDay, size: size)
 
             if showTitle {
                 VStack(alignment: .leading, spacing: VNSpacing.space2) {
@@ -110,28 +161,5 @@ public struct VNMoonPhaseView: View {
 
     private var isFullMoon: Bool {
         lunarDay == 15
-    }
-
-    private var moonSystemIcon: String {
-        switch lunarDay {
-        case 1:
-            return "moonphase.new.moon"
-        case 2...5:
-            return "moonphase.waxing.crescent"
-        case 6...9:
-            return "moonphase.first.quarter"
-        case 10...14:
-            return "moonphase.waxing.gibbous"
-        case 15:
-            return "moonphase.full.moon"
-        case 16...20:
-            return "moonphase.waning.gibbous"
-        case 21...24:
-            return "moonphase.last.quarter"
-        case 25...30:
-            return "moonphase.waning.crescent"
-        default:
-            return "moonphase.new.moon"
-        }
     }
 }

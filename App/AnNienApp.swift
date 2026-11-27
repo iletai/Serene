@@ -17,6 +17,15 @@ struct AnNienApp: App {
     @State private var scheduleTask: Task<Void, Never>?
     @State private var updateAction: AppUpdateAction = .none
     @State private var deepLinks = DeepLinkCenter.shared
+    @AppStorage("onboarding.completed") private var onboardingCompleted = false
+    /// Under UI tests the walkthrough would cover the screen being driven, so it is never shown.
+    private let skipsOnboarding: Bool = {
+        #if DEV
+        UITestSupport.isActive
+        #else
+        false
+        #endif
+    }()
 
     init() {
         // Must be set before launch finishes so a cold-start notification tap is delivered.
@@ -44,6 +53,32 @@ struct AnNienApp: App {
         }
     }
 
+    private var needsOnboarding: Bool { !onboardingCompleted && !skipsOnboarding }
+
+    /// One cover for both screens: two `.fullScreenCover`s on one view show only one, so a forced
+    /// update could be dropped on first launch. Update wins; onboarding follows if still pending.
+    private var showsCover: Binding<Bool> {
+        Binding(
+            get: { updateAction != .none || needsOnboarding },
+            set: {
+                guard !$0 else { return }
+                if updateAction != .none { updateAction = .none } else { onboardingCompleted = true }
+            }
+        )
+    }
+
+    @ViewBuilder
+    private var coverContent: some View {
+        if updateAction != .none {
+            ForceUpdateView(viewModel: ForceUpdateViewModel(action: updateAction) { updateAction = .none })
+        } else {
+            OnboardingView(viewModel: OnboardingViewModel(
+                requestNotifications: { (try? await container.notificationEngine.requestAuthorization()) ?? false },
+                onFinish: { onboardingCompleted = true }
+            ))
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             MainTabView(pendingDeepLink: $deepLinks.pendingAction)
@@ -52,9 +87,18 @@ struct AnNienApp: App {
                 .onOpenURL { deepLinks.open($0) }
                 .preferredColorScheme(preferredScheme)
                 .environment(\.locale, selectedLocale)
+                .fullScreenCover(isPresented: showsCover) {
+                    coverContent
+                    // Covers do not pick up modifiers applied after the presenting view's own.
+                    .preferredColorScheme(preferredScheme)
+                    .environment(\.locale, selectedLocale)
+                }
                 .task {
-                    // Initial permissions & background synchronization
-                    _ = try? await container.notificationEngine.requestAuthorization()
+                    // Initial permissions & background synchronization. While onboarding is up it owns the
+                    // notification prompt (page 3); if skipped, the onboardingCompleted onChange asks instead.
+                    if onboardingCompleted || skipsOnboarding {
+                        _ = try? await container.notificationEngine.requestAuthorization()
+                    }
                     if await ContentSyncPolicy.autoSyncAllowed() {
                         try? await container.syncRemoteContent()
                     }
@@ -64,10 +108,11 @@ struct AnNienApp: App {
                     await AppUpdateService.shared.check()
                     updateAction = AppUpdateService.shared.action
                 }
-                .appUpdateSheet(
-                    action: $updateAction,
-                    accentColor: Color.vnCinnabarLacquerRed
-                )
+                .onChange(of: onboardingCompleted) { _, done in
+                    // Skip / "Để sau" never reach page 3; the system shows the prompt only once, so this is a no-op otherwise.
+                    guard done else { return }
+                    Task { _ = try? await container.notificationEngine.requestAuthorization() }
+                }
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
                         Task { await ads.start() }

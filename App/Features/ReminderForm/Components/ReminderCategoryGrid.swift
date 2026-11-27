@@ -8,13 +8,7 @@ struct ReminderCategoryGrid: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VNSpacing.sm) {
-            Text("reminder.category_header")
-                .font(.vnDisplay(.caption2, weight: .medium))
-                .tracking(0.66)
-                .foregroundColor(.vnAccentGoldText)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
-                .accessibilityAddTraits(.isHeader)
+            VNGroupHeader(String(localized: "reminder.category_header"))
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: VNSpacing.sm) {
                 categoryCard(cat: .deathAnniversary, icon: "flame.fill", subtitle: String(localized: "reminder.cat.death_anniversary_desc"), isMain: true)
@@ -38,6 +32,7 @@ struct ReminderCategoryGrid: View {
                         .font(.subheadline.weight(.bold))
                         .foregroundColor(isSelected ? .vnAccentHeritageRed : .vnAccentGoldText)
                         .frame(width: iconBox, height: iconBox)
+                        .vnBeat(active: isSelected && cat == .wedding)
                         .accessibilityHidden(true)
                         .background(
                             RoundedRectangle(cornerRadius: VNCornerRadius.small)
