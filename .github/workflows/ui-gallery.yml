@@ -1,62 +1,70 @@
 name: UI Gallery
 
+# Reusable: called from ci.yml (PR / feature push) and from every deploy-*.yml, so each run page shows the screens.
+# Output: GitHub Actions Job Summary (images in a light/dark table) + artifact `ui-gallery` (full-res PNGs + index.html)
+# + sticky PR comment on pull requests. Never blocks a deploy: callers run it as a sibling job.
 on:
-  push:
-    branches: ['feat/**']
-  pull_request:
-    paths:
-      - 'App/**'
-      - 'Packages/**'
-      - 'project.yml'
-      - 'Tests/UITests/**'
-      - 'scripts/ui-gallery/**'
-      - '.github/workflows/ui-gallery.yml'
+  workflow_call:
+    inputs:
+      scheme:
+        type: string
+        default: AnNien-Dev
+      configuration:
+        type: string
+        default: Debug-Development
+      ui-test-target:
+        type: string
+        default: AnNienUITests
+      simulator:
+        type: string
+        default: iPhone 16 Pro
+      locale:
+        type: string
+        default: vi
+      xcode-version:
+        type: string
+        default: latest-stable
   workflow_dispatch:
 
 permissions:
   contents: read
-  pull-requests: write
-
-concurrency:
-  group: ui-gallery-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  SIMULATOR: iPhone 16 Pro
-  RESULT_BUNDLE: ${{ github.workspace }}/build/ui-gallery.xcresult
-  GALLERY_DIR: ${{ github.workspace }}/build/ui-gallery
 
 jobs:
   gallery:
-    name: Build UI gallery
-    runs-on: macos-15
-    timeout-minutes: 60
-
+    name: UI Screenshot Gallery
+    runs-on: macos-26
+    timeout-minutes: 45
+    # A caller job must grant at least these.
+    permissions:
+      contents: write        # push the ui-gallery branch (thumbnails)
+      pull-requests: write   # sticky PR comment
+    concurrency:
+      group: ui-gallery-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      SIMULATOR: ${{ inputs.simulator || 'iPhone 16 Pro' }}
+      LOCALE: ${{ inputs.locale || 'vi' }}
+      SCHEME: ${{ inputs.scheme || 'AnNien-Dev' }}
+      CONFIGURATION: ${{ inputs.configuration || 'Debug-Development' }}
+      UI_TEST_TARGET: ${{ inputs.ui-test-target || 'AnNienUITests' }}
+      OUT: ${{ github.workspace }}/build/ui-gallery
+      RESULT: ${{ github.workspace }}/build/ui-gallery.xcresult
+      # Fork PRs get a read-only token: no branch push, no comment; the artifact still works.
+      CAN_PUBLISH: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Select latest stable Xcode
-        uses: maxim-lobanov/setup-xcode@v1
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90  # v1
         with:
-          xcode-version: latest-stable
-
-      - name: Install Tooling
+          xcode-version: ${{ inputs.xcode-version || 'latest-stable' }}
+      - name: Install tooling
+        run: which xcodegen || brew install xcodegen
+      - name: Write secrets xcconfig
+        # Explicit secret mapping only (never toJSON(secrets)); Config/Secrets.xcconfig is gitignored and not uploaded.
+        env:
+          MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
         run: |
-          which xcodegen || brew install xcodegen
-          which xcbeautify || brew install xcbeautify
-
-      - name: Generate Xcode Project
-        run: xcodegen generate
-
-      - name: SPM Dependency Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved', 'project.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
-
+          [ -n "$MICROCMS_API_KEY" ] && printf 'MICROCMS_API_KEY = %s\n' "$MICROCMS_API_KEY" > Config/Secrets.xcconfig || true
+      - run: xcodegen generate
       - name: Boot simulator
         run: |
           # Exact name first; fall back to any iPhone if this Xcode ships different models.
@@ -64,79 +72,83 @@ jobs:
           import json, os, sys
           devices = [d for ds in json.load(sys.stdin)["devices"].values() for d in ds]
           exact = [d for d in devices if d["name"] == os.environ["SIMULATOR"]]
-          print((exact or [d for d in devices if d["name"].startswith("iPhone")])[0]["udid"])
-          ')
-          echo "Using simulator $udid"
-          echo "SIM_UDID=$udid" >> "$GITHUB_ENV"
-          xcrun simctl boot "$udid" || true
-          xcrun simctl bootstatus "$udid" -b
-
+          chosen = (exact or [d for d in devices if d["name"].startswith("iPhone")])[0]
+          print(chosen["udid"], chosen["name"], sep="|")')
+          echo "SIM_UDID=${udid%%|*}" >> "$GITHUB_ENV"
+          echo "SIM_NAME=${udid#*|}" >> "$GITHUB_ENV"
+          xcrun simctl boot "${udid%%|*}" || true
+          xcrun simctl bootstatus "${udid%%|*}" -b
       - name: Run UIGalleryTests
+        # A failing test still leaves screenshots (they show the bug); the gallery is built either way.
+        continue-on-error: true
+        env:
+          # TEST_RUNNER_ vars are forwarded to the XCUITest runner (read as UI_GALLERY / UI_GALLERY_LOCALE).
+          TEST_RUNNER_UI_GALLERY: '1'
+          TEST_RUNNER_UI_GALLERY_LOCALE: ${{ env.LOCALE }}
         run: |
-          set -o pipefail
           xcodebuild test \
-            -scheme AnNien-Dev \
-            -configuration Debug-Development \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
             -destination "platform=iOS Simulator,id=$SIM_UDID" \
-            -only-testing:AnNienUITests/UIGalleryTests \
-            -resultBundlePath "$RESULT_BUNDLE" \
-            2>&1 | xcbeautify --renderer github-actions
-
+            -only-testing:"$UI_TEST_TARGET/UIGalleryTests" \
+            -resultBundlePath "$RESULT"
       - name: Build gallery
-        if: always()
+        if: always() && hashFiles('build/ui-gallery.xcresult/**') != ''
         run: |
-          if [ -d "$RESULT_BUNDLE" ]; then
-            scripts/ui-gallery/build-gallery.sh "$RESULT_BUNDLE" "$GALLERY_DIR"
-          fi
-
-      - name: Upload gallery
-        if: always()
+          export_dir=$(mktemp -d)
+          xcrun xcresulttool export attachments --path "$RESULT" --output-path "$export_dir"
+          # Job Summary cannot embed artifacts and strips data: URIs, so images need a URL: thumbnails go to branch ui-gallery.
+          # Forks cannot push, so their summary lists names only (empty base).
+          base=""
+          [ "$CAN_PUBLISH" = "true" ] && base="https://github.com/$GITHUB_REPOSITORY/blob/ui-gallery/runs/$GITHUB_RUN_ID/thumbs"
+          python3 -I scripts/ui-gallery/gallery.py "$export_dir" "$OUT" --image-base "$base" \
+            --device "$SIM_NAME" --locale "$LOCALE" --sha "$GITHUB_SHA" --build "$GITHUB_RUN_NUMBER" \
+            --artifact-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID#artifacts"
+      - name: Publish thumbnails to branch ui-gallery
+        # Flat orphan branch (history rewritten each time, newest 30 runs kept) keeps the repo small.
+        if: always() && env.CAN_PUBLISH == 'true' && hashFiles('build/ui-gallery/thumbs/*') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          remote="https://github.com/$GITHUB_REPOSITORY.git"
+          # Header auth keeps the token out of .git/config and out of error output.
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64)"
+          pub=$(mktemp -d)
+          git -c http.extraheader="$auth" clone --quiet --depth 1 --branch ui-gallery "$remote" "$pub" 2>/dev/null || git init --quiet -b ui-gallery "$pub"
+          cd "$pub"
+          mkdir -p "runs/$GITHUB_RUN_ID"
+          cp -R "$OUT/thumbs" "runs/$GITHUB_RUN_ID/thumbs"
+          (cd runs && printf '%s\n' * | sort -rn | tail -n +31 | xargs rm -rf)
+          git checkout --quiet --orphan flat
+          git add -A
+          git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit --quiet -m "ui-gallery: run $GITHUB_RUN_ID"
+          git -c http.extraheader="$auth" push --quiet --force "$remote" flat:ui-gallery
+      - name: Upload gallery artifact
+        if: always() && hashFiles('build/ui-gallery/index.html') != ''
         uses: actions/upload-artifact@v4
         with:
           name: ui-gallery
-          path: ${{ env.GALLERY_DIR }}
+          path: build/ui-gallery
           if-no-files-found: warn
-
-      - name: Upload result bundle
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-gallery-xcresult
-          path: ${{ env.RESULT_BUNDLE }}
-          if-no-files-found: warn
-
-      - name: Job summary
+      - name: Job Summary
         if: always()
         run: |
-          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-          {
-            echo "## UI gallery"
-            echo "Artifact **ui-gallery** (open \`index.html\`) on [this run]($run_url#artifacts)."
-            echo
-            cat "$GALLERY_DIR/summary.md" 2>/dev/null || echo "No screenshots were produced."
-          } >> "$GITHUB_STEP_SUMMARY"
-
+          if [ -f "$OUT/summary.md" ]; then cat "$OUT/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          else echo "## UI Screenshot Gallery: no screenshots were produced" >> "$GITHUB_STEP_SUMMARY"; fi
       - name: Sticky PR comment
-        if: always() && github.event_name == 'pull_request'
-        # Fork PRs get a read-only token; a missing comment must not fail the gallery job.
+        if: always() && github.event_name == 'pull_request' && env.CAN_PUBLISH == 'true'
         continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
             const marker = '<!-- ui-gallery -->';
-            const summaryPath = `${process.env.GALLERY_DIR}/summary.md`;
-            const summary = fs.existsSync(summaryPath)
-              ? fs.readFileSync(summaryPath, 'utf8')
-              : 'No screenshots were produced.';
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const body = `${marker}\n### UI gallery\nDownload artifact **ui-gallery** from [this run](${runUrl}#artifacts) and open \`index.html\`.\n\n${summary}`;
+            const file = `${process.env.OUT}/summary.md`;
+            const body = `${marker}\n${fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : 'No screenshots were produced.'}`;
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
             const existing = comments.find(c => c.body && c.body.startsWith(marker));
-            if (existing) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
-            } else {
-              await github.rest.issues.createComment({ owner, repo, issue_number, body });
-            }
+            if (existing) await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            else await github.rest.issues.createComment({ owner, repo, issue_number, body });
