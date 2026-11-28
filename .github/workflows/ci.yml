@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, develop]
   push:
-    branches: [develop, main, 'feat/**']
+    branches: [develop, main, 'feat/*']
   workflow_dispatch:
 
 concurrency:
@@ -16,4 +16,12 @@ jobs:
     uses: iletai/ios-shared/.github/workflows/ios-ci.yml@main
     with:
       xcconfig-secrets: MICROCMS_API_KEY
+    secrets: inherit
+
+  # Non-gating sibling: never delays or blocks the jobs above.
+  gallery:
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/ui-gallery.yml
     secrets: inherit

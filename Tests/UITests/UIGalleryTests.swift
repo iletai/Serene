@@ -13,6 +13,11 @@ final class UIGalleryTests: XCTestCase {
 
     private static var didCheckSystemAlert = false
 
+    override func setUpWithError() throws {
+        // Forwarded from TEST_RUNNER_UI_GALLERY; keeps the normal `fastlane test` run from paying for the gallery.
+        try XCTSkipUnless(ProcessInfo.processInfo.environment["UI_GALLERY"] == "1", "gallery runs only in ui-gallery.yml")
+    }
+
     func testCalendar() {
         gallery("calendar", route: "calendar", anchor: "Lịch Ngày", scrollsToBottom: true)
     }

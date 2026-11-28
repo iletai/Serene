@@ -18,3 +18,11 @@ jobs:
       # Config/Secrets.xcconfig (gitignored), read by Shared.xcconfig -> App/Info.plist
       xcconfig-secrets: MICROCMS_API_KEY
     secrets: inherit
+
+  # Non-gating sibling: never delays or blocks the jobs above.
+  gallery:
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/ui-gallery.yml
+    secrets: inherit
